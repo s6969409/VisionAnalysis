@@ -40,7 +40,7 @@ namespace VisionAnalysis
             get => GetValue(PValueProperty);
             set{
                 SetValue(PValueProperty, value);
-                tb.Text = value.ToString();
+                tb.Text = value == null ? "" : value.ToString();
             }
         }
         public event TextChangedEventHandler PValueChanged;

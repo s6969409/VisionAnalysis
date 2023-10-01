@@ -7,6 +7,24 @@
         xmlns:EmguUI="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.Platform.NetFramework"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded">
+    <Window.Resources>
+        <HierarchicalDataTemplate x:Key="TreeNode" ItemsSource="{Binding childNodes}">
+            <StackPanel Orientation="Horizontal" MouseDown="tvi_MouseDown" MouseMove="tvi_MouseMove">
+                <TextBlock Text="{Binding name}"/>
+                <StackPanel.ContextMenu>
+                    <ContextMenu Visibility="{Binding contextMenuVisibility}"
+                                 FontSize="{Binding FontSize}">
+                        <MenuItem Header="Remove" Click="MenuItem_Click"/>
+                        <Separator/>
+                        <MenuItem Header="Cut" Click="MenuItem_Click" IsEnabled="False"/>
+                        <MenuItem Header="Copy" Click="MenuItem_Click" IsEnabled="False"/>
+                        <MenuItem Header="Past" Click="MenuItem_Click" Loaded="MenuItem_Loaded"/>
+
+                    </ContextMenu>
+                </StackPanel.ContextMenu>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -30,7 +48,7 @@
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
 
-            <TreeView x:Name="tvl" ItemTemplate="{StaticResource TreeNode}" MouseDoubleClick="tvl_MouseDoubleClick"/>
+            <TreeView x:Name="tvl" ItemTemplate="{StaticResource TreeNode}" MouseDoubleClick="tvl_MouseDoubleClick" SelectedItemChanged="tvl_SelectedItemChanged"/>
             <Canvas x:Name="tvlCanvas"/>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" ShowsPreview="true" Width="5"/>
             <Image x:Name="img" Grid.Column="2"/>

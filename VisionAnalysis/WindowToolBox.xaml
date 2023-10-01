@@ -6,5 +6,12 @@
         xmlns:local="clr-namespace:VisionAnalysis"
         mc:Ignorable="d"
         Title="WindowToolBox" Height="450" Width="300">
-    <TreeView x:Name="tv" ItemTemplate="{StaticResource TreeNode}" Loaded="tv_Loaded"/>
+    <Window.Resources>
+        <HierarchicalDataTemplate x:Key="TreeNode_ToolBox" ItemsSource="{Binding childNodes}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding name}"/>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
+    <TreeView x:Name="tv" ItemTemplate="{StaticResource TreeNode_ToolBox}" Loaded="tv_Loaded" MouseDoubleClick="tv_MouseDoubleClick"/>
 </Window>

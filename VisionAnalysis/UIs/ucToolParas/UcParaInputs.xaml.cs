@@ -23,15 +23,17 @@ namespace VisionAnalysis
     /// </summary>
     public partial class UcParaInputs : UserControl, IToolEditParas
     {
-        public UcParaInputs(List<Nd> nodes)
+        private ObservableRangeCollection<Nd> nodes;
+        public UcParaInputs(ObservableRangeCollection<Nd> nodes)
         {
             InitializeComponent();
+            this.nodes = nodes;
             #region read save paras or default value...
-            Inputs["ImageUrl"] = new IInput() { value = "" };
-            Outputs["SourceImage"] = null;
+            Inputs["ImageUrl"] = new PInput() { value = "" };
+            Outputs["SourceImage"] = new POutput();
             #endregion
         }
-        public UcParaInputs(List<Nd> nodes, JObject inputs) : this(nodes)
+        public UcParaInputs(ObservableRangeCollection<Nd> nodes, JObject inputs) : this(nodes)
         {
             ucT_ImageUrl.PValue = (string)inputs["ImageUrl"];
         }
@@ -39,14 +41,14 @@ namespace VisionAnalysis
         #region implement IToolEditParas member
         public string ToolName { get; set; }
         public Image UIImage { get; set; }
-        public Dictionary<string, IInput> Inputs { get; } = new Dictionary<string, IInput>();
-        public Dictionary<string, object> Outputs { get; } = new Dictionary<string, object>();
+        public Dictionary<string, PInput> Inputs { get; } = new Dictionary<string, PInput>();
+        public Dictionary<string, POutput> Outputs { get; } = new Dictionary<string, POutput>();
         public Action actionProcess => () =>
         {
             if (File.Exists(ucT_ImageUrl.PValue.ToString()))
             {
-                Outputs["SourceImage"] = new Mat(ucT_ImageUrl.PValue.ToString());
-                updateUIImage((Mat)Outputs["SourceImage"]);
+                Outputs["SourceImage"].value = new Mat(ucT_ImageUrl.PValue.ToString());
+                updateUIImage((Mat)Outputs["SourceImage"].value);
             }
         };
         public Func<string, JObject> getJObjectAndSaveImg => (imgDirPath) =>
