@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:VisionAnalysis"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel>
-        <local:UcText PName="ImageUrl" x:Name="ucT_ImageUrl" PValueChanged="ImageUrlChanged"/>
-    </StackPanel>
+    <Grid>
+        
+    </Grid>
 </UserControl>

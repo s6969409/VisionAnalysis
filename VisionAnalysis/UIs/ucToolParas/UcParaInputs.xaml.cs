@@ -35,7 +35,7 @@ namespace VisionAnalysis
         }
         public UcParaInputs(ObservableRangeCollection<Nd> nodes, JObject inputs) : this(nodes)
         {
-            ucT_ImageUrl.PValue = (string)inputs["ImageUrl"];
+            Inputs["ImageUrl"].value = (string)inputs["ImageUrl"];
         }
 
         #region implement IToolEditParas member
@@ -45,9 +45,9 @@ namespace VisionAnalysis
         public Dictionary<string, POutput> Outputs { get; } = new Dictionary<string, POutput>();
         public Action actionProcess => () =>
         {
-            if (File.Exists(ucT_ImageUrl.PValue.ToString()))
+            if (File.Exists(Inputs["ImageUrl"].value.ToString()))
             {
-                Outputs["SourceImage"].value = new Mat(ucT_ImageUrl.PValue.ToString());
+                Outputs["SourceImage"].value = new Mat(Inputs["ImageUrl"].value.ToString());
                 updateUIImage((Mat)Outputs["SourceImage"].value);
             }
         };
@@ -65,10 +65,6 @@ namespace VisionAnalysis
         };
         #endregion
 
-        private void ImageUrlChanged(object newValue)
-        {
-            Inputs["ImageUrl"].value = newValue;
-        }
         private void updateUIImage(Mat mat)
         {
             if (UIImage != null) UIImage.Source = Tools.ToBitmapSource(mat);

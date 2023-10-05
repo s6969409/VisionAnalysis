@@ -59,7 +59,15 @@ namespace VisionAnalysis
             foreach (Nd nd in nodes)
             {
                 IToolEditParas tool = (IToolEditParas)nd.value;
-                tool.actionProcess();
+                try
+                {
+                    tool.actionProcess();
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.ToString(), $"{tool.ToolName} Exception!");
+                    break;
+                }
             }
         }
         private void Load_Click(object sender, RoutedEventArgs e)

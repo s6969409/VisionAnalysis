@@ -33,9 +33,7 @@ namespace VisionAnalysis
             InitializeComponent();
             this.nodes = nodes;
             #region read save paras or default value...
-            Inputs["InputImage"] = new PInput() {
-                ToolName = "Inputs", ParaName = "SourceImage",
-                value = new Mat() };
+            Inputs["InputImage"] = new PInput() { value = new Mat() };
             Inputs["threshold"] = new PInput() { value = 100 };
             Inputs["maxValue"] = new PInput() { value = 200 };
             Inputs["thresholdType"] = new PInput() { value = ThresholdType.Binary };
@@ -90,8 +88,6 @@ namespace VisionAnalysis
                         {
                             if (pNameKey == Inputs[inputKey].ParaName && toolEditParas.Outputs[pNameKey].value != null)
                             {
-                                Mat mat = (Mat)toolEditParas.Outputs[pNameKey].value;
-
                                 Inputs[inputKey].value = toolEditParas.Outputs[pNameKey].value;
                                 break;
                             }
