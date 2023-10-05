@@ -136,6 +136,7 @@ namespace VisionAnalysis
         private void tvl_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             Nd selected = tvl.SelectedItem as Nd;
+            if (selected == null) return;
             if(selected.value is Mat)
             {
                 img.Source = Tools.ToBitmapSource((Mat)selected.value);

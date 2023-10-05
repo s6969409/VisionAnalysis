@@ -37,9 +37,9 @@
                         </Grid.RowDefinitions>
                         <ListView x:Name="lv_inputs" SelectionChanged="lv_inputs_SelectionChanged"/>
                         <StackPanel Grid.Row="1">
-                            <local:UcText PName="ToolName" x:Name="ucT_ToolName"/>
-                            <local:UcText PName="ParaName" x:Name="ucT_ParaName"/>
-                            <local:UcText PName="value" x:Name="ucT_value"/>
+                            <local:UcText PName="ToolName" x:Name="ucT_ToolName" PValueChanged="ucT_ToolName_PValueChanged"/>
+                            <local:UcText PName="ParaName" x:Name="ucT_ParaName" PValueChanged="ucT_ParaName_PValueChanged"/>
+                            <local:UcText PName="value" x:Name="ucT_value" PValueChanged="ucT_value_PValueChanged"/>
                         </StackPanel>
                     </Grid>
                 </TabItem>

@@ -88,7 +88,7 @@ namespace VisionAnalysis
                         IToolEditParas toolEditParas = nd.value as IToolEditParas;
                         foreach (string pNameKey in toolEditParas.Outputs.Keys)
                         {
-                            if (pNameKey == Inputs[inputKey].ParaName && toolEditParas.Outputs[pNameKey] != null)
+                            if (pNameKey == Inputs[inputKey].ParaName && toolEditParas.Outputs[pNameKey].value != null)
                             {
                                 Mat mat = (Mat)toolEditParas.Outputs[pNameKey].value;
 

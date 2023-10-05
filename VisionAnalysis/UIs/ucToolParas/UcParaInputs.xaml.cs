@@ -65,9 +65,9 @@ namespace VisionAnalysis
         };
         #endregion
 
-        private void tb_path_TextChanged(object sender, TextChangedEventArgs e)
+        private void ImageUrlChanged(object newValue)
         {
-            Inputs["ImageUrl"].value = ucT_ImageUrl.PValue.ToString();
+            Inputs["ImageUrl"].value = newValue;
         }
         private void updateUIImage(Mat mat)
         {

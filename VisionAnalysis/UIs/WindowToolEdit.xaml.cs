@@ -31,8 +31,6 @@ namespace VisionAnalysis
             lv_inputs.ItemsSource = toolEditParas.Inputs.Keys;
         }
 
-        public object this[string key] { get => 0; }
-
         private void Run_Click(object sender, RoutedEventArgs e)
         {
             ((IToolEditParas)ucPara).actionProcess();
@@ -45,6 +43,27 @@ namespace VisionAnalysis
             ucT_ToolName.PValue = toolEditParas.Inputs[paraName].ToolName;
             ucT_ParaName.PValue = toolEditParas.Inputs[paraName].ParaName;
             ucT_value.PValue = toolEditParas.Inputs[paraName].value;
+        }
+
+        private void ucT_ToolName_PValueChanged(object newValue)
+        {
+            string paraName = lv_inputs.SelectedItem as string;
+            IToolEditParas toolEditParas = (IToolEditParas)ucPara;
+            toolEditParas.Inputs[paraName].ToolName = newValue.ToString();
+        }
+
+        private void ucT_ParaName_PValueChanged(object newValue)
+        {
+            string paraName = lv_inputs.SelectedItem as string;
+            IToolEditParas toolEditParas = (IToolEditParas)ucPara;
+            toolEditParas.Inputs[paraName].ParaName = newValue.ToString();
+        }
+
+        private void ucT_value_PValueChanged(object newValue)
+        {
+            string paraName = lv_inputs.SelectedItem as string;
+            IToolEditParas toolEditParas = (IToolEditParas)ucPara;
+            toolEditParas.Inputs[paraName].value = newValue.ToString();
         }
     }
 
