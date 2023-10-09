@@ -25,19 +25,31 @@ namespace VisionAnalysis
     {
         private ObservableRangeCollection<Nd> nodes = new ObservableRangeCollection<Nd>();
         private TVImoveByMouse tVImoveByMouse;
+        private WindowToolBox toolBox;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            tVImoveByMouse = new TVImoveByMouse(this, tvl, tvl_Move);
-
-            WindowToolBox window = new WindowToolBox(addTool);
-            window.Show();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            #region initial fronSize
+            int fontSize = WindowPreference.getCfgValue<int>(
+                WindowPreference.fontSize);
+            if (fontSize == 0)
+            {
+                fontSize = 16;
+                WindowPreference.saveCfgValue(WindowPreference.fontSize, fontSize);
+            }
+            FontSize = fontSize;
+            #endregion
+
+            #region UI setting
+            tVImoveByMouse = new TVImoveByMouse(this, tvl, tvl_Move);
+            toolBox = new WindowToolBox(addTool);
+            #endregion
+
             Mat mat = new Mat();
             nodes.Clear();
             
@@ -47,26 +59,52 @@ namespace VisionAnalysis
             tvl.ItemsSource = nodes;
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            Application.Current.Shutdown();
+        }
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            if(e.Key == Key.F2)
+            {
+                Hide();
+                WindowPreference window = new WindowPreference();
+                WindowControlHelper.WindowInitial(window, this,
+                    WindowControlHelper.WindowLocation.OwnCenter);
+                window.ShowDialog();
+                Show();
+            }
+        }
+
         private void tvl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             Nd selectNd = tvl.SelectedItem as Nd;
-            if(selectNd.value is IToolEditParas)
+            if(selectNd != null && selectNd.value is IToolEditParas)
                 new WindowToolEdit((UserControl)selectNd.value) { Title = selectNd.name }.Show();
         }
 
+        #region ToolBar click event
         private void Run_Click(object sender, RoutedEventArgs e)
         {
+            #region runException read
+            bool runException = WindowPreference.getCfgValue<bool>(
+                WindowPreference.runException);
+            #endregion
+
             foreach (Nd nd in nodes)
             {
                 IToolEditParas tool = (IToolEditParas)nd.value;
-                try
+                if(runException) tool.actionProcess();
+                else
                 {
-                    tool.actionProcess();
-                }
-                catch(Exception ex)
-                {
-                    MessageBox.Show(ex.ToString(), $"{tool.ToolName} Exception!");
-                    break;
+                    try { tool.actionProcess(); }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString(), $"{tool.ToolName} Exception!");
+                        break;
+                    }
                 }
             }
         }
@@ -119,6 +157,12 @@ namespace VisionAnalysis
 
             File.WriteAllText(savePath, jArray.ToString());
         }
+        private void ToolBox_Click(object sender, RoutedEventArgs e)
+        {
+            WindowControlHelper.WindowInitialShow(toolBox, this,
+                    WindowControlHelper.WindowLocation.Left);
+        }
+        #endregion
 
         #region events for TreeViewItem move by mouse hold
         private void tvi_MouseDown(object sender, MouseButtonEventArgs e)
@@ -239,10 +283,17 @@ namespace VisionAnalysis
                 }
             }
 
-            Nd ToolThresHold = new Nd(new UcParaThresHold(nodes) { ToolName = toolName });
-            nodes.Add(ToolThresHold);
+            Nd addNd;
+            if (type == typeof(UcParaThresHold))
+            {
+                addNd = new Nd(new UcParaThresHold(nodes) { ToolName = toolName });
+            }
+            else { addNd = null; }
+
+            nodes.Add(addNd);
         }
         #endregion
+
 
     }
 
@@ -271,7 +322,7 @@ namespace VisionAnalysis
         {
             get
             {
-                if(value is IToolEditParas)
+                if (value is IToolEditParas)
                 {
                     IToolEditParas toolEditParas = value as IToolEditParas;
                     return toolEditParas.ToolName;
@@ -300,14 +351,12 @@ namespace VisionAnalysis
         public Nd(string name, object value) { _name = name; this.value = value; }
 
         public bool CanExpand => childNodes.Count != 0;
+        public int FontSize { get => WindowPreference.getCfgValue<int>(WindowPreference.fontSize); }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void onPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

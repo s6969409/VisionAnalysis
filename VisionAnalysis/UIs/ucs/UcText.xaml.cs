@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,24 +24,6 @@ namespace VisionAnalysis
         public UcText()
         {
             InitializeComponent();
-
-            initUI();
-        }
-
-        private void initUI()
-        {
-            textBox.TextChanged += (sender, e) =>
-            {
-                TextBox tb = sender as TextBox;
-                PValue = tb.Text;
-                PValueChanged?.Invoke(PValue);
-            };
-            comboBox.SelectionChanged += (sender, e) =>
-            {
-                ComboBox cb = sender as ComboBox;
-                PValue = cb.SelectedItem;
-                PValueChanged?.Invoke(PValue);
-            };
         }
 
         public event Action<object> PValueChanged;
@@ -58,13 +41,7 @@ namespace VisionAnalysis
         public object PValue
         {
             get => GetValue(PValueProperty);
-            set{
-                SetValue(PValueProperty, value);
-                //tb.Text = value == null ? "" : value.ToString();
-                //做更換UI
-                //先觀察執行順序 2
-                updateUI();
-            }
+            set => SetValue(PValueProperty, value);
         }
 
         private static void onPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
@@ -78,10 +55,7 @@ namespace VisionAnalysis
                 }
                 else if (args.Property.Name.Equals("PValue"))
                 {
-                    //uc.tb.Text = args.NewValue == null ? "" : args.NewValue.ToString();
-                    //先觀察執行順序 1
                     uc.updateUI();
-                    //if(uc.comboBox.Visibility == Visibility.Visible)
                 }
             }
         }
@@ -99,9 +73,18 @@ namespace VisionAnalysis
             else
             {
                 textBox.Text = PValue == null ? "" : PValue.ToString();
-                
             }
+        }
 
+        private void textChange(object sender, TextChangedEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            PValue = tb.Text;
+        }
+        private void selectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox cb = sender as ComboBox;
+            PValue = cb.SelectedItem;
         }
     }
 }

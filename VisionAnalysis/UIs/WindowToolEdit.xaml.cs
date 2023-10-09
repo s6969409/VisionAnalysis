@@ -23,10 +23,16 @@ namespace VisionAnalysis
         public WindowToolEdit(UserControl ucPara)
         {
             InitializeComponent();
+
+            #region initial fronSize
+            int fontSize = WindowPreference.getCfgValue<int>(
+                WindowPreference.fontSize);
+            FontSize = fontSize;
+            #endregion
+
             IToolEditParas toolEditParas = ucPara as IToolEditParas;
             toolEditParas.UIImage = img;
             this.ucPara = ucPara;
-            tbSetting.Content = ucPara;
 
             lv_inputs.ItemsSource = toolEditParas.Inputs.Keys;
         }
@@ -40,30 +46,27 @@ namespace VisionAnalysis
         {
             string paraName = lv_inputs.SelectedItem as string;
             IToolEditParas toolEditParas = (IToolEditParas)ucPara;
-            ucT_ToolName.PValue = toolEditParas.Inputs[paraName].ToolName;
-            ucT_ParaName.PValue = toolEditParas.Inputs[paraName].ParaName;
-            ucT_value.PValue = toolEditParas.Inputs[paraName].value;
-        }
+            DataContext = toolEditParas.Inputs[paraName];
+            
+            //var s = Enum.Parse(typeof(ThresholdType), (string)inputs["thresholdType"])
+            if(toolEditParas.Inputs[paraName].value is Enum)
+            {
+                ComboBox comboBox = new ComboBox();
+                comboBox.ItemsSource = toolEditParas.Inputs[paraName].valueSource;
+                Binding binding = new Binding("value");
+                comboBox.SetBinding(ComboBox.SelectedItemProperty, binding);
 
-        private void ucT_ToolName_PValueChanged(object newValue)
-        {
-            string paraName = lv_inputs.SelectedItem as string;
-            IToolEditParas toolEditParas = (IToolEditParas)ucPara;
-            toolEditParas.Inputs[paraName].ToolName = newValue.ToString();
-        }
+                cc_value.Content = comboBox;
 
-        private void ucT_ParaName_PValueChanged(object newValue)
-        {
-            string paraName = lv_inputs.SelectedItem as string;
-            IToolEditParas toolEditParas = (IToolEditParas)ucPara;
-            toolEditParas.Inputs[paraName].ParaName = newValue.ToString();
-        }
+            }
+            else
+            {
+                TextBox textBox = new TextBox();
+                Binding binding = new Binding("value");
+                textBox.SetBinding(TextBox.TextProperty, binding);
 
-        private void ucT_value_PValueChanged(object newValue)
-        {
-            string paraName = lv_inputs.SelectedItem as string;
-            IToolEditParas toolEditParas = (IToolEditParas)ucPara;
-            toolEditParas.Inputs[paraName].value = newValue.ToString();
+                cc_value.Content = textBox;
+            }
         }
     }
 

@@ -3,6 +3,7 @@ using Emgu.CV.CvEnum;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -54,13 +55,6 @@ namespace VisionAnalysis
             Inputs["threshold"] = new PInput() { value = (int)inputs["threshold"]};
             Inputs["maxValue"] = new PInput() { value = (int)inputs["maxValue"] };
             Inputs["thresholdType"] = new PInput() { value = Enum.Parse(typeof(ThresholdType), (string)inputs["thresholdType"]) };
-        }
-
-        private void NumericTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            // 使用正則表達式確保只允許數值輸入
-            Regex regex = new Regex("[^0-9]+");
-            e.Handled = regex.IsMatch(e.Text);
         }
 
         private T getEnum<T>(object arg)
@@ -141,11 +135,45 @@ namespace VisionAnalysis
         Action actionProcess { get; }
         Func<string, JObject> getJObjectAndSaveImg { get; }
     }
-    public class PInput
+    public class PInput: INotifyPropertyChanged
     {
-        public string ToolName { get; set; }
-        public string ParaName { get; set; }
-        public object value { get; set; }
+        private string _ToolName;
+        public string ToolName
+        {
+            get => _ToolName;
+            set
+            {
+                _ToolName = value;
+                onPropertyChanged(nameof(ToolName));
+            }
+        }
+        private string _ParaName;
+        public string ParaName
+        {
+            get => _ParaName;
+            set
+            {
+                _ParaName = value;
+                onPropertyChanged(nameof(ParaName));
+            }
+        }
+        private object _value;
+        public object value { 
+            get => _value; 
+            set
+            {
+                if(_value == null)
+                {
+                    _value = value;
+                }
+                else
+                {
+                    _value = Convert.ChangeType(value, _value.GetType());
+                }
+
+                onPropertyChanged(nameof(this.value));
+            } 
+        }
         public JObject getJObjectAndSaveImg(string imgDirPath)
         {
             JObject jobject = new JObject();
@@ -161,9 +189,35 @@ namespace VisionAnalysis
 
             return jobject;
         }
+        public Type Type { get => _value == null ? null : _value.GetType(); }
+        public Array valueSource
+        {
+            get => _value == null ? null : Enum.GetValues(_value.GetType());
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void onPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
-    public class POutput
+    public class POutput: INotifyPropertyChanged
     {
-        public object value { get; set; }
+        private object _value;
+        public object value
+        {
+            get => _value;
+            set
+            {
+                _value = value;
+                onPropertyChanged(nameof(value));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void onPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

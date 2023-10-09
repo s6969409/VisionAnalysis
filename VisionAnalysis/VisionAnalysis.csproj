@@ -121,6 +121,9 @@
     <Compile Include="UIs\ucs\UcText.xaml.cs">
       <DependentUpon>UcText.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UIs\ucs\WindowPreference.xaml.cs">
+      <DependentUpon>WindowPreference.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UIs\ucToolParas\Tools.cs" />
     <Compile Include="UIs\ucToolParas\UcParaInputs.xaml.cs">
       <DependentUpon>UcParaInputs.xaml</DependentUpon>
@@ -151,6 +154,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="UIs\ucs\UcText.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIs\ucs\WindowPreference.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

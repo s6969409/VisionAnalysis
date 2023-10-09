@@ -1,0 +1,41 @@
+﻿<Window x:Class="VisionAnalysis.WindowPreference"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VisionAnalysis"
+        mc:Ignorable="d"
+        Title="WindowPreference" Height="450" Width="800" Loaded="Window_Loaded">
+    <Window.Resources>
+        <HierarchicalDataTemplate x:Key="TreeNode" ItemsSource="{Binding childNodes}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding name}"/>
+                <Label Content=":"/>
+                <ContentControl Loaded="ContentControl_Loaded"/>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource PrivacyDarkGray}"/>
+            <Setter Property="Foreground" Value="Yellow"/>
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="Background" Value="Yellow"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="TreeViewItem">
+            <Setter Property="Background" Value="{StaticResource DarkBackground}"/>
+            <Setter Property="Foreground" Value="MediumPurple"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="IsExpanded" Value="{Binding isExpanded, Mode=TwoWay}"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <TreeView x:Name="tv" ItemTemplate="{StaticResource TreeNode}"/>
+    </Grid>
+</Window>

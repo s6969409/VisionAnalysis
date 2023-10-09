@@ -26,24 +26,33 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            
+
             <TabControl>
-                <TabItem Header="Settings" x:Name="tbSetting"/>
                 <TabItem Header="Paras">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
+                            <RowDefinition Height="10"/>
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
                         <ListView x:Name="lv_inputs" SelectionChanged="lv_inputs_SelectionChanged"/>
-                        <StackPanel Grid.Row="1">
-                            <local:UcText PName="ToolName" x:Name="ucT_ToolName" PValueChanged="ucT_ToolName_PValueChanged"/>
-                            <local:UcText PName="ParaName" x:Name="ucT_ParaName" PValueChanged="ucT_ParaName_PValueChanged"/>
-                            <local:UcText PName="value" x:Name="ucT_value" PValueChanged="ucT_value_PValueChanged"/>
+                        
+                        <StackPanel Grid.Row="2">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="ToolName"/>
+                                <TextBox Text="{Binding ToolName}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="ParaName"/>
+                                <TextBox Text="{Binding ParaName}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="value"/>
+                                <ContentControl x:Name="cc_value"/>
+                            </StackPanel>
                         </StackPanel>
                     </Grid>
                 </TabItem>
-                <TabItem Header="ImgSelect"/>
             </TabControl>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" ShowsPreview="true" Width="5"/>
             <Image Grid.Column="2" x:Name="img"/>

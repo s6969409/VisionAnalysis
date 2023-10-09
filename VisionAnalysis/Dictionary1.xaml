@@ -6,6 +6,11 @@
     <SolidColorBrush x:Key="PrivacyDarkGray" Color="#303030"/>
     <!--#endregion-->
 
+    <Style TargetType="TextBox">
+        <Setter Property="MinWidth" Value="50"/>
+        <Setter Property="MaxWidth" Value="100"/>
+    </Style>
+    
     <Style TargetType="TreeView">
         <Setter Property="Background" Value="{StaticResource DarkBackground}"/>
     </Style>

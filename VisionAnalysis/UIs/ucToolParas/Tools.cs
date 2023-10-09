@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -279,5 +280,80 @@ namespace VisionAnalysis
 
         #endregion
 
+    }
+
+    public class WindowControlHelper
+    {
+        #region Window control
+        public enum WindowLocation { NoneSet, Top, Bottom, Left, Right, OwnCenter }
+        private class ClosingListenerBuilder
+        {
+            private Window window;
+            public ClosingListenerBuilder(Window window)
+            {
+                this.window = window;
+            }
+
+            public void closing(object sender, CancelEventArgs e)
+            {
+                e.Cancel = true;
+                window.Visibility = Visibility.Hidden;
+            }
+        }
+
+        public static void WindowInitialShow(Window newW, Window owner, WindowLocation location)
+        {
+            if (newW.IsLoaded)
+            {
+                newW.Visibility = Visibility.Visible;
+                setWindowLocation(newW, owner, location);
+                newW.Focus();
+            }
+            else
+            {
+                WindowInitial(newW, owner, location);
+                newW.Closing += new ClosingListenerBuilder(newW).closing;
+                newW.Show();
+            }
+        }
+        public static void WindowInitial(Window newW, Window owner, WindowLocation location)
+        {
+            newW.FontSize = WindowPreference.getCfgValue<int>(
+                    WindowPreference.fontSize);
+            setWindowLocation(newW, owner, location);
+        }
+        private static void setWindowLocation(Window newW, Window owner, WindowLocation location)
+        {
+            if (location == WindowLocation.NoneSet)
+            {
+
+            }
+            else if (location == WindowLocation.Top && owner.Top - owner.Height > 0)
+            {
+                newW.Left = owner.Left;
+                newW.Top = owner.Top - owner.Height;
+            }
+            else if (location == WindowLocation.Bottom && owner.Top + owner.Height < SystemParameters.WorkArea.Height)
+            {
+                newW.Left = owner.Left;
+                newW.Top = owner.Top + owner.Height;
+            }
+            else if (location == WindowLocation.Left && owner.Left - newW.Width > 0)
+            {
+                newW.Left = owner.Left - newW.Width;
+                newW.Top = owner.Top;
+            }
+            else if (location == WindowLocation.Right && owner.Left + owner.Width < SystemParameters.WorkArea.Width)
+            {
+                newW.Left = owner.Left + owner.Width;
+                newW.Top = owner.Top;
+            }
+            else if (location == WindowLocation.OwnCenter)
+            {
+                newW.Owner = owner;
+                newW.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            }
+        }
+        #endregion
     }
 }

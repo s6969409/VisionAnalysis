@@ -38,6 +38,8 @@
                 <Button Content="Load" Click="Load_Click"/>
                 <Separator/>
                 <Button Content="Save" Click="Save_Click"/>
+                <Separator/>
+                <Button Content="ToolBox" Click="ToolBox_Click"/>
             </ToolBar>
         </ToolBarTray>
         

@@ -26,6 +26,12 @@ namespace VisionAnalysis
         {
             InitializeComponent();
             this.addTool = addTool;
+
+            #region initial fronSize
+            int fontSize = WindowPreference.getCfgValue<int>(
+                WindowPreference.fontSize);
+            FontSize = fontSize;
+            #endregion
         }
 
         private void tv_Loaded(object sender, RoutedEventArgs e)
