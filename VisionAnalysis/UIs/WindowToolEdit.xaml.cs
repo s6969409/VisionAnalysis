@@ -23,15 +23,19 @@ namespace VisionAnalysis
         public WindowToolEdit(UserControl ucPara)
         {
             InitializeComponent();
+
+            #region initial fronSize
+            int fontSize = WindowPreference.getCfgValue<int>(
+                WindowPreference.fontSize);
+            FontSize = fontSize;
+            #endregion
+
             IToolEditParas toolEditParas = ucPara as IToolEditParas;
             toolEditParas.UIImage = img;
             this.ucPara = ucPara;
-            tbSetting.Content = ucPara;
 
             lv_inputs.ItemsSource = toolEditParas.Inputs.Keys;
         }
-
-        public object this[string key] { get => 0; }
 
         private void Run_Click(object sender, RoutedEventArgs e)
         {
@@ -42,9 +46,27 @@ namespace VisionAnalysis
         {
             string paraName = lv_inputs.SelectedItem as string;
             IToolEditParas toolEditParas = (IToolEditParas)ucPara;
-            ucT_ToolName.PValue = toolEditParas.Inputs[paraName].ToolName;
-            ucT_ParaName.PValue = toolEditParas.Inputs[paraName].ParaName;
-            ucT_value.PValue = toolEditParas.Inputs[paraName].value;
+            DataContext = toolEditParas.Inputs[paraName];
+            
+            //var s = Enum.Parse(typeof(ThresholdType), (string)inputs["thresholdType"])
+            if(toolEditParas.Inputs[paraName].value is Enum)
+            {
+                ComboBox comboBox = new ComboBox();
+                comboBox.ItemsSource = toolEditParas.Inputs[paraName].valueSource;
+                Binding binding = new Binding("value");
+                comboBox.SetBinding(ComboBox.SelectedItemProperty, binding);
+
+                cc_value.Content = comboBox;
+
+            }
+            else
+            {
+                TextBox textBox = new TextBox();
+                Binding binding = new Binding("value");
+                textBox.SetBinding(TextBox.TextProperty, binding);
+
+                cc_value.Content = textBox;
+            }
         }
     }
 

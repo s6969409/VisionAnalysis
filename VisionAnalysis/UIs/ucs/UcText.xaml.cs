@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +26,8 @@ namespace VisionAnalysis
             InitializeComponent();
         }
 
+        public event Action<object> PValueChanged;
+
         public static readonly DependencyProperty PNameProperty =
         DependencyProperty.Register("PName", typeof(string), typeof(UcText), new PropertyMetadata("PName", onPropertyChanged));
         public static readonly DependencyProperty PValueProperty =
@@ -38,16 +41,7 @@ namespace VisionAnalysis
         public object PValue
         {
             get => GetValue(PValueProperty);
-            set{
-                SetValue(PValueProperty, value);
-                tb.Text = value.ToString();
-            }
-        }
-        public event TextChangedEventHandler PValueChanged;
-        private void tb_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            PValue = tb.Text;
-            PValueChanged?.Invoke(sender, e);
+            set => SetValue(PValueProperty, value);
         }
 
         private static void onPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
@@ -57,13 +51,40 @@ namespace VisionAnalysis
                 UcText uc = obj as UcText;
                 if (args.Property.Name.Equals("PName"))
                 {
-                    uc.lb.Content = args.NewValue;
+                    uc.label.Content = args.NewValue;
                 }
                 else if (args.Property.Name.Equals("PValue"))
                 {
-                    uc.tb.Text = args.NewValue == null ? "" : args.NewValue.ToString();
+                    uc.updateUI();
                 }
             }
+        }
+
+        private void updateUI()
+        {
+            comboBox.Visibility = PValue is Enum ? Visibility.Visible : Visibility.Hidden;
+            textBox.Visibility = PValue is Enum ? Visibility.Hidden : Visibility.Visible;
+
+            if (PValue is Enum)
+            {
+                comboBox.ItemsSource = Enum.GetValues(PValue.GetType());
+                comboBox.SelectedItem = PValue;
+            }
+            else
+            {
+                textBox.Text = PValue == null ? "" : PValue.ToString();
+            }
+        }
+
+        private void textChange(object sender, TextChangedEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            PValue = tb.Text;
+        }
+        private void selectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox cb = sender as ComboBox;
+            PValue = cb.SelectedItem;
         }
     }
 }

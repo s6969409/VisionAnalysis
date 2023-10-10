@@ -3,6 +3,7 @@ using Emgu.CV.CvEnum;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -27,40 +28,33 @@ namespace VisionAnalysis
     /// </summary>
     public partial class UcParaThresHold : UserControl, IToolEditParas
     {
-        private List<Nd> nodes;
-        public UcParaThresHold(List<Nd> nodes)
+        private ObservableRangeCollection<Nd> nodes;
+        public UcParaThresHold(ObservableRangeCollection<Nd> nodes)
         {
             InitializeComponent();
             this.nodes = nodes;
             #region read save paras or default value...
-            Inputs["InputImage"] = new IInput() {
-                ToolName = "Inputs", ParaName = "SourceImage",
-                value = new Mat(@"D:\05_Project\HCA-20tmpResult\BackGroung_Image.bmp") };
-            Inputs["threshold"] = new IInput() { value = 100 };
-            Inputs["maxValue"] = new IInput() { value = 200 };
-            Inputs["thresholdType"] = new IInput() { value = ThresholdType.Binary };
+            Inputs["InputImage"] = new PInput() { value = new Mat() };
+            Inputs["threshold"] = new PInput() { value = 100 };
+            Inputs["maxValue"] = new PInput() { value = 200 };
+            Inputs["thresholdType"] = new PInput() { value = ThresholdType.Binary };
 
-            Outputs["Output1"] = new Mat();
+            Outputs["Output1"] = new POutput() { value = new Mat() };
             #endregion
         }
-        public UcParaThresHold(List<Nd> nodes, JObject inputs): this(nodes)
+        public UcParaThresHold(ObservableRangeCollection<Nd> nodes, JObject inputs): this(nodes)
         {
-            Inputs["InputImage"] = new IInput()
+            string InputImageUrl = (string)inputs["InputImage"]["value"];
+
+            Inputs["InputImage"] = new PInput()
             {
                 ToolName = (string)inputs["InputImage"]["ToolName"],
                 ParaName = (string)inputs["InputImage"]["ParaName"],
-                value = new Mat((string)inputs["InputImage"]["value"])
+                value = File.Exists(InputImageUrl) ? new Mat(InputImageUrl) : null
             };
-            Inputs["threshold"] = new IInput() { value = (int)inputs["threshold"]};
-            Inputs["maxValue"] = new IInput() { value = (int)inputs["maxValue"] };
-            Inputs["thresholdType"] = new IInput() { value = Enum.Parse(typeof(ThresholdType), (string)inputs["thresholdType"]) };
-        }
-
-        private void NumericTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            // 使用正則表達式確保只允許數值輸入
-            Regex regex = new Regex("[^0-9]+");
-            e.Handled = regex.IsMatch(e.Text);
+            Inputs["threshold"] = new PInput() { value = (int)inputs["threshold"]};
+            Inputs["maxValue"] = new PInput() { value = (int)inputs["maxValue"] };
+            Inputs["thresholdType"] = new PInput() { value = Enum.Parse(typeof(ThresholdType), (string)inputs["thresholdType"]) };
         }
 
         private T getEnum<T>(object arg)
@@ -72,8 +66,8 @@ namespace VisionAnalysis
         #region implement IToolEditParas member
         public string ToolName { get; set; }
         public Image UIImage { get; set; }
-        public Dictionary<string, IInput> Inputs { get; } = new Dictionary<string, IInput>();
-        public Dictionary<string, object> Outputs { get; } = new Dictionary<string, object>();
+        public Dictionary<string, PInput> Inputs { get; } = new Dictionary<string, PInput>();
+        public Dictionary<string, POutput> Outputs { get; } = new Dictionary<string, POutput>();
         public Action actionProcess => () =>
         {
             #region read paras
@@ -86,11 +80,9 @@ namespace VisionAnalysis
                         IToolEditParas toolEditParas = nd.value as IToolEditParas;
                         foreach (string pNameKey in toolEditParas.Outputs.Keys)
                         {
-                            if (pNameKey == Inputs[inputKey].ParaName && toolEditParas.Outputs[pNameKey] != null)
+                            if (pNameKey == Inputs[inputKey].ParaName && toolEditParas.Outputs[pNameKey].value != null)
                             {
-                                Mat mat = (Mat)toolEditParas.Outputs[pNameKey];
-
-                                Inputs[inputKey].value = toolEditParas.Outputs[pNameKey];
+                                Inputs[inputKey].value = toolEditParas.Outputs[pNameKey].value;
                                 break;
                             }
                         }
@@ -101,11 +93,11 @@ namespace VisionAnalysis
 
             CvInvoke.Threshold(
                 (Mat)Inputs["InputImage"].value,
-                (Mat)Outputs["Output1"],
+                (Mat)Outputs["Output1"].value,
                 (int)Inputs["threshold"].value,
                 (int)Inputs["maxValue"].value,
                 getEnum<ThresholdType>(Inputs["thresholdType"].value));
-            updateUIImage((Mat)Outputs["Output1"]);
+            updateUIImage((Mat)Outputs["Output1"].value);
         };
 
         public Func<string, JObject> getJObjectAndSaveImg => (imgDirPath) =>
@@ -126,12 +118,6 @@ namespace VisionAnalysis
         };
         #endregion
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            Mat mat = (Mat)Inputs["InputImage"].value;
-
-            updateUIImage(mat);
-        }
         private void updateUIImage(Mat mat)
         {
             if (UIImage != null) UIImage.Source = Tools.ToBitmapSource(mat);
@@ -144,16 +130,50 @@ namespace VisionAnalysis
     {
         string ToolName { get; }
         Image UIImage { get; set; }
-        Dictionary<string, IInput> Inputs { get; }
-        Dictionary<string, object> Outputs { get; }
+        Dictionary<string, PInput> Inputs { get; }
+        Dictionary<string, POutput> Outputs { get; }
         Action actionProcess { get; }
         Func<string, JObject> getJObjectAndSaveImg { get; }
     }
-    public class IInput
+    public class PInput: INotifyPropertyChanged
     {
-        public string ToolName { get; set; }
-        public string ParaName { get; set; }
-        public object value { get; set; }
+        private string _ToolName;
+        public string ToolName
+        {
+            get => _ToolName;
+            set
+            {
+                _ToolName = value;
+                onPropertyChanged(nameof(ToolName));
+            }
+        }
+        private string _ParaName;
+        public string ParaName
+        {
+            get => _ParaName;
+            set
+            {
+                _ParaName = value;
+                onPropertyChanged(nameof(ParaName));
+            }
+        }
+        private object _value;
+        public object value { 
+            get => _value; 
+            set
+            {
+                if(_value == null)
+                {
+                    _value = value;
+                }
+                else
+                {
+                    _value = Convert.ChangeType(value, _value.GetType());
+                }
+
+                onPropertyChanged(nameof(this.value));
+            } 
+        }
         public JObject getJObjectAndSaveImg(string imgDirPath)
         {
             JObject jobject = new JObject();
@@ -165,9 +185,39 @@ namespace VisionAnalysis
                 ((Mat)value).Save(imgPath);
                 jobject["value"] = imgPath;
             }
-            else jobject["value"] = value.ToString();
+            else jobject["value"] = value == null ? null : value.ToString();
 
             return jobject;
+        }
+        public Type Type { get => _value == null ? null : _value.GetType(); }
+        public Array valueSource
+        {
+            get => _value == null ? null : Enum.GetValues(_value.GetType());
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void onPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    public class POutput: INotifyPropertyChanged
+    {
+        private object _value;
+        public object value
+        {
+            get => _value;
+            set
+            {
+                _value = value;
+                onPropertyChanged(nameof(value));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void onPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
