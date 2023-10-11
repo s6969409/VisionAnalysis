@@ -128,7 +128,7 @@ namespace VisionAnalysis
 
     public interface IToolEditParas
     {
-        string ToolName { get; }
+        string ToolName { get; set; }
         Image UIImage { get; set; }
         Dictionary<string, PInput> Inputs { get; }
         Dictionary<string, POutput> Outputs { get; }

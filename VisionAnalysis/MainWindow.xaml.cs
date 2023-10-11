@@ -283,17 +283,9 @@ namespace VisionAnalysis
                 }
             }
 
-            Nd addNd;
-            if (type == typeof(UcParaInputs))
-            {
-                addNd = new Nd(new UcParaInputs(nodes) { ToolName = toolName });
-            }
-            else if (type == typeof(UcParaThresHold))
-            {
-                addNd = new Nd(new UcParaThresHold(nodes) { ToolName = toolName });
-            }
-            else { throw new Exception($"工具{type}無法解析!"); }
-
+            IToolEditParas iTool = Activator.CreateInstance(type, new object[] { nodes }) as IToolEditParas;
+            iTool.ToolName = toolName;
+            Nd addNd = new Nd(iTool);
             nodes.Add(addNd);
         }
         #endregion
