@@ -37,8 +37,8 @@ namespace VisionAnalysis
         private void tv_Loaded(object sender, RoutedEventArgs e)
         {
             #region ToolThresHold 重想一下結構
-            ToolBoxShow ToolThresHold = new ToolBoxShow(typeof(UcParaThresHold));
-            tools.Add(ToolThresHold);
+            Type[] toolTypes = { typeof(UcParaInputs), typeof(UcParaThresHold) };
+            tools.AddRange(toolTypes.Select(t => new ToolBoxShow(t)));
             #endregion
 
             tv.ItemsSource = tools;

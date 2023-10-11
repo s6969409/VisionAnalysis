@@ -284,11 +284,15 @@ namespace VisionAnalysis
             }
 
             Nd addNd;
-            if (type == typeof(UcParaThresHold))
+            if (type == typeof(UcParaInputs))
+            {
+                addNd = new Nd(new UcParaInputs(nodes) { ToolName = toolName });
+            }
+            else if (type == typeof(UcParaThresHold))
             {
                 addNd = new Nd(new UcParaThresHold(nodes) { ToolName = toolName });
             }
-            else { addNd = null; }
+            else { throw new Exception($"工具{type}無法解析!"); }
 
             nodes.Add(addNd);
         }
