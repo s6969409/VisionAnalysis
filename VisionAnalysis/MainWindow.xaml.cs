@@ -82,7 +82,7 @@ namespace VisionAnalysis
         {
             Nd selectNd = tvl.SelectedItem as Nd;
             if(selectNd != null && selectNd.value is IToolEditParas)
-                new WindowToolEdit((UserControl)selectNd.value) { Title = selectNd.name }.Show();
+                new WindowToolEdit((UserControl)selectNd.value, nodes) { Title = selectNd.name }.Show();
         }
 
         #region ToolBar click event

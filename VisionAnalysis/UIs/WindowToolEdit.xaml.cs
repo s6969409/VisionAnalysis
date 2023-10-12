@@ -19,8 +19,9 @@ namespace VisionAnalysis
     /// </summary>
     public partial class WindowToolEdit : Window
     {
-        public UserControl ucPara;
-        public WindowToolEdit(UserControl ucPara)
+        private UserControl ucPara;
+        private IEnumerable<Nd> nodes;
+        public WindowToolEdit(UserControl ucPara, IEnumerable<Nd> nodes)
         {
             InitializeComponent();
 
@@ -35,6 +36,10 @@ namespace VisionAnalysis
             this.ucPara = ucPara;
 
             lv_inputs.ItemsSource = toolEditParas.Inputs.Keys;
+
+            this.nodes = nodes;
+
+            cb_ToolName.ItemsSource = nodes.Select(nd => nd.name);
         }
 
         private void Run_Click(object sender, RoutedEventArgs e)
@@ -44,11 +49,10 @@ namespace VisionAnalysis
 
         private void lv_inputs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            cb_ToolName.IsEnabled = true;
             string paraName = lv_inputs.SelectedItem as string;
             IToolEditParas toolEditParas = (IToolEditParas)ucPara;
             DataContext = toolEditParas.Inputs[paraName];
-            
-            //var s = Enum.Parse(typeof(ThresholdType), (string)inputs["thresholdType"])
             if(toolEditParas.Inputs[paraName].value is Enum)
             {
                 ComboBox comboBox = new ComboBox();
@@ -67,6 +71,17 @@ namespace VisionAnalysis
 
                 cc_value.Content = textBox;
             }
+
+        }
+
+        private void cb_ToolName_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox comboBox = sender as ComboBox;
+            cb_ParaName.IsEnabled = comboBox.SelectedItem != null;
+            if (!cb_ParaName.IsEnabled) return;
+            Nd selectedNd = nodes.First(nd => nd.name == comboBox.SelectedItem.ToString());
+            IToolEditParas selectedTool = selectedNd.value as IToolEditParas;
+            cb_ParaName.ItemsSource = selectedTool.Outputs.Keys;
         }
     }
 

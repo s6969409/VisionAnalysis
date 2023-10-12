@@ -40,11 +40,11 @@
                         <StackPanel Grid.Row="2">
                             <StackPanel Orientation="Horizontal">
                                 <Label Content="ToolName"/>
-                                <TextBox Text="{Binding ToolName}"/>
+                                <ComboBox x:Name="cb_ToolName" SelectedItem="{Binding ToolName}" SelectionChanged="cb_ToolName_SelectionChanged" IsEnabled="False"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Content="ParaName"/>
-                                <TextBox Text="{Binding ParaName}"/>
+                                <ComboBox x:Name="cb_ParaName" SelectedItem="{Binding ParaName}" IsEnabled="False"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Content="value"/>
