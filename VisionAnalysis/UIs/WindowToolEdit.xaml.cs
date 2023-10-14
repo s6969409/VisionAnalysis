@@ -39,7 +39,7 @@ namespace VisionAnalysis
 
             this.nodes = nodes;
 
-            cb_ToolName.ItemsSource = nodes.Select(nd => nd.name);
+            cb_ToolName.ItemsSource = new string[] { "" }.Concat(nodes.Select(nd => nd.name).Where(name => name != toolEditParas.ToolName));
         }
 
         private void Run_Click(object sender, RoutedEventArgs e)
@@ -79,9 +79,16 @@ namespace VisionAnalysis
             ComboBox comboBox = sender as ComboBox;
             cb_ParaName.IsEnabled = comboBox.SelectedItem != null;
             if (!cb_ParaName.IsEnabled) return;
-            Nd selectedNd = nodes.First(nd => nd.name == comboBox.SelectedItem.ToString());
-            IToolEditParas selectedTool = selectedNd.value as IToolEditParas;
-            cb_ParaName.ItemsSource = selectedTool.Outputs.Keys;
+            if(comboBox.SelectedItem.ToString() == "")
+            {
+                cb_ParaName.ItemsSource = null;
+            }
+            else
+            {
+                Nd selectedNd = nodes.First(nd => nd.name == comboBox.SelectedItem.ToString());
+                IToolEditParas selectedTool = selectedNd.value as IToolEditParas;
+                cb_ParaName.ItemsSource = new string[] { "" }.Concat(selectedTool.Outputs.Keys);
+            }
         }
     }
 
