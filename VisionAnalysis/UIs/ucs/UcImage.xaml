@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="VisionAnalysis.UcImage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VisionAnalysis"
+              xmlns:EmguUI="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.Platform.NetFramework"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <WindowsFormsHost>
+            <EmguUI:ImageBox x:Name="cvIb" FunctionalMode="RightClickMenu" SizeChanged="cvIb_SizeChanged" MouseMove="cvIb_MouseMove"/>
+        </WindowsFormsHost>
+        <ToolBarTray Grid.Row="1">
+            <ToolBar>
+                <Label x:Name="lb_size" Content="圖片Size"/>
+                <Separator/>
+                <Label x:Name="lb_format" Content="圖片格式"/>
+                <Separator/>
+                <Label x:Name="lb_position" Content="滑鼠座標"/>
+                <Separator/>
+                <Label x:Name="lb_value" Content="亮度"/>
+                <Separator/>
+                <Label x:Name="lb_scale" Content="倍率"/>
+            </ToolBar>
+        </ToolBarTray>
+    </Grid>
+</UserControl>

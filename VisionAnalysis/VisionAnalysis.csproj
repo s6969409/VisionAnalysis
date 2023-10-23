@@ -118,6 +118,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UIs\ucs\UcImage.xaml.cs">
+      <DependentUpon>UcImage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UIs\ucs\UcText.xaml.cs">
       <DependentUpon>UcText.xaml</DependentUpon>
     </Compile>
@@ -153,6 +156,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UIs\ucs\UcImage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UIs\ucs\UcText.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

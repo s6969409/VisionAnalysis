@@ -191,18 +191,18 @@ namespace VisionAnalysis
             if (selected == null) return;
             if(selected.value is Mat)
             {
-                img.Source = Tools.ToBitmapSource((Mat)selected.value);
+                loadImg((Mat)selected.value);
             }
             else if (selected.value is PInput)
             {
                 PInput selectedInput = selected.value as PInput;
                 if (selectedInput.value is Mat)
                 {
-                    img.Source = Tools.ToBitmapSource((Mat)selectedInput.value);
+                    loadImg((Mat)selectedInput.value);
                 }
                 else
                 {
-                    img.Source = null;
+                    loadImg(null);//Emgu.CV.UI.ImageBox
                 }
             }
             else if (selected.value is POutput)
@@ -210,16 +210,16 @@ namespace VisionAnalysis
                 POutput selectedInput = selected.value as POutput;
                 if (selectedInput.value is Mat)
                 {
-                    img.Source = Tools.ToBitmapSource((Mat)selectedInput.value);
+                    loadImg((Mat)selectedInput.value);
                 }
                 else
                 {
-                    img.Source = null;
+                    loadImg(null);
                 }
             }
             else
             {
-                img.Source = null;
+                loadImg(null);
             }
 
 
@@ -290,7 +290,11 @@ namespace VisionAnalysis
         }
         #endregion
 
-
+        private void loadImg(Mat mat)
+        {
+            //img.Source = Tools.ToBitmapSource(mat);
+            img.Image = mat;
+        }
     }
 
     public interface IPara

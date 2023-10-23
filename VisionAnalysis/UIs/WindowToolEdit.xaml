@@ -36,21 +36,24 @@
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
                         <ListView x:Name="lv_inputs" SelectionChanged="lv_inputs_SelectionChanged"/>
-                        
-                        <StackPanel Grid.Row="2">
-                            <StackPanel Orientation="Horizontal">
+
+                        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
                                 <Label Content="ToolName"/>
                                 <ComboBox x:Name="cb_ToolName" SelectedItem="{Binding ToolName}" SelectionChanged="cb_ToolName_SelectionChanged" IsEnabled="False"/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal">
                                 <Label Content="ParaName"/>
                                 <ComboBox x:Name="cb_ParaName" SelectedItem="{Binding ParaName}" IsEnabled="False"/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal">
                                 <Label Content="value"/>
                                 <ContentControl x:Name="cc_value"/>
                             </StackPanel>
-                        </StackPanel>
+                            </StackPanel>
+
+                        </ScrollViewer>
                     </Grid>
                 </TabItem>
             </TabControl>
