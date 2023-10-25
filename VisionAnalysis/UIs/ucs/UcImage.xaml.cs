@@ -21,7 +21,7 @@ namespace VisionAnalysis
     /// <summary>
     /// UcImage.xaml 的互動邏輯
     /// </summary>
-    public partial class UcImage : UserControl
+    public partial class UcImage : UserControl, IMatProperty
     {
         public UcImage()
         {
@@ -83,5 +83,9 @@ namespace VisionAnalysis
         {
             lb_scale.Content = $"放大倍率:{scale.ToString("0.00")}";
         }
+    }
+    public interface IMatProperty
+    {
+        Mat Image { set; get; }
     }
 }

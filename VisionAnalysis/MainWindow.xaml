@@ -51,8 +51,8 @@
             </Grid.ColumnDefinitions>
 
             <TreeView x:Name="tvl" ItemTemplate="{StaticResource TreeNode}" MouseDoubleClick="tvl_MouseDoubleClick" SelectedItemChanged="tvl_SelectedItemChanged" Grid.ColumnSpan="2"/>
-            <Canvas x:Name="tvlCanvas" Grid.ColumnSpan="2"/>
-            <GridSplitter Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" ShowsPreview="true" Width="5"/>
+            <Canvas x:Name="tvlCanvas"/>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" ShowsPreview="true" Width="5"/>
             <local:UcImage x:Name="img" Grid.Column="3"/>
             <Canvas x:Name="myCanvas" Grid.Column="3"/>
         </Grid>

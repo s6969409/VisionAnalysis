@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
+using Emgu.CV.UI;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -65,7 +66,7 @@ namespace VisionAnalysis
 
         #region implement IToolEditParas member
         public string ToolName { get; set; }
-        public Image UIImage { get; set; }
+        public IMatProperty UIImage { get; set; }
         public Dictionary<string, PInput> Inputs { get; } = new Dictionary<string, PInput>();
         public Dictionary<string, POutput> Outputs { get; } = new Dictionary<string, POutput>();
         public Action actionProcess => () =>
@@ -120,7 +121,8 @@ namespace VisionAnalysis
 
         private void updateUIImage(Mat mat)
         {
-            if (UIImage != null) UIImage.Source = Tools.ToBitmapSource(mat);
+            //if (UIImage != null) UIImage.Source = Tools.ToBitmapSource(mat);
+            if (UIImage != null) UIImage.Image = mat;
         }
 
         
@@ -129,13 +131,17 @@ namespace VisionAnalysis
     public interface IToolEditParas
     {
         string ToolName { get; set; }
-        Image UIImage { get; set; }
+        IMatProperty UIImage { get; set; }
         Dictionary<string, PInput> Inputs { get; }
         Dictionary<string, POutput> Outputs { get; }
         Action actionProcess { get; }
         Func<string, JObject> getJObjectAndSaveImg { get; }
     }
-    public class PInput: INotifyPropertyChanged
+    public interface IParaValue
+    {
+        object value { get; }
+    }
+    public class PInput: IParaValue, INotifyPropertyChanged
     {
         private string _ToolName;
         public string ToolName
@@ -201,7 +207,7 @@ namespace VisionAnalysis
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-    public class POutput: INotifyPropertyChanged
+    public class POutput: IParaValue, INotifyPropertyChanged
     {
         private object _value;
         public object value

@@ -58,7 +58,7 @@
                 </TabItem>
             </TabControl>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" ShowsPreview="true" Width="5"/>
-            <Image Grid.Column="2" x:Name="img"/>
+            <local:UcImage Grid.Column="2" x:Name="img"/>
         </Grid>
     </Grid>
 </Window>

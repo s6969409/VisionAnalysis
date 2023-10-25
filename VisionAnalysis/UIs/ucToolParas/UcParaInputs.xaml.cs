@@ -40,7 +40,7 @@ namespace VisionAnalysis
 
         #region implement IToolEditParas member
         public string ToolName { get; set; }
-        public Image UIImage { get; set; }
+        public IMatProperty UIImage { get; set; }
         public Dictionary<string, PInput> Inputs { get; } = new Dictionary<string, PInput>();
         public Dictionary<string, POutput> Outputs { get; } = new Dictionary<string, POutput>();
         public Action actionProcess => () =>
@@ -67,7 +67,8 @@ namespace VisionAnalysis
 
         private void updateUIImage(Mat mat)
         {
-            if (UIImage != null) UIImage.Source = Tools.ToBitmapSource(mat);
+            //if (UIImage != null) UIImage.Source = Tools.ToBitmapSource(mat);
+            if (UIImage != null) UIImage.Image = mat;
         }
     }
 }

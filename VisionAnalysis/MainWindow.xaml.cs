@@ -341,14 +341,26 @@ namespace VisionAnalysis
             value = valueDefault;
             foreach (var item in valueDefault.Inputs)
             {
-                childNodes.Add(new Nd(item.Key, item.Value));
+                childNodes.Add(buildParaNd(item));
             }
             foreach (var item in valueDefault.Outputs)
             {
-                childNodes.Add(new Nd(item.Key, item.Value));
+                childNodes.Add(buildParaNd(item));
             }
         }
         public Nd(string name, object value) { _name = name; this.value = value; }
+        public Nd buildParaNd<T>(KeyValuePair<string, T> item)where T: IParaValue
+        {
+            Nd nd = new Nd(item.Key, item.Value.value);
+            if (item.Value.value is Dictionary<string, T>)
+            {
+                foreach (KeyValuePair<string, T> i in (Dictionary<string, T>)item.Value.value)
+                {
+                    nd.childNodes.Add(buildParaNd(i));
+                }
+            }
+            return nd;
+        }
 
         public bool CanExpand => childNodes.Count != 0;
         public int FontSize { get => WindowPreference.getCfgValue<int>(WindowPreference.fontSize); }
