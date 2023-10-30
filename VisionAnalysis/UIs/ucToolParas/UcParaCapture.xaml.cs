@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,9 +14,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace VisionAnalysis.UIs.ucToolParas
+namespace VisionAnalysis
 {
     /// <summary>
     /// UcParaCapture.xaml 的互動邏輯
@@ -23,9 +23,15 @@ namespace VisionAnalysis.UIs.ucToolParas
     public partial class UcParaCapture : UserControl, IToolEditParas
     {
         private ObservableRangeCollection<Nd> nodes;
-        public UcParaCapture()
+        public UcParaCapture(ObservableRangeCollection<Nd> nodes)
         {
             InitializeComponent();
+            this.nodes = nodes;
+
+            Inputs["InputImage"] = new PInput() { value = new Mat() };
+            Inputs["ROI"] = new PInput() { value = ParaDictBuilder.Rectangle() };
+
+            Outputs["Output1"] = new POutput() { value = new Mat() };
         }
 
         #region implement IToolEditParas member
@@ -35,34 +41,13 @@ namespace VisionAnalysis.UIs.ucToolParas
         public Dictionary<string, POutput> Outputs { get; } = new Dictionary<string, POutput>();
         public Action actionProcess => () =>
         {
-            #region read paras
-            foreach (string inputKey in Inputs.Keys)
-            {
-                foreach (Nd nd in nodes)
-                {
-                    if (nd.name == Inputs[inputKey].ToolName)
-                    {
-                        IToolEditParas toolEditParas = nd.value as IToolEditParas;
-                        foreach (string pNameKey in toolEditParas.Outputs.Keys)
-                        {
-                            if (pNameKey == Inputs[inputKey].ParaName && toolEditParas.Outputs[pNameKey].value != null)
-                            {
-                                Inputs[inputKey].value = toolEditParas.Outputs[pNameKey].value;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            #endregion
+            //read paras
+            UcPHelper.readInputs(this, nodes);
 
-            //CvInvoke.Threshold(
-            //    (Mat)Inputs["InputImage"].value,
-            //    (Mat)Outputs["Output1"].value,
-            //    (int)Inputs["threshold"].value,
-            //    (int)Inputs["maxValue"].value,
-            //    getEnum<ThresholdType>(Inputs["thresholdType"].value));
-            //updateUIImage((Mat)Outputs["Output1"].value);
+            Dictionary<string, PInput> dictROI = (Dictionary<string, PInput>)Inputs["ROI"].value;
+            Rectangle roi = ParaDictRead.Rectangle(dictROI);
+            Outputs["Output1"].value = new Mat((Mat)Inputs["InputImage"].value, roi);
+            updateUIImage((Mat)Outputs["Output1"].value);
         };
 
         public Func<string, JObject> getJObjectAndSaveImg => (imgDirPath) =>
@@ -72,16 +57,16 @@ namespace VisionAnalysis.UIs.ucToolParas
             jobject["ToolName"] = ToolName;
             jobject["Inputs"] = new JObject();
             jobject["Inputs"]["InputImage"] = Inputs["InputImage"].getJObjectAndSaveImg(imgDirPath);
-            jobject["Inputs"]["threshold"] = (int)Inputs["threshold"].value;
-            jobject["Inputs"]["maxValue"] = (int)Inputs["maxValue"].value;
-            jobject["Inputs"]["thresholdType"] = Inputs["thresholdType"].value.ToString();
-            jobject["Outputs"] = new JObject();
-            jobject["Outputs"]["Output1"] = 100;
+            jobject["Inputs"]["ROI"] = null;//???
 
 
             return jobject;
         };
         #endregion
 
+        private void updateUIImage(Mat mat)
+        {
+            if (UIImage != null) UIImage.Image = mat;
+        }
     }
 }

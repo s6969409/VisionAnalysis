@@ -71,26 +71,8 @@ namespace VisionAnalysis
         public Dictionary<string, POutput> Outputs { get; } = new Dictionary<string, POutput>();
         public Action actionProcess => () =>
         {
-            #region read paras
-            foreach (string inputKey in Inputs.Keys)
-            {
-                foreach (Nd nd in nodes)
-                {
-                    if (nd.name == Inputs[inputKey].ToolName)
-                    {
-                        IToolEditParas toolEditParas = nd.value as IToolEditParas;
-                        foreach (string pNameKey in toolEditParas.Outputs.Keys)
-                        {
-                            if (pNameKey == Inputs[inputKey].ParaName && toolEditParas.Outputs[pNameKey].value != null)
-                            {
-                                Inputs[inputKey].value = toolEditParas.Outputs[pNameKey].value;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            #endregion
+            //read paras
+            UcPHelper.readInputs(this, nodes);
 
             CvInvoke.Threshold(
                 (Mat)Inputs["InputImage"].value,
@@ -121,7 +103,6 @@ namespace VisionAnalysis
 
         private void updateUIImage(Mat mat)
         {
-            //if (UIImage != null) UIImage.Source = Tools.ToBitmapSource(mat);
             if (UIImage != null) UIImage.Image = mat;
         }
 

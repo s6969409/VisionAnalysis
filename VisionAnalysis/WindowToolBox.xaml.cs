@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -36,10 +37,9 @@ namespace VisionAnalysis
 
         private void tv_Loaded(object sender, RoutedEventArgs e)
         {
-            #region ToolThresHold 重想一下結構
-            Type[] toolTypes = { typeof(UcParaInputs), typeof(UcParaThresHold) };
+            Type[] toolTypes = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.Namespace == "VisionAnalysis" && t.Name.Contains("UcPara")).ToArray();
             tools.AddRange(toolTypes.Select(t => new ToolBoxShow(t)));
-            #endregion
 
             tv.ItemsSource = tools;
         }

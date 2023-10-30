@@ -264,6 +264,13 @@ namespace VisionAnalysis
         #region window API for other window
         private void addTool(Type type)
         {
+            IToolEditParas iTool = Activator.CreateInstance(type, new object[] { nodes }) as IToolEditParas;
+            iTool.ToolName = toolNameGenerate(type);
+            Nd addNd = new Nd(iTool);
+            nodes.Add(addNd);
+        }
+        private string toolNameGenerate(Type type)
+        {
             int num = 1;
             string toolName = $"{type.Name}{num}";
             bool hasSameName = true;
@@ -282,18 +289,34 @@ namespace VisionAnalysis
                     }
                 }
             }
-
-            IToolEditParas iTool = Activator.CreateInstance(type, new object[] { nodes }) as IToolEditParas;
-            iTool.ToolName = toolName;
-            Nd addNd = new Nd(iTool);
-            nodes.Add(addNd);
+            return toolName;
         }
         #endregion
 
         private void loadImg(Mat mat)
         {
-            //img.Source = Tools.ToBitmapSource(mat);
             img.Image = mat;
+        }
+
+        private void tvl_Drop(object sender, DragEventArgs e)
+        {
+            string[] paths = e.Data.GetData(DataFormats.FileDrop) as string[];
+            if (paths.Length != 1) return;
+
+            IToolEditParas iTool = new UcParaInputs(nodes);
+            iTool.ToolName = toolNameGenerate(typeof(UcParaInputs));
+            iTool.Inputs["ImageUrl"].value = paths[0];
+            iTool.actionProcess();
+            Nd addNd = new Nd(iTool);
+            nodes.Add(addNd);
+        }
+
+        private void tvl_DragEnter(object sender, DragEventArgs e)
+        {
+
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effects = DragDropEffects.Link;
+            else e.Effects = DragDropEffects.None;
         }
     }
 

@@ -6,6 +6,13 @@
         xmlns:local="clr-namespace:VisionAnalysis"
         mc:Ignorable="d"
         Title="WindowToolEdit" Height="450" Width="800">
+    <Window.Resources>
+        <HierarchicalDataTemplate x:Key="TreeNode" ItemsSource="{Binding childNodes}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding name}"/>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -35,22 +42,22 @@
                             <RowDefinition Height="10"/>
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
-                        <ListView x:Name="lv_inputs" SelectionChanged="lv_inputs_SelectionChanged"/>
+                        <TreeView x:Name="tv_inputs" ItemTemplate="{StaticResource TreeNode}" SelectedItemChanged="tv_inputs_SelectedItemChanged"/>
 
                         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal">
-                                <Label Content="ToolName"/>
-                                <ComboBox x:Name="cb_ToolName" SelectedItem="{Binding ToolName}" SelectionChanged="cb_ToolName_SelectionChanged" IsEnabled="False"/>
-                            </StackPanel>
+                                    <Label Content="ToolName"/>
+                                    <ComboBox x:Name="cb_ToolName" SelectedItem="{Binding ToolName}" SelectionChanged="cb_ToolName_SelectionChanged" IsEnabled="False"/>
+                                </StackPanel>
                                 <StackPanel Orientation="Horizontal">
-                                <Label Content="ParaName"/>
-                                <ComboBox x:Name="cb_ParaName" SelectedItem="{Binding ParaName}" IsEnabled="False"/>
-                            </StackPanel>
+                                    <Label Content="ParaName"/>
+                                    <ComboBox x:Name="cb_ParaName" SelectedItem="{Binding ParaName}" IsEnabled="False"/>
+                                </StackPanel>
                                 <StackPanel Orientation="Horizontal">
-                                <Label Content="value"/>
-                                <ContentControl x:Name="cc_value"/>
-                            </StackPanel>
+                                    <Label Content="value"/>
+                                    <ContentControl x:Name="cc_value"/>
+                                </StackPanel>
                             </StackPanel>
 
                         </ScrollViewer>

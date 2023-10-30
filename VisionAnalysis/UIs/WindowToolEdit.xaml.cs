@@ -35,7 +35,9 @@ namespace VisionAnalysis
             toolEditParas.UIImage = img;
             this.ucPara = ucPara;
 
-            lv_inputs.ItemsSource = toolEditParas.Inputs.Keys;
+            Nd nd1 = new Nd("Inputs", null);
+            nd1.childNodes.AddRange(toolEditParas.Inputs.Select(i => UcPHelper.NdBuild(i)));
+            tv_inputs.ItemsSource = nd1.childNodes;
 
             this.nodes = nodes;
 
@@ -45,33 +47,6 @@ namespace VisionAnalysis
         private void Run_Click(object sender, RoutedEventArgs e)
         {
             ((IToolEditParas)ucPara).actionProcess();
-        }
-
-        private void lv_inputs_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            cb_ToolName.IsEnabled = true;
-            string paraName = lv_inputs.SelectedItem as string;
-            IToolEditParas toolEditParas = (IToolEditParas)ucPara;
-            DataContext = toolEditParas.Inputs[paraName];
-            if(toolEditParas.Inputs[paraName].value is Enum)
-            {
-                ComboBox comboBox = new ComboBox();
-                comboBox.ItemsSource = toolEditParas.Inputs[paraName].valueSource;
-                Binding binding = new Binding("value");
-                comboBox.SetBinding(ComboBox.SelectedItemProperty, binding);
-
-                cc_value.Content = comboBox;
-
-            }
-            else
-            {
-                TextBox textBox = new TextBox();
-                Binding binding = new Binding("value");
-                textBox.SetBinding(TextBox.TextProperty, binding);
-
-                cc_value.Content = textBox;
-            }
-
         }
 
         private void cb_ToolName_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -88,6 +63,32 @@ namespace VisionAnalysis
                 Nd selectedNd = nodes.First(nd => nd.name == comboBox.SelectedItem.ToString());
                 IToolEditParas selectedTool = selectedNd.value as IToolEditParas;
                 cb_ParaName.ItemsSource = new string[] { "" }.Concat(selectedTool.Outputs.Keys);
+            }
+        }
+
+        private void tv_inputs_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            cb_ToolName.IsEnabled = true;
+            Nd selectedNd = tv_inputs.SelectedItem as Nd;
+            string paraName = selectedNd.name;
+            PInput val = selectedNd.value as PInput;
+            DataContext = val;
+            if (val.value is Enum)
+            {
+                ComboBox comboBox = new ComboBox();
+                comboBox.ItemsSource = val.valueSource;
+                Binding binding = new Binding("value");
+                comboBox.SetBinding(ComboBox.SelectedItemProperty, binding);
+
+                cc_value.Content = comboBox;
+            }
+            else
+            {
+                TextBox textBox = new TextBox();
+                Binding binding = new Binding("value");
+                textBox.SetBinding(TextBox.TextProperty, binding);
+
+                cc_value.Content = textBox;
             }
         }
     }

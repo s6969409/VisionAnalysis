@@ -50,7 +50,7 @@
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
 
-            <TreeView x:Name="tvl" ItemTemplate="{StaticResource TreeNode}" MouseDoubleClick="tvl_MouseDoubleClick" SelectedItemChanged="tvl_SelectedItemChanged" Grid.ColumnSpan="2"/>
+            <TreeView x:Name="tvl" ItemTemplate="{StaticResource TreeNode}" MouseDoubleClick="tvl_MouseDoubleClick" SelectedItemChanged="tvl_SelectedItemChanged"  AllowDrop="True" Drop="tvl_Drop" DragEnter="tvl_DragEnter"/>
             <Canvas x:Name="tvlCanvas"/>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" ShowsPreview="true" Width="5"/>
             <local:UcImage x:Name="img" Grid.Column="3"/>
