@@ -111,6 +111,7 @@ namespace VisionAnalysis
         private void Load_Click(object sender, RoutedEventArgs e)
         {
             string loadPath = PathSelector.getUserSelectPath(PathSelector.PathRequest.ReadFile);
+            if (!File.Exists(loadPath)) return;
             string imgDirPath = $@"{Path.GetDirectoryName(loadPath)}\Images";
 
             nodes.Clear();
@@ -131,6 +132,11 @@ namespace VisionAnalysis
                 else if (typeof(UcParaThresHold).FullName.Equals(toolType))
                 {
                     Nd ToolThresHold = new Nd(new UcParaThresHold(nodes, inputs) { ToolName = toolName });
+                    nodes.Add(ToolThresHold);
+                }
+                else if (typeof(UcParaCapture).FullName.Equals(toolType))
+                {
+                    Nd ToolThresHold = new Nd(new UcParaCapture(nodes, inputs) { ToolName = toolName });
                     nodes.Add(ToolThresHold);
                 }
                 else throw new Exception($"無法解析ToolType:\n{toolType}\n程式沒寫!?");
@@ -372,9 +378,9 @@ namespace VisionAnalysis
             }
         }
         public Nd(string name, object value) { _name = name; this.value = value; }
-        public Nd buildParaNd<T>(KeyValuePair<string, T> item)where T: IParaValue
+        private Nd buildParaNd<T>(KeyValuePair<string, T> item)where T: IParaValue
         {
-            Nd nd = new Nd(item.Key, item.Value.value);
+            Nd nd = new Nd(item.Key, item.Value);
             if (item.Value.value is Dictionary<string, T>)
             {
                 foreach (KeyValuePair<string, T> i in (Dictionary<string, T>)item.Value.value)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -9,23 +10,89 @@ namespace VisionAnalysis
 {
     public class ParaDictBuilder
     {
+        #region Rectangle
         public static Dictionary<string, PInput> Rectangle()
         {
-            Dictionary<string, PInput> rect = new Dictionary<string, PInput>();
-            rect["p1"] = new PInput() { value = Point() };
-            rect["p2"] = new PInput() { value = Point() };
+            Dictionary<string, PInput> pDict = new Dictionary<string, PInput>();
+            pDict["p1"] = new PInput() { value = Point() };
+            pDict["p2"] = new PInput() { value = Point() };
 
-            return rect;
+            return pDict;
         }
+        public static Dictionary<string, PInput> Rectangle(JToken jToken)
+        {
+            Dictionary<string, PInput> pDict = new Dictionary<string, PInput>();
+            var temp = jToken["value"]["p1"];
 
+            pDict["p1"] = JObjectToPInput(jToken["value"]["p1"]);
+            pDict["p2"] = JObjectToPInput(jToken["value"]["p2"]);
+
+            return pDict;
+        }
+        #endregion
+        #region Point
         public static Dictionary<string, PInput> Point()
         {
-            Dictionary<string, PInput> p = new Dictionary<string, PInput>();
-            p["x"] = new PInput() { value = 200 };
-            p["y"] = new PInput() { value = 200 };
+            Dictionary<string, PInput> pDict = new Dictionary<string, PInput>();
+            pDict["x"] = new PInput() { value = 200 };
+            pDict["y"] = new PInput() { value = 200 };
 
-            return p;
+            return pDict;
         }
+        public static Dictionary<string, PInput> Point(JToken jToken)
+        {
+            Dictionary<string, PInput> pDict = new Dictionary<string, PInput>();
+            pDict["x"] = JObjectToPInput(jToken["value"]["x"]);
+            pDict["y"] = JObjectToPInput(jToken["value"]["y"]);
+
+            return pDict;
+        }
+        #endregion
+        #region BaseTypeTranfer
+        public static PInput JObjectToPInput(JToken jToken)
+        {
+            object value;
+
+            if (jToken["value"].Type == JTokenType.Object)
+            {
+                Dictionary<string, PInput> pInput = new Dictionary<string, PInput>();
+                foreach (JProperty jProperty in jToken["value"].ToObject<JObject>().Properties())
+                {
+                    pInput[jProperty.Name] = JObjectToPInput(jProperty.Value);
+                }
+                value = pInput;
+            }
+            else value = JTokenDataCast(jToken["value"]);
+
+            return buildCrossReference(jToken, value);
+        }
+        public static PInput JObjectToPInput<T>(JToken jToken)
+        {
+            object value;
+
+            if (typeof(T).IsEnum)
+            {
+                value = Enum.Parse(typeof(T), (string)jToken["value"]);
+            }
+            else throw new InvalidCastException($"{typeof(T)} 目前尚未實做!!");
+
+            return buildCrossReference(jToken, value);
+        }
+        private static PInput buildCrossReference(JToken jToken,object value) => new PInput()
+        {
+            ToolName = jToken["ToolName"] == null ? null : jToken["ToolName"].ToString(),
+            ParaName = jToken["ParaName"] == null ? null : jToken["ParaName"].ToString(),
+            value = value
+        };
+        private static object JTokenDataCast(JToken jToken)
+        {
+            if (jToken.Type == JTokenType.Boolean) return (bool)jToken;
+            else if (jToken.Type == JTokenType.Float) return (float)jToken;
+            else if (jToken.Type == JTokenType.Integer) return (int)jToken;
+            else if (jToken.Type == JTokenType.String) return (string)jToken;
+            else throw new InvalidCastException($"{jToken.Type} 目前尚未實做!!");
+        }
+        #endregion
     }
     public class ParaDictRead
     {

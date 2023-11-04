@@ -35,7 +35,7 @@ namespace VisionAnalysis
         }
         public UcParaInputs(ObservableRangeCollection<Nd> nodes, JObject inputs) : this(nodes)
         {
-            Inputs["ImageUrl"].value = (string)inputs["ImageUrl"];
+            Inputs["ImageUrl"] = ParaDictBuilder.JObjectToPInput(inputs["ImageUrl"]);
         }
 
         #region implement IToolEditParas member
@@ -56,10 +56,7 @@ namespace VisionAnalysis
             JObject jobject = new JObject();
             jobject["ToolType"] = GetType().FullName;
             jobject["ToolName"] = ToolName;
-            jobject["Inputs"] = new JObject();
-            jobject["Inputs"]["ImageUrl"] = Inputs["ImageUrl"].value.ToString();
-            jobject["Outputs"] = new JObject();
-            jobject["Outputs"]["SourceImage"] = 100;
+            jobject["Inputs"] = PInput.getJObjectAndSaveImg(Inputs, imgDirPath);
 
             return jobject;
         };

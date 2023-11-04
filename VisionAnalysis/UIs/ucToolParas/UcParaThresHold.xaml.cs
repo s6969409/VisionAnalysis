@@ -53,9 +53,9 @@ namespace VisionAnalysis
                 ParaName = (string)inputs["InputImage"]["ParaName"],
                 value = File.Exists(InputImageUrl) ? new Mat(InputImageUrl) : null
             };
-            Inputs["threshold"] = new PInput() { value = (int)inputs["threshold"]};
-            Inputs["maxValue"] = new PInput() { value = (int)inputs["maxValue"] };
-            Inputs["thresholdType"] = new PInput() { value = Enum.Parse(typeof(ThresholdType), (string)inputs["thresholdType"]) };
+            Inputs["threshold"] = ParaDictBuilder.JObjectToPInput(inputs["threshold"]);
+            Inputs["maxValue"] = ParaDictBuilder.JObjectToPInput(inputs["maxValue"]);
+            Inputs["thresholdType"] = ParaDictBuilder.JObjectToPInput<ThresholdType>(inputs["thresholdType"]);
         }
 
         private T getEnum<T>(object arg)
@@ -88,14 +88,7 @@ namespace VisionAnalysis
             JObject jobject = new JObject();
             jobject["ToolType"] = GetType().FullName;
             jobject["ToolName"] = ToolName;
-            jobject["Inputs"] = new JObject();
-            jobject["Inputs"]["InputImage"] = Inputs["InputImage"].getJObjectAndSaveImg(imgDirPath);
-            jobject["Inputs"]["threshold"] = (int)Inputs["threshold"].value;
-            jobject["Inputs"]["maxValue"] = (int)Inputs["maxValue"].value;
-            jobject["Inputs"]["thresholdType"] = Inputs["thresholdType"].value.ToString();
-            jobject["Outputs"] = new JObject();
-            jobject["Outputs"]["Output1"] = 100;
-
+            jobject["Inputs"] = PInput.getJObjectAndSaveImg(Inputs, imgDirPath);
 
             return jobject;
         };
@@ -161,18 +154,44 @@ namespace VisionAnalysis
                 onPropertyChanged(nameof(this.value));
             } 
         }
-        public JObject getJObjectAndSaveImg(string imgDirPath)
+        public static JObject getJObjectAndSaveImg(Dictionary<string, PInput> inputs, string imgDirPath)
         {
             JObject jobject = new JObject();
-            jobject["ToolName"] = ToolName;
-            jobject["ParaName"] = ParaName;
-            if (value is Mat)
+            foreach(string key in inputs.Keys)
+            {
+                jobject[key] = getJObjectAndSaveImg(inputs[key], imgDirPath);
+            }
+            return jobject;
+        }
+        public static JObject getJObjectAndSaveImg(PInput pi, string imgDirPath)
+        {
+            JObject jobject = new JObject();
+            jobject["ToolName"] = pi.ToolName;
+            jobject["ParaName"] = pi.ParaName;
+            if (pi.value is PInput)
+            {
+                PInput input = pi.value as PInput;
+                jobject["value"] = getJObjectAndSaveImg(input, imgDirPath);
+            }
+            else if (pi.value is Dictionary<string, PInput>)
+            {
+                jobject["value"] = new JObject();
+
+                Dictionary<string, PInput> paras = pi.value as Dictionary<string, PInput>;
+                foreach(var p in paras)
+                {
+                    jobject["value"][p.Key] = getJObjectAndSaveImg(p.Value, imgDirPath);
+                }
+            }
+            else if (pi.value is Mat)
             {
                 string imgPath = $@"{imgDirPath}\{Directory.GetFiles(imgDirPath).Length}.bmp";
-                ((Mat)value).Save(imgPath);
+                ((Mat)pi.value).Save(imgPath);
                 jobject["value"] = imgPath;
             }
-            else jobject["value"] = value == null ? null : value.ToString();
+            else if (pi.value is int) jobject["value"] = (int)pi.value;
+            else if (pi.value is float) jobject["value"] = (float)pi.value;
+            else jobject["value"] = pi.value == null ? null : pi.value.ToString();
 
             return jobject;
         }
