@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Emgu.CV;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,6 +31,8 @@ namespace VisionAnalysis
                 WindowPreference.fontSize);
             FontSize = fontSize;
             #endregion
+
+            cc_valueUIInit();
 
             IToolEditParas toolEditParas = ucPara as IToolEditParas;
             toolEditParas.UIImage = img;
@@ -75,21 +78,31 @@ namespace VisionAnalysis
             DataContext = val;
             if (val.value is Enum)
             {
-                ComboBox comboBox = new ComboBox();
-                comboBox.ItemsSource = val.valueSource;
-                Binding binding = new Binding("value");
-                comboBox.SetBinding(ComboBox.SelectedItemProperty, binding);
-
                 cc_value.Content = comboBox;
+            }
+            else if (val.value is Mat)
+            {
+                img.Image = val.value as Mat;
+
+                textBox.IsEnabled = false;
+                cc_value.Content = textBox;
             }
             else
             {
-                TextBox textBox = new TextBox();
-                Binding binding = new Binding("value");
-                textBox.SetBinding(TextBox.TextProperty, binding);
-
+                textBox.IsEnabled = true;
                 cc_value.Content = textBox;
             }
         }
+
+        #region ContentControl cc_value used
+        private TextBox textBox = new TextBox();
+        private ComboBox comboBox = new ComboBox();
+        private void cc_valueUIInit()
+        {
+            Binding binding = new Binding("value");
+            textBox.SetBinding(TextBox.TextProperty, binding);
+            comboBox.SetBinding(ComboBox.SelectedItemProperty, binding);
+        }
+        #endregion
     }
 }

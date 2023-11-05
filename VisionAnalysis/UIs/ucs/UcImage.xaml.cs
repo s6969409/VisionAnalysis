@@ -81,6 +81,7 @@ namespace VisionAnalysis
         }
         private void cvIb_SizeChanged(object sender, EventArgs e)
         {
+            lb_scale.Width = 100;//Content改變不知道為什麼不會改變外觀長度...
             lb_scale.Content = $"放大倍率:{scale.ToString("0.00")}";
         }
     }
