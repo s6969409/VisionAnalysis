@@ -20,9 +20,9 @@ namespace VisionAnalysis
     /// </summary>
     public partial class WindowToolEdit : Window
     {
-        private UserControl ucPara;
+        private IToolEditParas toolEditParas;
         private IEnumerable<Nd> nodes;
-        public WindowToolEdit(UserControl ucPara, IEnumerable<Nd> nodes)
+        public WindowToolEdit(IToolEditParas toolEditParas, IEnumerable<Nd> nodes)
         {
             InitializeComponent();
 
@@ -34,12 +34,11 @@ namespace VisionAnalysis
 
             cc_valueUIInit();
 
-            IToolEditParas toolEditParas = ucPara as IToolEditParas;
+            this.toolEditParas = toolEditParas;
             toolEditParas.UIImage = img;
-            this.ucPara = ucPara;
 
             Nd nd1 = new Nd("Inputs", null);
-            nd1.childNodes.AddRange(toolEditParas.Inputs.Select(i => UcPHelper.NdBuild(i)));
+            nd1.childNodes.AddRange(toolEditParas.Inputs.Select(i => TepHelper.NdBuild(i)));
             tv_inputs.ItemsSource = nd1.childNodes;
 
             this.nodes = nodes;
@@ -47,10 +46,7 @@ namespace VisionAnalysis
             cb_ToolName.ItemsSource = new string[] { "" }.Concat(nodes.Select(nd => nd.name).Where(name => name != toolEditParas.ToolName));
         }
 
-        private void Run_Click(object sender, RoutedEventArgs e)
-        {
-            ((IToolEditParas)ucPara).actionProcess();
-        }
+        private void Run_Click(object sender, RoutedEventArgs e) => toolEditParas.actionProcess();
 
         private void cb_ToolName_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

@@ -7,26 +7,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 
 namespace VisionAnalysis
 {
-    /// <summary>
-    /// UcParaCapture.xaml 的互動邏輯
-    /// </summary>
-    public partial class UcParaCapture : UserControl, IToolEditParas
+    public class TepCapture : IToolEditParas
     {
         private ObservableRangeCollection<Nd> nodes;
-        public UcParaCapture(ObservableRangeCollection<Nd> nodes)
+        public TepCapture(ObservableRangeCollection<Nd> nodes)
         {
-            InitializeComponent();
             this.nodes = nodes;
 
             Inputs["InputImage"] = new PInput() { value = new Mat() };
@@ -34,8 +22,11 @@ namespace VisionAnalysis
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
         }
-        public UcParaCapture(ObservableRangeCollection<Nd> nodes, JObject inputs) : this(nodes)
+        public TepCapture(ObservableRangeCollection<Nd> nodes, JObject jobject) : this(nodes)
         {
+            ToolName = (string)jobject["ToolName"];
+            JObject inputs = (JObject)jobject["Inputs"];
+
             string InputImageUrl = (string)inputs["InputImage"]["value"];
 
             Inputs["InputImage"] = new PInput()
@@ -55,7 +46,7 @@ namespace VisionAnalysis
         public Action actionProcess => () =>
         {
             //read paras
-            UcPHelper.readInputs(this, nodes);
+            TepHelper.readInputs(this, nodes);
 
             Mat inputImage = Inputs["InputImage"].value as Mat;
             Dictionary<string, PInput> dictROI = (Dictionary<string, PInput>)Inputs["ROI"].value;

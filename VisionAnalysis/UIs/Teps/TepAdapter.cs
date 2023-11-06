@@ -110,7 +110,7 @@ namespace VisionAnalysis
             return new Point((int)dict["x"].value, (int)dict["y"].value);
         }
     }
-    public class UcPHelper
+    public class TepHelper
     {
         public static void readInputs(IToolEditParas tool, ObservableRangeCollection<Nd> nodes)
         {

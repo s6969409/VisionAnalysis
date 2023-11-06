@@ -53,7 +53,7 @@ namespace VisionAnalysis
             Mat mat = new Mat();
             nodes.Clear();
             
-            Nd input = new Nd(new UcParaInputs(nodes) { ToolName = "Inputs" });
+            Nd input = new Nd(new TepInputs(nodes) { ToolName = "Inputs" });
             nodes.Add(input);
 
             tvl.ItemsSource = nodes;
@@ -82,7 +82,7 @@ namespace VisionAnalysis
         {
             Nd selectNd = tvl.SelectedItem as Nd;
             if(selectNd != null && selectNd.value is IToolEditParas)
-                new WindowToolEdit((UserControl)selectNd.value, nodes) { Title = selectNd.name }.Show();
+                new WindowToolEdit((IToolEditParas)selectNd.value, nodes) { Title = selectNd.name }.Show();
         }
 
         #region ToolBar click event
@@ -112,7 +112,6 @@ namespace VisionAnalysis
         {
             string loadPath = PathSelector.getUserSelectPath(PathSelector.PathRequest.ReadFile);
             if (!File.Exists(loadPath)) return;
-            string imgDirPath = $@"{Path.GetDirectoryName(loadPath)}\Images";
 
             nodes.Clear();
             string str = File.ReadAllText(loadPath);
@@ -121,26 +120,11 @@ namespace VisionAnalysis
             foreach(JObject jobject in jArray)
             {
                 string toolType = (string)jobject["ToolType"];
-                string toolName = (string)jobject["ToolName"];
-                JObject inputs = (JObject)jobject["Inputs"];
-                JObject outputs = (JObject)jobject["Outputs"];
-                if (typeof(UcParaInputs).FullName.Equals(toolType))
-                {
-                    Nd input = new Nd(new UcParaInputs(nodes, inputs) { ToolName = toolName });
-                    nodes.Add(input);
-                }
-                else if (typeof(UcParaThresHold).FullName.Equals(toolType))
-                {
-                    Nd ToolThresHold = new Nd(new UcParaThresHold(nodes, inputs) { ToolName = toolName });
-                    nodes.Add(ToolThresHold);
-                }
-                else if (typeof(UcParaCapture).FullName.Equals(toolType))
-                {
-                    Nd ToolThresHold = new Nd(new UcParaCapture(nodes, inputs) { ToolName = toolName });
-                    nodes.Add(ToolThresHold);
-                }
-                else throw new Exception($"無法解析ToolType:\n{toolType}\n程式沒寫!?");
+                Type type = Type.GetType(toolType);
+                if (type == null) throw new Exception($"無法解析ToolType:\n{toolType}\n程式沒寫!?");
 
+                IToolEditParas input = Activator.CreateInstance(type, new object[] { nodes, jobject }) as IToolEditParas;
+                nodes.Add(new Nd(input));
             }
         }
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -299,18 +283,15 @@ namespace VisionAnalysis
         }
         #endregion
 
-        private void loadImg(Mat mat)
-        {
-            img.Image = mat;
-        }
+        private void loadImg(Mat mat) => img.Image = mat;
 
         private void tvl_Drop(object sender, DragEventArgs e)
         {
             string[] paths = e.Data.GetData(DataFormats.FileDrop) as string[];
             if (paths.Length != 1) return;
 
-            IToolEditParas iTool = new UcParaInputs(nodes);
-            iTool.ToolName = toolNameGenerate(typeof(UcParaInputs));
+            IToolEditParas iTool = new TepInputs(nodes);
+            iTool.ToolName = toolNameGenerate(typeof(TepInputs));
             iTool.Inputs["ImageUrl"].value = paths[0];
             iTool.actionProcess();
             Nd addNd = new Nd(iTool);

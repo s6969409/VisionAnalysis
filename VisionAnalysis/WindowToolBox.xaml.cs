@@ -38,7 +38,7 @@ namespace VisionAnalysis
         private void tv_Loaded(object sender, RoutedEventArgs e)
         {
             Type[] toolTypes = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => t.Namespace == "VisionAnalysis" && t.Name.Contains("UcPara")).ToArray();
+                .Where(t => t.Namespace == "VisionAnalysis" && t.Name.Contains("Tep")).ToArray();
             tools.AddRange(toolTypes.Select(t => new ToolBoxShow(t)));
 
             tv.ItemsSource = tools;

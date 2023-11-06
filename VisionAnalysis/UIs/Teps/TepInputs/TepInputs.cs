@@ -6,35 +6,25 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace VisionAnalysis
 {
-    /// <summary>
-    /// UcParaInputs.xaml 的互動邏輯
-    /// </summary>
-    public partial class UcParaInputs : UserControl, IToolEditParas
+    public class TepInputs : IToolEditParas
     {
         private ObservableRangeCollection<Nd> nodes;
-        public UcParaInputs(ObservableRangeCollection<Nd> nodes)
+        public TepInputs(ObservableRangeCollection<Nd> nodes)
         {
-            InitializeComponent();
             this.nodes = nodes;
             #region read save paras or default value...
             Inputs["ImageUrl"] = new PInput() { value = "" };
             Outputs["SourceImage"] = new POutput();
             #endregion
         }
-        public UcParaInputs(ObservableRangeCollection<Nd> nodes, JObject inputs) : this(nodes)
+        public TepInputs(ObservableRangeCollection<Nd> nodes, JObject jobject) : this(nodes)
         {
+            ToolName = (string)jobject["ToolName"];
+            JObject inputs = (JObject)jobject["Inputs"];
+
             Inputs["ImageUrl"] = ParaDictBuilder.JObjectToPInput(inputs["ImageUrl"]);
         }
 

@@ -1,38 +1,21 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
-using Emgu.CV.UI;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace VisionAnalysis
 {
-    /// <summary>
-    /// UcParaThresHold.xaml 的互動邏輯
-    /// </summary>
-    public partial class UcParaThresHold : UserControl, IToolEditParas
+    public class TepThresHold : IToolEditParas
     {
         private ObservableRangeCollection<Nd> nodes;
-        public UcParaThresHold(ObservableRangeCollection<Nd> nodes)
+        public TepThresHold(ObservableRangeCollection<Nd> nodes)
         {
-            InitializeComponent();
             this.nodes = nodes;
             #region read save paras or default value...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
@@ -43,8 +26,11 @@ namespace VisionAnalysis
             Outputs["Output1"] = new POutput() { value = new Mat() };
             #endregion
         }
-        public UcParaThresHold(ObservableRangeCollection<Nd> nodes, JObject inputs): this(nodes)
+        public TepThresHold(ObservableRangeCollection<Nd> nodes, JObject jobject) : this(nodes)
         {
+            ToolName = (string)jobject["ToolName"];
+            JObject inputs = (JObject)jobject["Inputs"];
+
             string InputImageUrl = (string)inputs["InputImage"]["value"];
 
             Inputs["InputImage"] = new PInput()
@@ -72,7 +58,7 @@ namespace VisionAnalysis
         public Action actionProcess => () =>
         {
             //read paras
-            UcPHelper.readInputs(this, nodes);
+            TepHelper.readInputs(this, nodes);
 
             CvInvoke.Threshold(
                 (Mat)Inputs["InputImage"].value,
@@ -99,8 +85,9 @@ namespace VisionAnalysis
             if (UIImage != null) UIImage.Image = mat;
         }
 
-        
+
     }
+
 
     public interface IToolEditParas
     {
@@ -115,7 +102,7 @@ namespace VisionAnalysis
     {
         object value { get; }
     }
-    public class PInput: IParaValue, INotifyPropertyChanged
+    public class PInput : IParaValue, INotifyPropertyChanged
     {
         private string _ToolName;
         public string ToolName
@@ -138,11 +125,12 @@ namespace VisionAnalysis
             }
         }
         private object _value;
-        public object value { 
-            get => _value; 
+        public object value
+        {
+            get => _value;
             set
             {
-                if(_value == null)
+                if (_value == null)
                 {
                     _value = value;
                 }
@@ -152,12 +140,12 @@ namespace VisionAnalysis
                 }
 
                 onPropertyChanged(nameof(this.value));
-            } 
+            }
         }
         public static JObject getJObjectAndSaveImg(Dictionary<string, PInput> inputs, string imgDirPath)
         {
             JObject jobject = new JObject();
-            foreach(string key in inputs.Keys)
+            foreach (string key in inputs.Keys)
             {
                 jobject[key] = getJObjectAndSaveImg(inputs[key], imgDirPath);
             }
@@ -178,7 +166,7 @@ namespace VisionAnalysis
                 jobject["value"] = new JObject();
 
                 Dictionary<string, PInput> paras = pi.value as Dictionary<string, PInput>;
-                foreach(var p in paras)
+                foreach (var p in paras)
                 {
                     jobject["value"][p.Key] = getJObjectAndSaveImg(p.Value, imgDirPath);
                 }
@@ -195,19 +183,13 @@ namespace VisionAnalysis
 
             return jobject;
         }
-        public Type Type { get => _value == null ? null : _value.GetType(); }
-        public Array valueSource
-        {
-            get => _value == null ? null : Enum.GetValues(_value.GetType());
-        }
+        public Type Type => _value == null ? null : _value.GetType();
+        public Array valueSource => _value == null ? null : Enum.GetValues(_value.GetType());
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void onPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        protected void onPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-    public class POutput: IParaValue, INotifyPropertyChanged
+    public class POutput : IParaValue, INotifyPropertyChanged
     {
         private object _value;
         public object value
@@ -221,9 +203,6 @@ namespace VisionAnalysis
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void onPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        protected void onPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

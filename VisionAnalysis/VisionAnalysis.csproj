@@ -128,21 +128,15 @@
     <Compile Include="UIs\ucs\WindowPreference.xaml.cs">
       <DependentUpon>WindowPreference.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UIs\ucToolParas\ParaDictBuilder.cs" />
-    <Compile Include="UIs\ucToolParas\Tools.cs" />
-    <Compile Include="UIs\ucToolParas\UcParaCapture.xaml.cs">
-      <DependentUpon>UcParaCapture.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UIs\ucToolParas\UcParaInputs.xaml.cs">
-      <DependentUpon>UcParaInputs.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UIs\ucToolParas\UcParaThresHold.xaml.cs">
-      <DependentUpon>UcParaThresHold.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="UIs\Teps\TepAdapter.cs" />
+    <Compile Include="UIs\Teps\TepCapture\TepCapture.cs" />
+    <Compile Include="UIs\Teps\TepInputs\TepInputs.cs" />
+    <Compile Include="UIs\Teps\TepThresHold\TepThresHold.cs" />
+    <Compile Include="UIs\Tools.cs" />
     <Compile Include="WindowToolBox.xaml.cs">
       <DependentUpon>WindowToolBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UIs\WindowToolEdit.xaml.cs">
+    <Compile Include="UIs\Teps\WindowToolEdit.xaml.cs">
       <DependentUpon>WindowToolEdit.xaml</DependentUpon>
     </Compile>
     <Page Include="Dictionary1.xaml">
@@ -173,23 +167,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UIs\ucToolParas\UcParaCapture.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UIs\ucToolParas\UcParaInputs.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UIs\ucToolParas\UcParaThresHold.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="WindowToolBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UIs\WindowToolEdit.xaml">
+    <Page Include="UIs\Teps\WindowToolEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
