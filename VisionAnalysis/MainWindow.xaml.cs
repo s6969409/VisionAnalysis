@@ -123,20 +123,20 @@ namespace VisionAnalysis
                 Type type = Type.GetType(toolType);
                 if (type == null) throw new Exception($"無法解析ToolType:\n{toolType}\n程式沒寫!?");
 
-                IToolEditParas input = Activator.CreateInstance(type, new object[] { nodes, jobject }) as IToolEditParas;
+                IToolEditParas input = Activator.CreateInstance(type, new object[] { nodes }) as IToolEditParas;
+                input.loadParas(jobject);
                 nodes.Add(new Nd(input));
             }
         }
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            string savePath = PathSelector.getUserSelectPath(PathSelector.PathRequest.ReadFile);
+            string savePath = PathSelector.getUserSelectPath(PathSelector.PathRequest.SaveFile);
             string imgDirPath = $@"{Path.GetDirectoryName(savePath)}\Images";
             if (!Directory.Exists(imgDirPath)) Directory.CreateDirectory(imgDirPath);
             foreach(string path in Directory.GetFiles(imgDirPath))
             {
                 File.Delete(path);
             }
-
 
             JArray jArray = new JArray(); 
             foreach(Nd nd in nodes)
@@ -177,9 +177,10 @@ namespace VisionAnalysis
         #region show by selected para
         private void tvl_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            loadImg(null);
             Nd selected = tvl.SelectedItem as Nd;
-            if (selected == null) return;
-            if(selected.value is Mat)
+            if (selected == null) return; 
+            if (selected.value is Mat)
             {
                 loadImg((Mat)selected.value);
             }
@@ -190,10 +191,6 @@ namespace VisionAnalysis
                 {
                     loadImg((Mat)selectedInput.value);
                 }
-                else
-                {
-                    loadImg(null);//Emgu.CV.UI.ImageBox
-                }
             }
             else if (selected.value is POutput)
             {
@@ -202,14 +199,10 @@ namespace VisionAnalysis
                 {
                     loadImg((Mat)selectedInput.value);
                 }
-                else
+                else if (selectedInput.value is IEnumerable<object>)
                 {
-                    loadImg(null);
+                    table.update((IEnumerable<object>)selectedInput.value);
                 }
-            }
-            else
-            {
-                loadImg(null);
             }
 
 

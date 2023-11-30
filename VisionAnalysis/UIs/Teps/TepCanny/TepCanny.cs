@@ -2,21 +2,20 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace VisionAnalysis
 {
-    public class TepCapture : BaseToolEditParas
+    public class TepCanny : BaseToolEditParas
     {
-        public TepCapture(ObservableRangeCollection<Nd> nodes) : base(nodes)
+        public TepCanny(ObservableRangeCollection<Nd> nodes) : base(nodes)
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
-            Inputs["ROI"] = new PInput() { value = ParaDictBuilder.Rectangle() };
+            Inputs["threshold1"] = new PInput() { value = 200 };
+            Inputs["threshold2"] = new PInput() { value = 255 };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             #endregion
@@ -27,11 +26,12 @@ namespace VisionAnalysis
         {
             base.actionProcess();//read paras
 
-            Mat inputImage = Inputs["InputImage"].value as Mat;
-            Dictionary<string, PInput> dictROI = (Dictionary<string, PInput>)Inputs["ROI"].value;
-            Rectangle roi = ParaDictRead.Rectangle(dictROI);
+            CvInvoke.Canny(
+                (Mat)Inputs["InputImage"].value, 
+                (Mat)Outputs["Output1"].value, 
+                (int)Inputs["threshold1"].value, 
+                (int)Inputs["threshold2"].value);
 
-            Outputs["Output1"].value = new Mat(inputImage, roi);
             updateUIImage((Mat)Outputs["Output1"].value);
         };
         #endregion

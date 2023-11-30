@@ -75,8 +75,8 @@ namespace VisionAnalysis
             }
             lb_position.Content = $"滑鼠座標:{x},{y}";
 
-            IEnumerable<object> vs = new object[mat.NumberOfChannels];
-            vs = vs.Select((a, i) => mat.GetData().GetValue(y, x, i));
+            IEnumerable<object> vs = Enumerable.Range(0, mat.NumberOfChannels)
+                .Select(i => mat.NumberOfChannels == 1 ? mat.GetData().GetValue(y, x) : mat.GetData().GetValue(y, x, i));
             lb_value.Content = $"value:{string.Join(",", vs)}";
         }
         private void cvIb_SizeChanged(object sender, EventArgs e)

@@ -75,6 +75,7 @@ namespace VisionAnalysis
             if (val.value is Enum)
             {
                 cc_value.Content = comboBox;
+                comboBox.ItemsSource = toolEditParas.Inputs[paraName].valueSource;
             }
             else if (val.value is Mat)
             {

@@ -1,7 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Emgu.CV;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,7 +52,7 @@ namespace VisionAnalysis
         }
         #endregion
         #region BaseTypeTranfer
-        public static PInput JObjectToPInput(JToken jToken)
+        public static PInput JObjectToPInput(JToken jToken, Type type = null)
         {
             object value;
 
@@ -62,36 +65,30 @@ namespace VisionAnalysis
                 }
                 value = pInput;
             }
-            else value = JTokenDataCast(jToken["value"]);
-
-            return buildCrossReference(jToken, value);
-        }
-        public static PInput JObjectToPInput<T>(JToken jToken)
-        {
-            object value;
-
-            if (typeof(T).IsEnum)
+            else if (type != null && type.IsEnum && (jToken["value"].Type == JTokenType.String || jToken["value"].Type == JTokenType.Integer))
             {
-                value = Enum.Parse(typeof(T), (string)jToken["value"]);
+                value = Enum.Parse(type, (string)jToken["value"]);
             }
-            else throw new InvalidCastException($"{typeof(T)} 目前尚未實做!!");
+            else if (jToken["value"].Type == JTokenType.Boolean) value = (bool)jToken["value"];
+            else if (jToken["value"].Type == JTokenType.Float) value = (float)jToken["value"];
+            else if (jToken["value"].Type == JTokenType.Integer) value = (int)jToken["value"];
+            else if (jToken["value"].Type == JTokenType.String) value = (string)jToken["value"];
+            else throw new InvalidCastException($"jToken[value].Type = {jToken["value"].Type} + type = {type} 目前尚未實做!!");
 
-            return buildCrossReference(jToken, value);
+            return BuildCrossReference(jToken, value);
         }
-        private static PInput buildCrossReference(JToken jToken,object value) => new PInput()
+        private static PInput BuildCrossReference(JToken jToken,object value) => new PInput()
         {
             ToolName = jToken["ToolName"] == null ? null : jToken["ToolName"].ToString(),
             ParaName = jToken["ParaName"] == null ? null : jToken["ParaName"].ToString(),
             value = value
         };
-        private static object JTokenDataCast(JToken jToken)
+        public static PInput BuildMatByCrossReference(JToken jToken) => new PInput()
         {
-            if (jToken.Type == JTokenType.Boolean) return (bool)jToken;
-            else if (jToken.Type == JTokenType.Float) return (float)jToken;
-            else if (jToken.Type == JTokenType.Integer) return (int)jToken;
-            else if (jToken.Type == JTokenType.String) return (string)jToken;
-            else throw new InvalidCastException($"{jToken.Type} 目前尚未實做!!");
-        }
+            ToolName = jToken["ToolName"] == null ? null : jToken["ToolName"].ToString(),
+            ParaName = jToken["ParaName"] == null ? null : jToken["ParaName"].ToString(),
+            value = File.Exists((string)jToken["value"]) ? new Mat((string)jToken["value"]) : null
+        };
         #endregion
     }
     public class ParaDictRead
@@ -133,6 +130,11 @@ namespace VisionAnalysis
                 }
             }
         }
+        public static T getEnum<T>(object arg)
+        {
+            string code = arg.ToString();
+            return (T)Enum.Parse(typeof(T), code);
+        }
         public static Nd NdBuild<T>(KeyValuePair<string,T> kvInput)where T: IParaValue
         {
             Nd nd = new Nd(kvInput.Key, kvInput.Value);
@@ -144,4 +146,171 @@ namespace VisionAnalysis
             return nd;
         }
     }
+
+    #region IToolEditParas implement
+    public interface IToolEditParas
+    {
+        string ToolName { get; set; }
+        IMatProperty UIImage { get; set; }
+        Dictionary<string, PInput> Inputs { get; }
+        Dictionary<string, POutput> Outputs { get; }
+        Action actionProcess { get; }
+        Func<string, JObject> getJObjectAndSaveImg { get; }
+        Action<JObject> loadParas { get; }
+    }
+    public class BaseToolEditParas : IToolEditParas
+    {
+        protected ObservableRangeCollection<Nd> nodes;
+
+        public BaseToolEditParas(ObservableRangeCollection<Nd> nodes) { this.nodes = nodes; }
+
+        public virtual string ToolName { get; set; }
+        public virtual IMatProperty UIImage { get; set; }
+        public virtual Dictionary<string, PInput> Inputs { get; } = new Dictionary<string, PInput>();
+        public virtual Dictionary<string, POutput> Outputs { get; } = new Dictionary<string, POutput>();
+        public virtual Action actionProcess => () => TepHelper.readInputs(this, nodes);
+        public virtual Func<string, JObject> getJObjectAndSaveImg => (imgDirPath) =>
+        {
+            JObject jobject = new JObject();
+            jobject["ToolType"] = GetType().FullName;
+            jobject["ToolName"] = ToolName;
+            jobject["Inputs"] = PInput.getJObjectAndSaveImg(Inputs, imgDirPath);
+
+            return jobject;
+        };
+        public virtual Action<JObject> loadParas => (jobject) => 
+        {
+            ToolName = (string)jobject["ToolName"];
+            JObject inputs = (JObject)jobject["Inputs"];
+
+            string[] keys = Inputs.Keys.Select(k => k.ToString()).ToArray();
+            foreach (var key in keys)
+            {
+                if (Inputs[key].value is Mat)
+                {
+                    Inputs[key] = ParaDictBuilder.BuildMatByCrossReference(inputs[key]);
+                }
+                else if (Inputs[key].value is Enum)
+                {
+                    Inputs[key] = ParaDictBuilder.JObjectToPInput(inputs[key], Inputs[key].value.GetType());
+                }
+                else
+                {
+                    Inputs[key] = ParaDictBuilder.JObjectToPInput(inputs[key]);
+                }
+            }
+        };
+        protected virtual Action<Mat> updateUIImage => mat =>
+        {
+            if (UIImage != null) UIImage.Image = mat;
+        };
+    }
+    public interface IParaValue
+    {
+        object value { get; }
+    }
+    public class PInput : IParaValue, INotifyPropertyChanged
+    {
+        private string _ToolName;
+        public string ToolName
+        {
+            get => _ToolName;
+            set
+            {
+                _ToolName = value;
+                onPropertyChanged(nameof(ToolName));
+            }
+        }
+        private string _ParaName;
+        public string ParaName
+        {
+            get => _ParaName;
+            set
+            {
+                _ParaName = value;
+                onPropertyChanged(nameof(ParaName));
+            }
+        }
+        private object _value;
+        public object value
+        {
+            get => _value;
+            set
+            {
+                if (_value == null)
+                {
+                    _value = value;
+                }
+                else
+                {
+                    _value = Convert.ChangeType(value, _value.GetType());
+                }
+
+                onPropertyChanged(nameof(this.value));
+            }
+        }
+        public static JObject getJObjectAndSaveImg(Dictionary<string, PInput> inputs, string imgDirPath)
+        {
+            JObject jobject = new JObject();
+            foreach (string key in inputs.Keys)
+            {
+                jobject[key] = getJObjectAndSaveImg(inputs[key], imgDirPath);
+            }
+            return jobject;
+        }
+        public static JObject getJObjectAndSaveImg(PInput pi, string imgDirPath)
+        {
+            JObject jobject = new JObject();
+            jobject["ToolName"] = pi.ToolName;
+            jobject["ParaName"] = pi.ParaName;
+            if (pi.value is PInput)
+            {
+                PInput input = pi.value as PInput;
+                jobject["value"] = getJObjectAndSaveImg(input, imgDirPath);
+            }
+            else if (pi.value is Dictionary<string, PInput>)
+            {
+                jobject["value"] = new JObject();
+
+                Dictionary<string, PInput> paras = pi.value as Dictionary<string, PInput>;
+                foreach (var p in paras)
+                {
+                    jobject["value"][p.Key] = getJObjectAndSaveImg(p.Value, imgDirPath);
+                }
+            }
+            else if (pi.value is Mat)
+            {
+                string imgPath = $@"{imgDirPath}\{Directory.GetFiles(imgDirPath).Length}.bmp";
+                ((Mat)pi.value).Save(imgPath);
+                jobject["value"] = imgPath;
+            }
+            else if (pi.value is int) jobject["value"] = (int)pi.value;
+            else if (pi.value is float) jobject["value"] = (float)pi.value;
+            else jobject["value"] = pi.value == null ? null : pi.value.ToString();
+
+            return jobject;
+        }
+        public Type Type => _value == null ? null : _value.GetType();
+        public Array valueSource => _value == null ? null : Enum.GetValues(_value.GetType());
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void onPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+    public class POutput : IParaValue, INotifyPropertyChanged
+    {
+        private object _value;
+        public object value
+        {
+            get => _value;
+            set
+            {
+                _value = value;
+                onPropertyChanged(nameof(value));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void onPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+    #endregion
 }

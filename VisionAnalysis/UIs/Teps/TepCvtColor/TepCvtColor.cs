@@ -1,22 +1,21 @@
 ﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace VisionAnalysis
 {
-    public class TepCapture : BaseToolEditParas
+    public class TepCvtColor : BaseToolEditParas
     {
-        public TepCapture(ObservableRangeCollection<Nd> nodes) : base(nodes)
+        public TepCvtColor(ObservableRangeCollection<Nd> nodes) : base(nodes)
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
-            Inputs["ROI"] = new PInput() { value = ParaDictBuilder.Rectangle() };
+            Inputs["code"] = new PInput() { value = ColorConversion.Bgr2Gray };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             #endregion
@@ -27,11 +26,11 @@ namespace VisionAnalysis
         {
             base.actionProcess();//read paras
 
-            Mat inputImage = Inputs["InputImage"].value as Mat;
-            Dictionary<string, PInput> dictROI = (Dictionary<string, PInput>)Inputs["ROI"].value;
-            Rectangle roi = ParaDictRead.Rectangle(dictROI);
+            CvInvoke.CvtColor(
+                (Mat)Inputs["InputImage"].value,
+                (Mat)Outputs["Output1"].value,
+                TepHelper.getEnum<ColorConversion>(Inputs["code"].value));
 
-            Outputs["Output1"].value = new Mat(inputImage, roi);
             updateUIImage((Mat)Outputs["Output1"].value);
         };
         #endregion
