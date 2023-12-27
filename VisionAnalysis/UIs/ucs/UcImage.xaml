@@ -14,7 +14,7 @@
         </Grid.RowDefinitions>
 
         <WindowsFormsHost>
-            <EmguUI:ImageBox x:Name="cvIb" FunctionalMode="RightClickMenu" SizeChanged="cvIb_SizeChanged" MouseMove="cvIb_MouseMove"/>
+            <EmguUI:ImageBox x:Name="cvIb" FunctionalMode="RightClickMenu" SizeChanged="cvIb_SizeChanged" MouseMove="cvIb_MouseMove" MouseDoubleClick="cvIb_MouseDoubleClick"/>
         </WindowsFormsHost>
         <ToolBarTray Grid.Row="1">
             <ToolBar>

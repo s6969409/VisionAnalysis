@@ -47,9 +47,9 @@ namespace VisionAnalysis
             {
                 if (Image != null)
                 {
-                    double heightStd = (double)cvIb.ClientSize.Width * Image.Height / Image.Width;//Y/X
-                    if (cvIb.ClientSize.Height > heightStd) return (double)cvIb.ClientSize.Width / Image.Width;
-                    else return (double)cvIb.ClientSize.Height / Image.Height;
+                    double heightStd = (double)cvIb.Width * Image.Height / Image.Width;//Y/X
+                    if (cvIb.Height > heightStd) return (double)cvIb.Width / Image.Width;
+                    else return (double)cvIb.Height / Image.Height;
                 }
                 else
                 {
@@ -63,9 +63,10 @@ namespace VisionAnalysis
             ImageBox ib = sender as ImageBox;
             Mat mat = ib.Image as Mat;
             if (mat == null) return;
-            int offsetX = (int)(ib.Width / scale - mat.Width)/2;
+            int offsetX = (int)(ib.Width / scale - mat.Width) / 2;
+            int offsetY = (int)(ib.Height / scale - mat.Height) / 2;
             int x = (int)(e.X / scale - offsetX);
-            int y = (int)(e.Y / scale);
+            int y = (int)(e.Y / scale - offsetY);
 
             if(x < 0 || x >= mat.Width || y < 0 || y >= mat.Height)
             {
@@ -83,6 +84,12 @@ namespace VisionAnalysis
         {
             lb_scale.Width = 100;//Content改變不知道為什麼不會改變外觀長度...
             lb_scale.Content = $"放大倍率:{scale.ToString("0.00")}";
+        }
+
+        private void cvIb_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            ImageViewer imageViewer = new ImageViewer(Image);
+            imageViewer.ShowDialog();
         }
     }
     public interface IMatProperty

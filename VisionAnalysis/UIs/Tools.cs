@@ -168,7 +168,7 @@ namespace VisionAnalysis
         {
             w.MouseUp += Window_MouseUp;
             tv.MouseLeave += tv_MouseLeave;
-            this.onMove += onUpdate;
+            onMove += onUpdate;
         }
 
         public void tvi_MouseDown(object sender, MouseButtonEventArgs e)
