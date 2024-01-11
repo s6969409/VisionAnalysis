@@ -19,17 +19,18 @@ namespace VisionAnalysis
             Inputs["InputImage"] = new PInput() { value = new Mat() };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
-            Outputs["Contours"] = new POutput() { value = new List<object>() };
             #endregion
         }
         #region override BaseToolEditParas member
         public override Action actionProcess => () =>
         {
-            //read paras
-            TepHelper.readInputs(this, nodes);
+            base.actionProcess();//read paras
+
             Mat source = Inputs["InputImage"].value as Mat;
-            
-            base.actionProcess();
+
+            //process...
+
+            Outputs["Output1"].value = source;
         };
         #endregion
     }

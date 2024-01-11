@@ -1,4 +1,5 @@
 ﻿using Emgu.CV;
+using Emgu.CV.Structure;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -6,107 +7,9 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VisionAnalysis
 {
-    public class ParaDictBuilder
-    {
-        #region Rectangle
-        public static Dictionary<string, PInput> Rectangle()
-        {
-            Dictionary<string, PInput> pDict = new Dictionary<string, PInput>();
-            pDict["p1"] = new PInput() { value = Point() };
-            pDict["p2"] = new PInput() { value = Point() };
-
-            return pDict;
-        }
-        public static Dictionary<string, PInput> Rectangle(JToken jToken)
-        {
-            Dictionary<string, PInput> pDict = new Dictionary<string, PInput>();
-            var temp = jToken["value"]["p1"];
-
-            pDict["p1"] = JObjectToPInput(jToken["value"]["p1"]);
-            pDict["p2"] = JObjectToPInput(jToken["value"]["p2"]);
-
-            return pDict;
-        }
-        #endregion
-        #region Point
-        public static Dictionary<string, PInput> Point()
-        {
-            Dictionary<string, PInput> pDict = new Dictionary<string, PInput>();
-            pDict["x"] = new PInput() { value = 200 };
-            pDict["y"] = new PInput() { value = 200 };
-
-            return pDict;
-        }
-        public static Dictionary<string, PInput> Point(JToken jToken)
-        {
-            Dictionary<string, PInput> pDict = new Dictionary<string, PInput>();
-            pDict["x"] = JObjectToPInput(jToken["value"]["x"]);
-            pDict["y"] = JObjectToPInput(jToken["value"]["y"]);
-
-            return pDict;
-        }
-        #endregion
-        #region BaseTypeTranfer
-        public static PInput JObjectToPInput(JToken jToken, Type type = null)
-        {
-            object value;
-
-            if (jToken["value"].Type == JTokenType.Object)
-            {
-                Dictionary<string, PInput> pInput = new Dictionary<string, PInput>();
-                foreach (JProperty jProperty in jToken["value"].ToObject<JObject>().Properties())
-                {
-                    pInput[jProperty.Name] = JObjectToPInput(jProperty.Value);
-                }
-                value = pInput;
-            }
-            else if (type != null && type.IsEnum && (jToken["value"].Type == JTokenType.String || jToken["value"].Type == JTokenType.Integer))
-            {
-                value = Enum.Parse(type, (string)jToken["value"]);
-            }
-            else if (jToken["value"].Type == JTokenType.Boolean) value = (bool)jToken["value"];
-            else if (jToken["value"].Type == JTokenType.Float) value = (float)jToken["value"];
-            else if (jToken["value"].Type == JTokenType.Integer) value = (int)jToken["value"];
-            else if (jToken["value"].Type == JTokenType.String) value = (string)jToken["value"];
-            else throw new InvalidCastException($"jToken[value].Type = {jToken["value"].Type} + type = {type} 目前尚未實做!!");
-
-            return BuildCrossReference(jToken, value);
-        }
-        private static PInput BuildCrossReference(JToken jToken,object value) => new PInput()
-        {
-            ToolName = jToken["ToolName"] == null ? null : jToken["ToolName"].ToString(),
-            ParaName = jToken["ParaName"] == null ? null : jToken["ParaName"].ToString(),
-            value = value
-        };
-        public static PInput BuildMatByCrossReference(JToken jToken) => new PInput()
-        {
-            ToolName = jToken["ToolName"] == null ? null : jToken["ToolName"].ToString(),
-            ParaName = jToken["ParaName"] == null ? null : jToken["ParaName"].ToString(),
-            value = File.Exists((string)jToken["value"]) ? new Mat((string)jToken["value"]) : null
-        };
-        #endregion
-    }
-    public class ParaDictRead
-    {
-        public static Rectangle Rectangle(Dictionary<string, PInput> dict)
-        {
-            Point p1 = Point((Dictionary<string, PInput>)dict["p1"].value);
-            Point p2 = Point((Dictionary<string, PInput>)dict["p2"].value);
-            Size size = new Size(p2 - new Size(p1));
-
-            return new Rectangle(p1, size);
-        }
-
-        public static Point Point(Dictionary<string, PInput> dict)
-        {
-            return new Point((int)dict["x"].value, (int)dict["y"].value);
-        }
-    }
     public class TepHelper
     {
         public static void readInputs(IToolEditParas tool, ObservableRangeCollection<Nd> nodes)
@@ -147,7 +50,7 @@ namespace VisionAnalysis
         }
     }
 
-    #region IToolEditParas implement
+    #region IToolEditParas interface & base sample implement
     public interface IToolEditParas
     {
         string ToolName { get; set; }
@@ -188,15 +91,15 @@ namespace VisionAnalysis
             {
                 if (Inputs[key].value is Mat)
                 {
-                    Inputs[key] = ParaDictBuilder.BuildMatByCrossReference(inputs[key]);
+                    Inputs[key] = BuildMatByCrossReference(inputs[key]);
                 }
                 else if (Inputs[key].value is Enum)
                 {
-                    Inputs[key] = ParaDictBuilder.JObjectToPInput(inputs[key], Inputs[key].value.GetType());
+                    Inputs[key] = JObjectToPInput(inputs[key], Inputs[key].value.GetType());
                 }
                 else
                 {
-                    Inputs[key] = ParaDictBuilder.JObjectToPInput(inputs[key]);
+                    Inputs[key] = JObjectToPInput(inputs[key]);
                 }
             }
         };
@@ -204,6 +107,91 @@ namespace VisionAnalysis
         {
             if (UIImage != null) UIImage.Image = mat;
         };
+
+        #region BaseTypeTranfer
+        public static PInput JObjectToPInput(JToken jToken, Type type = null)
+        {
+            object value;
+
+            if (jToken["value"].Type == JTokenType.Object)
+            {
+                Dictionary<string, PInput> pInput = new Dictionary<string, PInput>();
+                foreach (JProperty jProperty in jToken["value"].ToObject<JObject>().Properties())
+                {
+                    pInput[jProperty.Name] = JObjectToPInput(jProperty.Value);
+                }
+                value = pInput;
+            }
+            else if (type != null && type.IsEnum && (jToken["value"].Type == JTokenType.String || jToken["value"].Type == JTokenType.Integer))
+            {
+                value = Enum.Parse(type, (string)jToken["value"]);
+            }
+            else if (jToken["value"].Type == JTokenType.Boolean) value = (bool)jToken["value"];
+            else if (jToken["value"].Type == JTokenType.Float) value = (float)jToken["value"];
+            else if (jToken["value"].Type == JTokenType.Integer) value = (int)jToken["value"];
+            else if (jToken["value"].Type == JTokenType.String) value = (string)jToken["value"];
+            else throw new InvalidCastException($"jToken[value].Type = {jToken["value"].Type} + type = {type} 目前尚未實做!!");
+
+            return BuildCrossReference(jToken, value);
+        }
+        private static PInput BuildCrossReference(JToken jToken, object value) => new PInput()
+        {
+            ToolName = jToken["ToolName"] == null ? null : jToken["ToolName"].ToString(),
+            ParaName = jToken["ParaName"] == null ? null : jToken["ParaName"].ToString(),
+            value = value
+        };
+        public static PInput BuildMatByCrossReference(JToken jToken) => new PInput()
+        {
+            ToolName = jToken["ToolName"] == null ? null : jToken["ToolName"].ToString(),
+            ParaName = jToken["ParaName"] == null ? null : jToken["ParaName"].ToString(),
+            value = File.Exists((string)jToken["value"]) ? new Mat((string)jToken["value"]) : null
+        };
+        #endregion
+        #region paraType Tranfer
+        protected static Dictionary<string, PInput> ParaDictBuilder<T>(params object[] ps)
+        {
+            if (typeof(T) == typeof(Rectangle))
+            {
+                string[] keyNames = { "p1", "p2" };
+                return keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ParaDictBuilder<Point>(ps[index * 2], ps[index * 2 + 1]) } }).ToDictionary(item => item.Key, item => item.Value);
+            }
+            else if (typeof(T) == typeof(Point))
+            {
+                string[] keyNames = { "x", "y" };
+                return keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ps[index] } }).ToDictionary(item => item.Key, item => item.Value);
+            }
+            else if (typeof(T) == typeof(Size))
+            {
+                string[] keyNames = { "Width", "Height" };
+                return keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ps[index] } }).ToDictionary(item => item.Key, item => item.Value);
+            }
+            else if (typeof(T) == typeof(MCvScalar))
+            {
+                string[] keyNames = { "v0", "v1", "v2", "v3" };
+                return keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ps[index] } }).ToDictionary(item => item.Key, item => item.Value);
+            }
+            else throw new Exception();
+        }
+        protected static T toT<T>(Dictionary<string, PInput> dict)
+        {
+            if (typeof(T) == typeof(Rectangle))
+            {
+                Point p1 = Base<Point>((Dictionary<string, PInput>)dict["p1"].value);
+                Point p2 = Base<Point>((Dictionary<string, PInput>)dict["p2"].value);
+                Size size = new Size(p2 - new Size(p1));
+
+                return (T)(object)new Rectangle(p1, size);
+            }
+            else
+            {
+                return Base<T>(dict);
+            }
+        }
+        private static T Base<T>(Dictionary<string, PInput> dict)
+        {
+            return (T)Activator.CreateInstance(typeof(T), dict.Values.Select(v => v.value).ToArray());
+        }
+        #endregion
     }
     public interface IParaValue
     {

@@ -122,7 +122,10 @@
     </ApplicationDefinition>
     <Compile Include="UIs\Teps\TepCanny\TepCanny.cs" />
     <Compile Include="UIs\Teps\TepCvtColor\TepCvtColor.cs" />
+    <Compile Include="UIs\Teps\TepDilate\TepDilate.cs" />
+    <Compile Include="UIs\Teps\TepErode\TepErode.cs" />
     <Compile Include="UIs\Teps\TepFindContours\TepFindContours.cs" />
+    <Compile Include="UIs\Teps\TepGetStructuringElement\TepGetStructuringElement.cs" />
     <Compile Include="UIs\Teps\TepTest.cs" />
     <Compile Include="UIs\ucs\UcImage.xaml.cs">
       <DependentUpon>UcImage.xaml</DependentUpon>

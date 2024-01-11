@@ -16,7 +16,7 @@ namespace VisionAnalysis
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
-            Inputs["ROI"] = new PInput() { value = ParaDictBuilder.Rectangle() };
+            Inputs["ROI"] = new PInput() { value = ParaDictBuilder<Rectangle>(100, 100, 200, 200) };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             #endregion
@@ -29,7 +29,7 @@ namespace VisionAnalysis
 
             Mat inputImage = Inputs["InputImage"].value as Mat;
             Dictionary<string, PInput> dictROI = (Dictionary<string, PInput>)Inputs["ROI"].value;
-            Rectangle roi = ParaDictRead.Rectangle(dictROI);
+            Rectangle roi = toT<Rectangle>(dictROI);
 
             Outputs["Output1"].value = new Mat(inputImage, roi);
             updateUIImage((Mat)Outputs["Output1"].value);
