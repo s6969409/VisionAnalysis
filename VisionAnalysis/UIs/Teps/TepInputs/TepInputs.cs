@@ -15,7 +15,7 @@ namespace VisionAnalysis
         {
             #region para value default...
             Inputs["ImageUrl"] = new PInput() { value = "" };
-            Outputs["SourceImage"] = new POutput();
+            Outputs["SourceImage"] = new POutput() { value = new Mat() };
             #endregion
         }
 

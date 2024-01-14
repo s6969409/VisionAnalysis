@@ -300,7 +300,7 @@ namespace VisionAnalysis
         }
     }
 
-    public interface IPara
+    public interface IUIPara
     {
         string name { get; }
         object value { get; set; }
@@ -338,6 +338,26 @@ namespace VisionAnalysis
         }
         public object value { get; set; }
         public bool isExpanded { get; set; } = true;
+        public string tip
+        {
+            get
+            {
+                if(value is IParaValue)
+                {
+                    IParaValue paraVal = value as IParaValue;
+                    return $"type: {paraVal.value.GetType()}\nvalue: {paraVal.value}";
+                }
+                else if (value is IToolEditParas)
+                {
+                    IToolEditParas val = value as IToolEditParas;
+                    return $"type: {val.GetType()}\nname: {val.ToolName}";
+                }
+                else
+                {
+                    throw new Exception("UI Node value is not {IParaValue} or {IToolEditParas}");
+                }
+            }
+        }
 
         public Nd(IToolEditParas valueDefault)
         {
