@@ -61,7 +61,7 @@ namespace VisionAnalysis
             {
                 Nd selectedNd = nodes.First(nd => nd.name == comboBox.SelectedItem.ToString());
                 IToolEditParas selectedTool = selectedNd.value as IToolEditParas;
-                cb_ParaName.ItemsSource = new string[] { "" }.Concat(selectedTool.Outputs.Keys);
+                cb_ParaName.ItemsSource = new string[] { "" }.Concat(selectedTool.Outputs.Select(p => p.Key));
             }
         }
 
