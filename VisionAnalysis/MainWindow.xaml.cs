@@ -180,11 +180,7 @@ namespace VisionAnalysis
             loadImg(null);
             Nd selected = tvl.SelectedItem as Nd;
             if (selected == null) return; 
-            if (selected.value is Mat)
-            {
-                loadImg((Mat)selected.value);
-            }
-            else if (selected.value is PInput)
+            if (selected.value is PInput)
             {
                 PInput selectedInput = selected.value as PInput;
                 if (selectedInput.value is Mat)
@@ -194,15 +190,23 @@ namespace VisionAnalysis
             }
             else if (selected.value is POutput)
             {
-                POutput selectedInput = selected.value as POutput;
-                if (selectedInput.value is Mat)
+                POutput selectedOutput = selected.value as POutput;
+                if (selectedOutput.value is Mat)
                 {
-                    loadImg((Mat)selectedInput.value);
+                    loadImg((Mat)selectedOutput.value);
                 }
-                else if (selectedInput.value is IEnumerable<object>)
+                else if (selectedOutput.value is IEnumerable<object>)
                 {
-                    table.update((IEnumerable<object>)selectedInput.value);
+                    table.update((IEnumerable<object>)selectedOutput.value);
                 }
+                else
+                {
+                    tv_obj.update(selectedOutput.value);
+                }
+            }
+            else
+            {
+                throw new ArgumentException($"{selected.value} 沒有定義處理函數");
             }
 
 

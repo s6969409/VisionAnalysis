@@ -60,6 +60,9 @@
                 <TabItem Header="Table">
                     <local:UcTable x:Name="table"/>
                 </TabItem>
+                <TabItem Header="Object">
+                    <local:UcTree x:Name="tv_obj"/>
+                </TabItem>
             </TabControl>
         </Grid>
     </Grid>

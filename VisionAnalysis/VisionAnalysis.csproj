@@ -136,6 +136,9 @@
     <Compile Include="UIs\ucs\UcText.xaml.cs">
       <DependentUpon>UcText.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UIs\ucs\UcTree.xaml.cs">
+      <DependentUpon>UcTree.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UIs\ucs\WindowPreference.xaml.cs">
       <DependentUpon>WindowPreference.xaml</DependentUpon>
     </Compile>
@@ -175,6 +178,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UIs\ucs\UcText.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIs\ucs\UcTree.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
