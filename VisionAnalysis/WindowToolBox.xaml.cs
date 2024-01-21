@@ -21,7 +21,7 @@ namespace VisionAnalysis
     public partial class WindowToolBox : Window
     {
         private Action<Type> addTool;
-        ObservableRangeCollection<ToolBoxShow> tools = new ObservableRangeCollection<ToolBoxShow>();
+        private ObservableRangeCollection<ToolBoxShow> tools = new ObservableRangeCollection<ToolBoxShow>();
 
         public WindowToolBox(Action<Type> addTool)
         {
