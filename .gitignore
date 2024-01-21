@@ -363,4 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # =============My define==============
-VisionAnalysis/UIs/Teps/TepTest.cs
+UIs/Teps/TepTest.cs
