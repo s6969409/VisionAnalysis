@@ -14,21 +14,27 @@ namespace VisionAnalysis
     {
         public static void readInputs(IToolEditParas tool, ObservableRangeCollection<Nd> nodes)
         {
+            //iterate through all input para of tool
             foreach (string inputKey in tool.Inputs.Keys)
             {
+                //iterate through all ref tool of node
                 foreach (Nd nd in nodes)
                 {
                     if (nd.name == tool.Inputs[inputKey].ToolName)
                     {
+                        bool isfound = false;
                         IToolEditParas toolEditParas = nd.value as IToolEditParas;
+                        //iterate through all output para of ref node(nd)
                         foreach (string pNameKey in toolEditParas.Outputs.Keys)
                         {
                             if (pNameKey == tool.Inputs[inputKey].ParaName && toolEditParas.Outputs[pNameKey].value != null)
                             {
                                 tool.Inputs[inputKey].value = toolEditParas.Outputs[pNameKey].value;
+                                isfound = true;
                                 break;
                             }
                         }
+                        if (isfound) break;
                     }
                 }
             }

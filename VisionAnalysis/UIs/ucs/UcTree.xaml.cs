@@ -21,7 +21,7 @@ namespace VisionAnalysis
     /// </summary>
     public partial class UcTree : UserControl
     {
-        private Node node = new Node() { name = "root"};
+        private Node node = new Node() { name = "root" };
         public UcTree()
         {
             InitializeComponent();
@@ -32,6 +32,7 @@ namespace VisionAnalysis
             node.value = obj;
             node.childNodes.Clear();
             buildObjStruct(node, obj);
+            if (tv.ItemsSource == null) tv.ItemsSource = node.childNodes;
         }
         private void buildObjStruct(Node node, object obj)
         {
@@ -45,10 +46,6 @@ namespace VisionAnalysis
                     node.childNodes.Add(newNd);
                     buildObjStruct(newNd, val);
                 }
-            }
-            else
-            {
-                node.value = obj;
             }
         }
 
