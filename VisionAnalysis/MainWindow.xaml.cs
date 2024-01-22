@@ -204,6 +204,10 @@ namespace VisionAnalysis
                     tv_obj.update(selectedOutput.value);
                 }
             }
+            else if (selected.value is IToolEditParas)
+            {
+
+            }
             else
             {
                 throw new ArgumentException($"{selected.value} 沒有定義處理函數");
@@ -349,7 +353,8 @@ namespace VisionAnalysis
                 if(value is IParaValue)
                 {
                     IParaValue paraVal = value as IParaValue;
-                    return $"type: {paraVal.value.GetType()}\nvalue: {paraVal.value}";
+                    if (paraVal.value == null) return "null";
+                    else return $"type: {paraVal.value.GetType()}\nvalue: {paraVal.value}";
                 }
                 else if (value is IToolEditParas)
                 {

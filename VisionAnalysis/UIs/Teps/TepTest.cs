@@ -19,6 +19,7 @@ namespace VisionAnalysis
             Inputs["InputImage"] = new PInput() { value = new Mat() };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
+            Outputs["Output2"] = new POutput() { value = new Rectangle(100,123,50,70) };
             #endregion
         }
         #region override BaseToolEditParas member

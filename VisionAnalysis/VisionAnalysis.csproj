@@ -122,6 +122,7 @@
     </ApplicationDefinition>
     <Compile Include="UIs\Teps\TepCanny\TepCanny.cs" />
     <Compile Include="UIs\Teps\TepCvtColor\TepCvtColor.cs" />
+    <Compile Include="UIs\Teps\TepDataTransfer\TepObjPaser.cs" />
     <Compile Include="UIs\Teps\TepDilate\TepDilate.cs" />
     <Compile Include="UIs\Teps\TepErode\TepErode.cs" />
     <Compile Include="UIs\Teps\TepFindContours\TepFindContours.cs" />

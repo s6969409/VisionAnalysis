@@ -20,7 +20,7 @@
         <Setter Property="BorderBrush" Value="Black"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="IsExpanded" Value="{Binding isExpanded, Mode=TwoWay}"/>
-        <Setter Property="ToolTip" Value="{Binding tip}" />
+        <Setter Property="ToolTip" Value="{Binding value.value}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="YellowGreen"/>
