@@ -120,14 +120,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="UIs\Teps\TepCanny\TepCanny.cs" />
-    <Compile Include="UIs\Teps\TepCvtColor\TepCvtColor.cs" />
-    <Compile Include="UIs\Teps\TepDataTransfer\TepObjPaser.cs" />
-    <Compile Include="UIs\Teps\TepDilate\TepDilate.cs" />
-    <Compile Include="UIs\Teps\TepErode\TepErode.cs" />
-    <Compile Include="UIs\Teps\TepFindContours\TepFindContours.cs" />
-    <Compile Include="UIs\Teps\TepGetStructuringElement\TepGetStructuringElement.cs" />
-    <Compile Include="UIs\Teps\TepTest.cs" />
+    <Compile Include="UIs\Tools\Teps\TepCanny\TepCanny.cs" />
+    <Compile Include="UIs\Tools\Teps\TepCvtColor\TepCvtColor.cs" />
+    <Compile Include="UIs\Tools\Teps\TepDataTransfer\TepObjPaser.cs" />
+    <Compile Include="UIs\Tools\Teps\TepDilate\TepDilate.cs" />
+    <Compile Include="UIs\Tools\Teps\TepErode\TepErode.cs" />
+    <Compile Include="UIs\Tools\Teps\TepFindContours\TepFindContours.cs" />
+    <Compile Include="UIs\Tools\Teps\TepGetStructuringElement\TepGetStructuringElement.cs" />
+    <Compile Include="UIs\Tools\Teps\TepTest.cs" />
     <Compile Include="UIs\ucs\UcImage.xaml.cs">
       <DependentUpon>UcImage.xaml</DependentUpon>
     </Compile>
@@ -143,15 +143,15 @@
     <Compile Include="UIs\ucs\WindowPreference.xaml.cs">
       <DependentUpon>WindowPreference.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UIs\Teps\TepAdapter.cs" />
-    <Compile Include="UIs\Teps\TepCapture\TepCapture.cs" />
-    <Compile Include="UIs\Teps\TepInputs\TepInputs.cs" />
-    <Compile Include="UIs\Teps\TepThresHold\TepThresHold.cs" />
+    <Compile Include="UIs\Tools\Teps\TepAdapter.cs" />
+    <Compile Include="UIs\Tools\Teps\TepCapture\TepCapture.cs" />
+    <Compile Include="UIs\Tools\Teps\TepInputs\TepInputs.cs" />
+    <Compile Include="UIs\Tools\Teps\TepThresHold\TepThresHold.cs" />
     <Compile Include="UIs\Tools.cs" />
     <Compile Include="WindowToolBox.xaml.cs">
       <DependentUpon>WindowToolBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UIs\Teps\WindowToolEdit.xaml.cs">
+    <Compile Include="UIs\ucs\WindowToolEdit.xaml.cs">
       <DependentUpon>WindowToolEdit.xaml</DependentUpon>
     </Compile>
     <Page Include="Dictionary1.xaml">
@@ -194,7 +194,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UIs\Teps\WindowToolEdit.xaml">
+    <Page Include="UIs\ucs\WindowToolEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

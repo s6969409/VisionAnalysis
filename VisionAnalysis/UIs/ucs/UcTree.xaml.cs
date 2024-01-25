@@ -55,11 +55,5 @@ namespace VisionAnalysis
             public object value { get; set; }
             public ObservableRangeCollection<Node> childNodes { get; } = new ObservableRangeCollection<Node>();
         }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            update(new { a = 10, bb="AA",m = new { NN=100} });
-            tv.ItemsSource = node.childNodes;
-        }
     }
 }
