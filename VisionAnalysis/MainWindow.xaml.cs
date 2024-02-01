@@ -191,9 +191,9 @@ namespace VisionAnalysis
             else if (selected.value is POutput)
             {
                 POutput selectedOutput = selected.value as POutput;
-                if (selectedOutput.value is Mat)
+                if (selectedOutput.value is IInputArray)
                 {
-                    loadImg((Mat)selectedOutput.value);
+                    loadImg((IInputArray)selectedOutput.value);
                 }
                 else if (selectedOutput.value is IEnumerable<object>)
                 {
@@ -284,7 +284,7 @@ namespace VisionAnalysis
         }
         #endregion
 
-        private void loadImg(Mat mat) => img.Image = mat;
+        private void loadImg(IInputArray inputArray) => img.Image = inputArray == null ? null : inputArray.GetInputArray().GetMat();
 
         private void tvl_Drop(object sender, DragEventArgs e)
         {
