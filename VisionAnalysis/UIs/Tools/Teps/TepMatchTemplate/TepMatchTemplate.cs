@@ -2,6 +2,7 @@
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -19,8 +20,10 @@ namespace VisionAnalysis
             Inputs["TemplateImage"] = new PInput() { value = new Mat() };
             Inputs["method"] = new PInput() { value = TemplateMatchingType.CcoeffNormed };
 
-            Outputs["Output1"] = new POutput() { value = new Mat() };
-            Outputs["Output2"] = new POutput() { value = null };
+            Outputs["OutputResult"] = new POutput() { value = null };
+            Outputs["OutputArr"] = new POutput() { value = null };
+            Outputs["OutputMatch"] = new POutput() { value = null };
+            Outputs["OutputReScale"] = new POutput() { value = null };
             #endregion
         }
 
@@ -37,6 +40,8 @@ namespace VisionAnalysis
             Mat result = new Mat(targetImage.Size, DepthType.Cv32F, 1);
 
             CvInvoke.MatchTemplate(targetImage, templateImage, result, method);
+            Outputs["OutputResult"].value = result;
+            Outputs["OutputArr"].value = toDataSets(result);
 
             // 找出結果的最小值、最大值、最小位置和最大位置
             double[] minValues, maxValues;
@@ -50,43 +55,28 @@ namespace VisionAnalysis
             Console.WriteLine("匹配位置：X = " + matchLocation.X + ", Y = " + matchLocation.Y);
             CvInvoke.Rectangle(targetImage, new Rectangle(matchLocation, templateImage.Size), new MCvScalar(0, 0, 255));
 
-            Outputs["Output1"].value = targetImage;
-
-            var a = result.ToImage<Gray, double>();
-            var b = a[0, 0];
-            Image<Bgr, byte> img = new Image<Bgr, byte>(result.Size);
-            // 遍歷圖像的每个像素，並重新調整亮度
-            for (int y = 0; y < a.Height; y++)
+            Outputs["OutputMatch"].value = targetImage;
+            
+            Image<Gray, double> img = result.ToImage<Gray, double>();
+            Parallel.For(0, img.Height, y =>
             {
-                for (int x = 0; x < a.Width; x++)
+                for (int x = 0; x < img.Width; x++)
                 {
-                    // 獲取當前的 Bgr 值
-                    var colors = colorBuilder(a[y, x].Intensity, minValues[0], maxValues[0], 5);
-                    Bgr bgr = new Bgr(colors[2], colors[1], colors[0]);
-
-                    // 將修改後的像素值重新調整
-                    img[y, x] = bgr;
+                    var intensity = colorBuilderX(img[y, x].Intensity, minValues[0], maxValues[0], 5);
+                    img.Data[y, x, 0] = intensity;
                 }
-            }
+            });
 
-            Outputs["Output2"].value = img;
+            Outputs["OutputReScale"].value = img.Convert<Gray, byte>();
         };
         #endregion
 
-        /*private IEnumerable<Color> turnFormat24bppRgb(int[] data, double limitDn = 0, double limitUp = 1)
+        private byte colorBuilderX(double val, double min, double max, int colorRanges)
         {
-            int colorRanges = 5;
-            int minSecond = data.Distinct().OrderBy(val => val).Skip(1).FirstOrDefault();
-            int max = data.Max();
-            int step = (max - minSecond) / colorRanges;
+            var newVal = (byte)((val - min) / (max - min) * byte.MaxValue);
 
-            minSecond += (int)((max - minSecond) * limitDn);
-            max -= (int)((max - minSecond) * (1 - limitUp));
-
-            IEnumerable<Color> ans = data.Select((val, i) => colorBuilder(val, minSecond, max, step, colorRanges));
-
-            return ans;
-        }*/
+            return newVal;
+        }
         private byte[] colorBuilder(double val, double min, double max, int colorRanges)
         {
             if (val == 0) return new byte[]{ 0,0,0,};
@@ -137,6 +127,18 @@ namespace VisionAnalysis
             Color color = Color.FromArgb(red, green, blue);
             return new[] { red, green, blue };
         }
-
+        private IEnumerable<object> toDataSets(IInputArray array)
+        {
+            Image<Gray, double> img = array.GetInputArray().GetMat().ToImage<Gray, double>();
+            ConcurrentBag<object> list = new ConcurrentBag<object>();
+            Parallel.For(0, img.Height, y =>
+            {
+                for (int x = 0; x < img.Width; x++)
+                {
+                    list.Add(new { x, y, value = img.Data[y, x, 0] });
+                }
+            });
+            return list;
+        }
     }
 }
