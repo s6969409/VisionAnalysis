@@ -19,6 +19,7 @@ namespace VisionAnalysis
             Inputs["TargetImage"] = new PInput() { value = new Mat() };
             Inputs["TemplateImage"] = new PInput() { value = new Mat() };
             Inputs["method"] = new PInput() { value = TemplateMatchingType.CcoeffNormed };
+            Inputs["FindVal"] = new PInput() { value = 0 };
 
             Outputs["OutputResult"] = new POutput() { value = null };
             Outputs["OutputArr"] = new POutput() { value = null };
@@ -32,7 +33,7 @@ namespace VisionAnalysis
         {
             base.actionProcess();//read paras
 
-            //process...
+            #region process... & output
             Mat targetImage = Inputs["TargetImage"].value as Mat;
             Mat templateImage = Inputs["TemplateImage"].value as Mat;
             TemplateMatchingType method = TepHelper.getEnum<TemplateMatchingType>(Inputs["method"].value);
@@ -42,91 +43,50 @@ namespace VisionAnalysis
             CvInvoke.MatchTemplate(targetImage, templateImage, result, method);
             Outputs["OutputResult"].value = result;
             Outputs["OutputArr"].value = toDataSets(result);
+            #endregion
 
-            // 找出結果的最小值、最大值、最小位置和最大位置
+            #region find max & min value
             double[] minValues, maxValues;
             Point[] minLocations, maxLocations;
             result.MinMax(out minValues, out maxValues, out minLocations, out maxLocations);
+            #endregion
 
-            // 如果使用 Ccoeff 或 CcoeffNormed 方法，最大值位置即為匹配位置
-            Point matchLocation = maxLocations[0];
+            #region output match locatiom information
+            float findVal = (float)Inputs["FindVal"].value;
+            var resultDatas = result.GetData().Cast<float>().Select((val, index) => new { val, x = index % result.Cols, y = index / result.Cols });
+            IEnumerable<Point> findPts = resultDatas.Where(v => v.val == findVal).Select(v => new Point(v.x, v.y));
 
-            // 輸出匹配結果位置
-            Console.WriteLine("匹配位置：X = " + matchLocation.X + ", Y = " + matchLocation.Y);
-            CvInvoke.Rectangle(targetImage, new Rectangle(matchLocation, templateImage.Size), new MCvScalar(0, 0, 255));
+            Mat OutputMatch = targetImage.Clone();
+            CvInvoke.Rectangle(OutputMatch, new Rectangle(maxLocations[0], templateImage.Size), new MCvScalar(0, 0, 255));
+            CvInvoke.PutText(OutputMatch, $"Max:{maxValues[0]}", maxLocations[0] + new Size(0, 30), FontFace.HersheySimplex, 1, new MCvScalar(0, 0, 255), 2);
+            foreach (Point pt in findPts)
+            {
+                CvInvoke.Rectangle(OutputMatch, new Rectangle(pt, templateImage.Size), new MCvScalar(0, 255, 0));
+                CvInvoke.PutText(OutputMatch, $"FindVal:{findVal}", pt + new Size(0, 30), FontFace.HersheySimplex, 1, new MCvScalar(0, 255, 0), 2);
+            }
+            CvInvoke.Rectangle(OutputMatch, new Rectangle(minLocations[0], templateImage.Size), new MCvScalar(255, 0, 0));
+            CvInvoke.PutText(OutputMatch, $"Min:{minValues[0]}", minLocations[0] + new Size(0, 30), FontFace.HersheySimplex, 1, new MCvScalar(255, 0, 0), 2);
+            Outputs["OutputMatch"].value = OutputMatch;
+            UIImage.Image = OutputMatch;
+            #endregion
 
-            Outputs["OutputMatch"].value = targetImage;
-            
+            #region output calculate value and turn to gray image by max & min scale value
             Image<Gray, double> img = result.ToImage<Gray, double>();
             Parallel.For(0, img.Height, y =>
             {
                 for (int x = 0; x < img.Width; x++)
                 {
-                    var intensity = colorBuilderX(img[y, x].Intensity, minValues[0], maxValues[0], 5);
+                    var intensity = colorBuilder(img[y, x].Intensity, minValues[0], maxValues[0], 5);
                     img.Data[y, x, 0] = intensity;
                 }
             });
 
             Outputs["OutputReScale"].value = img.Convert<Gray, byte>();
+            #endregion
         };
         #endregion
 
-        private byte colorBuilderX(double val, double min, double max, int colorRanges)
-        {
-            var newVal = (byte)((val - min) / (max - min) * byte.MaxValue);
-
-            return newVal;
-        }
-        private byte[] colorBuilder(double val, double min, double max, int colorRanges)
-        {
-            if (val == 0) return new byte[]{ 0,0,0,};
-
-            var step = (max - min) / colorRanges;
-            var index = (int)((val - min) * colorRanges / (max - min));
-            var h = (index + 1) * step + min;
-            var m = index * step + min;
-            var localR = ((double)val - m) / (h - m);
-
-            byte[] color = colorBdr(index, localR);
-
-            return color;
-        }
-        private byte[] colorBdr(int index, double range)
-        {
-            byte red = 0, green = 0, blue = 0, maxR = 200, maxG = 200, maxB = 200;
-            if (index == 0)//藍=>水藍
-            {
-                red = 0;
-                green = (byte)(range * maxG);
-                blue = (byte)maxB;
-            }
-            else if (index == 1)//水藍=>綠
-            {
-                red = 0;
-                green = (byte)maxG;
-                blue = (byte)((1 - range) * maxB);
-            }
-            else if (index == 2)//綠=>黃
-            {
-                red = (byte)(range * maxR);
-                green = (byte)maxG;
-                blue = 0;
-            }
-            else if (index == 3)//黃=>紅
-            {
-                red = (byte)(maxR);
-                green = (byte)((1 - range) * maxG);
-                blue = 0;
-            }
-            else if (index == 4)//紅=>紫
-            {
-                red = (byte)maxR;
-                green = 0;
-                blue = (byte)(range * maxB);
-            }
-            Color color = Color.FromArgb(red, green, blue);
-            return new[] { red, green, blue };
-        }
+        private byte colorBuilder(double val, double min, double max, int colorRanges) => (byte)((val - min) / (max - min) * byte.MaxValue);
         private IEnumerable<object> toDataSets(IInputArray array)
         {
             Image<Gray, double> img = array.GetInputArray().GetMat().ToImage<Gray, double>();
