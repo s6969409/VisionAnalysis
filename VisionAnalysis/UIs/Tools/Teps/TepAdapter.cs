@@ -233,15 +233,7 @@ namespace VisionAnalysis
             get => _value;
             set
             {
-                if (_value == null)
-                {
-                    _value = value;
-                }
-                else
-                {
-                    _value = Convert.ChangeType(value, _value.GetType());
-                }
-
+                _value = value;
                 onPropertyChanged(nameof(this.value));
             }
         }
