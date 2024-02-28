@@ -121,6 +121,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="UIs\Tools\Teps\TepCanny\TepCanny.cs" />
+    <Compile Include="UIs\Tools\Teps\TepCornerHarris\TepCornerHarris.cs" />
     <Compile Include="UIs\Tools\Teps\TepCvtColor\TepCvtColor.cs" />
     <Compile Include="UIs\Tools\Teps\TepMatchTemplate\TepMatchTemplate.cs" />
     <Compile Include="UIs\Tools\Trasfer\TepDataTransfer\TepObjParser.cs" />

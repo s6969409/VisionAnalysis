@@ -2,11 +2,13 @@
 using Emgu.CV.Structure;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace VisionAnalysis
 {
@@ -307,4 +309,34 @@ namespace VisionAnalysis
         protected void onPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
     #endregion
+
+    public class ImageProcess
+    {
+        public static Image<Gray, byte> ConvertGrayImg(Image<Gray, double> img, double min, double max)
+        {
+            Parallel.For(0, img.Height, y =>
+            {
+                for (int x = 0; x < img.Width; x++)
+                {
+                    var intensity = colorBuilder(img[y, x].Intensity, min, max);
+                    img.Data[y, x, 0] = intensity;
+                }
+            });
+            return img.Convert<Gray, byte>();
+        }
+        public static byte colorBuilder(double val, double min, double max) => (byte)((val - min) / (max - min) * byte.MaxValue);
+        public static IEnumerable<object> ConvertDataSets(IInputArray array)
+        {
+            Image<Gray, double> img = array.GetInputArray().GetMat().ToImage<Gray, double>();
+            ConcurrentBag<object> list = new ConcurrentBag<object>();
+            Parallel.For(0, img.Height, y =>
+            {
+                for (int x = 0; x < img.Width; x++)
+                {
+                    list.Add(new { x, y, value = img.Data[y, x, 0] });
+                }
+            });
+            return list;
+        }
+    }
 }

@@ -30,7 +30,7 @@ namespace VisionAnalysis
 
         #region override BaseToolEditParas member
         public override Action actionProcess => () =>
-        {
+        { 
             base.actionProcess();//read paras
 
             #region process... & output
@@ -42,13 +42,11 @@ namespace VisionAnalysis
 
             CvInvoke.MatchTemplate(targetImage, templateImage, result, method);
             Outputs["OutputResult"].value = result;
-            Outputs["OutputArr"].value = toDataSets(result);
+            Outputs["OutputArr"].value = ImageProcess.ConvertDataSets(result);
             #endregion
 
             #region find max & min value
-            double[] minValues, maxValues;
-            Point[] minLocations, maxLocations;
-            result.MinMax(out minValues, out maxValues, out minLocations, out maxLocations);
+            result.MinMax(out double[] minValues, out double[] maxValues, out Point[] minLocations, out Point[] maxLocations);
             #endregion
 
             #region output match locatiom information
@@ -76,7 +74,7 @@ namespace VisionAnalysis
             {
                 for (int x = 0; x < img.Width; x++)
                 {
-                    var intensity = colorBuilder(img[y, x].Intensity, minValues[0], maxValues[0], 5);
+                    var intensity = ImageProcess.colorBuilder(img[y, x].Intensity, minValues[0], maxValues[0]);
                     img.Data[y, x, 0] = intensity;
                 }
             });
@@ -86,19 +84,6 @@ namespace VisionAnalysis
         };
         #endregion
 
-        private byte colorBuilder(double val, double min, double max, int colorRanges) => (byte)((val - min) / (max - min) * byte.MaxValue);
-        private IEnumerable<object> toDataSets(IInputArray array)
-        {
-            Image<Gray, double> img = array.GetInputArray().GetMat().ToImage<Gray, double>();
-            ConcurrentBag<object> list = new ConcurrentBag<object>();
-            Parallel.For(0, img.Height, y =>
-            {
-                for (int x = 0; x < img.Width; x++)
-                {
-                    list.Add(new { x, y, value = img.Data[y, x, 0] });
-                }
-            });
-            return list;
-        }
+        
     }
 }
