@@ -1,4 +1,5 @@
 ﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,7 +17,7 @@ namespace VisionAnalysis
             Inputs["InputImage"] = new PInput() { value = new Mat() };
 
             Outputs["OutputResult"] = new POutput() { value = new Mat() };
-            Outputs["OutputReScale"] = new POutput() { value = null };
+            Outputs["OutputReScale"] = new POutput() { value = new Mat() };
             #endregion
         }
         #region override BaseToolEditParas member
@@ -34,7 +35,7 @@ namespace VisionAnalysis
             result.MinMax(out double[] minValues, out double[] maxValues, out Point[] minLocations, out Point[] maxLocations);
             #endregion
 
-            Outputs["OutputReScale"].value = ImageProcess.ConvertGrayImg(result.ToImage<Emgu.CV.Structure.Gray, double>(), minValues[0], maxValues[0]);
+            Outputs["OutputReScale"].value = ImageProcess.ConvertGrayImg(result.ToImage<Emgu.CV.Structure.Gray, double>(), minValues[0], maxValues[0]).Mat;
         };
         #endregion
     }
