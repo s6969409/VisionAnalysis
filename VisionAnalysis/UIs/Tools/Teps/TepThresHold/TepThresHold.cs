@@ -1,6 +1,5 @@
-﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,7 +18,7 @@ namespace VisionAnalysis
             Inputs["InputImage"] = new PInput() { value = new Mat() };
             Inputs["threshold"] = new PInput() { value = 100 };
             Inputs["maxValue"] = new PInput() { value = 200 };
-            Inputs["thresholdType"] = new PInput() { value = ThresholdType.Binary };
+            Inputs["thresholdType"] = new PInput() { value = ThresholdTypes.Binary };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             #endregion
@@ -30,12 +29,12 @@ namespace VisionAnalysis
         {
             base.actionProcess();//read paras
 
-            CvInvoke.Threshold(
+            Cv2.Threshold(
                 (Mat)Inputs["InputImage"].value,
                 (Mat)Outputs["Output1"].value,
                 (int)Inputs["threshold"].value,
                 (int)Inputs["maxValue"].value,
-                TepHelper.getEnum<ThresholdType>(Inputs["thresholdType"].value));
+                TepHelper.getEnum<ThresholdTypes>(Inputs["thresholdType"].value));
             updateUIImage((Mat)Outputs["Output1"].value);
         };
         #endregion

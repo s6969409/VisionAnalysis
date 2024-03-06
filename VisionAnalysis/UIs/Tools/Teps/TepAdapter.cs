@@ -1,11 +1,9 @@
-﻿using Emgu.CV;
-using Emgu.CV.Structure;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using OpenCvSharp;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -158,7 +156,7 @@ namespace VisionAnalysis
         #region paraType Tranfer
         protected static Dictionary<string, PInput> ParaDictBuilder<T>(params object[] ps)
         {
-            if (typeof(T) == typeof(Rectangle))
+            if (typeof(T) == typeof(Rect))
             {
                 string[] keyNames = { "p1", "p2" };
                 return keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ParaDictBuilder<Point>(ps[index * 2], ps[index * 2 + 1]) } }).ToDictionary(item => item.Key, item => item.Value);
@@ -173,7 +171,7 @@ namespace VisionAnalysis
                 string[] keyNames = { "Width", "Height" };
                 return keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ps[index] } }).ToDictionary(item => item.Key, item => item.Value);
             }
-            else if (typeof(T) == typeof(MCvScalar))
+            else if (typeof(T) == typeof(Scalar))
             {
                 string[] keyNames = { "v0", "v1", "v2", "v3" };
                 return keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ps[index] } }).ToDictionary(item => item.Key, item => item.Value);
@@ -182,13 +180,14 @@ namespace VisionAnalysis
         }
         protected static T toT<T>(Dictionary<string, PInput> dict)
         {
-            if (typeof(T) == typeof(Rectangle))
+            if (typeof(T) == typeof(Rect))
             {
                 Point p1 = Base<Point>((Dictionary<string, PInput>)dict["p1"].value);
                 Point p2 = Base<Point>((Dictionary<string, PInput>)dict["p2"].value);
-                Size size = new Size(p2 - new Size(p1));
+                Point diff = p2 - p1;
+                Size size = new Size(diff.X, diff.Y);
 
-                return (T)(object)new Rectangle(p1, size);
+                return (T)(object)new Rect(p1, size);
             }
             else
             {
@@ -276,7 +275,7 @@ namespace VisionAnalysis
             else if (pi.value is Mat)
             {
                 string imgPath = $@"{imgDirPath}\{Directory.GetFiles(imgDirPath).Length}.bmp";
-                ((Mat)pi.value).Save(imgPath);
+                ((Mat)pi.value).SaveImage(imgPath);
                 jobject["value"] = imgPath;
             }
             else if (pi.value is int) jobject["value"] = (int)pi.value;
@@ -311,28 +310,27 @@ namespace VisionAnalysis
 
     public class ImageProcess
     {
-        public static Image<Gray, byte> ConvertGrayImg(Image<Gray, double> img, double min, double max)
+        public static Mat ConvertGrayImg(Mat mat, double min, double max)
         {
-            Parallel.For(0, img.Height, y =>
+            Parallel.For(0, mat.Height, y =>
             {
-                for (int x = 0; x < img.Width; x++)
+                for (int x = 0; x < mat.Width; x++)
                 {
-                    var intensity = colorBuilder(img[y, x].Intensity, min, max);
-                    img.Data[y, x, 0] = intensity;
+                    var intensity = colorBuilder(mat.Get<double>(y, x), min, max);
+                    mat.Set(y, x, intensity);
                 }
             });
-            return img.Convert<Gray, byte>();
+            return mat;
         }
         public static byte colorBuilder(double val, double min, double max) => (byte)((val - min) / (max - min) * byte.MaxValue);
-        public static IEnumerable<object> ConvertDataSets(IInputArray array)
+        public static IEnumerable<object> ConvertDataSets(Mat mat)
         {
-            Image<Gray, double> img = array.GetInputArray().GetMat().ToImage<Gray, double>();
             ConcurrentBag<object> list = new ConcurrentBag<object>();
-            Parallel.For(0, img.Height, y =>
+            Parallel.For(0, mat.Height, y =>
             {
-                for (int x = 0; x < img.Width; x++)
+                for (int x = 0; x < mat.Width; x++)
                 {
-                    list.Add(new { x, y, value = img.Data[y, x, 0] });
+                    list.Add(new { x, y, value = mat.Get<double>(y, x, 0) });
                 }
             });
             return list;

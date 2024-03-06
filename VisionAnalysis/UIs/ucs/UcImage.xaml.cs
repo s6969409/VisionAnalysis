@@ -1,6 +1,5 @@
-﻿using Emgu.CV;
-using Emgu.CV.Structure;
-using Emgu.CV.UI;
+﻿using OpenCvSharp;
+using OpenCvSharp.WpfExtensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -28,16 +27,17 @@ namespace VisionAnalysis
             InitializeComponent();
         }
 
+        private Mat mat;
         public Mat Image 
-        { 
-            get => (Mat)cvIb.Image;
+        {
+            get => mat;
             set
             {
-                cvIb.Image = value;
-                cvIb.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+                mat = value;
+                img.Source = value == null ? null : value.ToBitmapSource();
                 if (value == null) return;
-                lb_size.Content = $"{value.Width}*{value.Height}*{value.NumberOfChannels}";
-                lb_format.Content = $"{value.Depth},Dims={value.Dims}";
+                lb_size.Content = $"{value.Width}*{value.Height}*{value.Channels()}";
+                lb_format.Content = $"{value.Depth()},Dims={value.Dims}";
             }
         }
 
@@ -47,9 +47,9 @@ namespace VisionAnalysis
             {
                 if (Image != null)
                 {
-                    double heightStd = (double)cvIb.Width * Image.Height / Image.Width;//Y/X
-                    if (cvIb.Height > heightStd) return (double)cvIb.Width / Image.Width;
-                    else return (double)cvIb.Height / Image.Height;
+                    double heightStd = (double)img.Width * Image.Height / Image.Width;//Y/X
+                    if (img.Height > heightStd) return (double)img.Width / Image.Width;
+                    else return (double)img.Height / Image.Height;
                 }
                 else
                 {
@@ -60,11 +60,9 @@ namespace VisionAnalysis
 
         private void cvIb_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            ImageBox ib = sender as ImageBox;
-            Mat mat = ib.Image as Mat;
-            if (mat == null) return;
-            int offsetX = (int)(ib.Width / scale - mat.Width) / 2;
-            int offsetY = (int)(ib.Height / scale - mat.Height) / 2;
+            if (Image == null) return;
+            int offsetX = (int)(Image.Width / scale - mat.Width) / 2;
+            int offsetY = (int)(Image.Height / scale - mat.Height) / 2;
             int x = (int)(e.X / scale - offsetX);
             int y = (int)(e.Y / scale - offsetY);
 
@@ -76,8 +74,9 @@ namespace VisionAnalysis
             }
             lb_position.Content = $"滑鼠座標:{x},{y}";
 
-            IEnumerable<object> vs = Enumerable.Range(0, mat.NumberOfChannels)
-                .Select(i => mat.NumberOfChannels == 1 ? mat.GetData().GetValue(y, x) : mat.GetData().GetValue(y, x, i));
+            int channels = Image.Channels();
+            IEnumerable<byte> vs = Enumerable.Range(0, channels)
+                .Select(i => channels == 1 ? mat.Get<byte>(y, x) : mat.Get<byte>(y, x, i));
             lb_value.Content = $"value:{string.Join(",", vs)}";
         }
         private void cvIb_SizeChanged(object sender, EventArgs e)
@@ -88,8 +87,8 @@ namespace VisionAnalysis
 
         private void cvIb_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            ImageViewer imageViewer = new ImageViewer(Image);
-            imageViewer.ShowDialog();
+            //ImageViewer imageViewer = new ImageViewer(Image);
+            //imageViewer.ShowDialog();
         }
     }
     public interface IMatProperty

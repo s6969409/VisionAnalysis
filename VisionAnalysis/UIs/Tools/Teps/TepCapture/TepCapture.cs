@@ -1,8 +1,7 @@
-﻿using Emgu.CV;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,7 +15,7 @@ namespace VisionAnalysis
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
-            Inputs["ROI"] = new PInput() { value = ParaDictBuilder<Rectangle>(100, 100, 200, 200) };
+            Inputs["ROI"] = new PInput() { value = ParaDictBuilder<Rect>(100, 100, 200, 200) };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             #endregion
@@ -29,7 +28,7 @@ namespace VisionAnalysis
 
             Mat inputImage = Inputs["InputImage"].value as Mat;
             Dictionary<string, PInput> dictROI = (Dictionary<string, PInput>)Inputs["ROI"].value;
-            Rectangle roi = toT<Rectangle>(dictROI);
+            Rect roi = toT<Rect>(dictROI);
 
             Outputs["Output1"].value = new Mat(inputImage, roi);
             updateUIImage((Mat)Outputs["Output1"].value);

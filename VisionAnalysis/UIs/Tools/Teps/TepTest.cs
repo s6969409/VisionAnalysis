@@ -1,10 +1,7 @@
-﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Util;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +16,7 @@ namespace VisionAnalysis
             Inputs["InputImage"] = new PInput() { value = new Mat() };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
-            Outputs["Output2"] = new POutput() { value = new Rectangle(100,123,50,70) };
+            Outputs["Output2"] = new POutput() { value = new Rect(100,123,50,70) };
             #endregion
         }
         #region override BaseToolEditParas member
@@ -30,7 +27,7 @@ namespace VisionAnalysis
             Mat source = Inputs["InputImage"].value as Mat;
 
             //process...
-
+            //OpenCvSharp.XFeatures2D.SURF a;
             Outputs["Output1"].value = source;
         };
         #endregion

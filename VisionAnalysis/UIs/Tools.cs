@@ -1,5 +1,5 @@
-﻿using Emgu.CV;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,32 +19,6 @@ namespace VisionAnalysis
 {
     public class Tools
     {
-        // 將 Emgu.CV 的 Mat 轉換為 WPF 的 BitmapSource
-        public static BitmapSource ToBitmapSource(Mat mat)
-        {
-            if (mat != null)
-            {
-                using (System.Drawing.Bitmap bitmap = mat.ToBitmap())
-                {
-                    if (bitmap == null) return null;
-                    IntPtr hBitmap = bitmap.GetHbitmap();
-                    try
-                    {
-                        return Imaging.CreateBitmapSourceFromHBitmap(
-                            hBitmap,
-                            IntPtr.Zero,
-                            Int32Rect.Empty,
-                            BitmapSizeOptions.FromEmptyOptions());
-                    }
-                    finally
-                    {
-                        DeleteObject(hBitmap); // 釋放 GDI 資源
-                    }
-                }
-            }
-            return null;
-        }
-
         // P/Invoke 函數，用於釋放 GDI 資源
         [System.Runtime.InteropServices.DllImport("gdi32.dll")]
         private static extern bool DeleteObject(IntPtr hObject);
@@ -163,7 +137,7 @@ namespace VisionAnalysis
         private object cut;
         private Action<object, object> onMove;
 
-        public TVImoveByMouse(Window w, TreeView tv, Action<object, object> onUpdate)
+        public TVImoveByMouse(System.Windows.Window w, TreeView tv, Action<object, object> onUpdate)
         {
             w.MouseUp += Window_MouseUp;
             tv.MouseLeave += tv_MouseLeave;
@@ -287,8 +261,8 @@ namespace VisionAnalysis
         public enum WindowLocation { NoneSet, Top, Bottom, Left, Right, OwnCenter }
         private class ClosingListenerBuilder
         {
-            private Window window;
-            public ClosingListenerBuilder(Window window)
+            private System.Windows.Window window;
+            public ClosingListenerBuilder(System.Windows.Window window)
             {
                 this.window = window;
             }
@@ -300,7 +274,7 @@ namespace VisionAnalysis
             }
         }
 
-        public static void WindowInitialShow(Window newW, Window owner, WindowLocation location)
+        public static void WindowInitialShow(System.Windows.Window newW, System.Windows.Window owner, WindowLocation location)
         {
             if (newW.IsLoaded)
             {
@@ -315,13 +289,13 @@ namespace VisionAnalysis
                 newW.Show();
             }
         }
-        public static void WindowInitial(Window newW, Window owner, WindowLocation location)
+        public static void WindowInitial(System.Windows.Window newW, System.Windows.Window owner, WindowLocation location)
         {
             newW.FontSize = WindowPreference.getCfgValue<int>(
                     WindowPreference.fontSize);
             setWindowLocation(newW, owner, location);
         }
-        private static void setWindowLocation(Window newW, Window owner, WindowLocation location)
+        private static void setWindowLocation(System.Windows.Window newW, System.Windows.Window owner, WindowLocation location)
         {
             if (location == WindowLocation.NoneSet)
             {

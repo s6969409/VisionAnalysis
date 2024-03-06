@@ -1,5 +1,5 @@
-﻿using Emgu.CV;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +26,7 @@ namespace VisionAnalysis
         {
             base.actionProcess();//read paras
 
-            CvInvoke.Canny(
+            Cv2.Canny(
                 (Mat)Inputs["InputImage"].value, 
                 (Mat)Outputs["Output1"].value, 
                 (int)Inputs["threshold1"].value, 

@@ -1,8 +1,6 @@
-﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
+﻿using OpenCvSharp;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +14,7 @@ namespace VisionAnalysis
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
             Inputs["blockSize"] = new PInput() { value = 3 };
+            Inputs["int"] = new PInput() { value = 3 };
             Inputs["k"] = new PInput() { value = 0.04 };
 
             Outputs["OutputResult"] = new POutput() { value = new Mat() };
@@ -29,17 +28,19 @@ namespace VisionAnalysis
 
             Mat source = Inputs["InputImage"].value as Mat;
             int blockSize = (int)Inputs["blockSize"].value;
+            int ksize = (int)Inputs["ksize"].value;
             double k = (double)Inputs["k"].value;
             Mat result = new Mat();
             //process...
-            CvInvoke.CornerHarris(source, result, blockSize, k: k);
+            Cv2.CornerHarris(source, result, blockSize, ksize, k);
             Outputs["OutputResult"].value = result;
 
             #region find max & min value
-            result.MinMax(out double[] minValues, out double[] maxValues, out Point[] minLocations, out Point[] maxLocations);
+            result.MinMaxIdx(out double minValue, out double maxValue);
+            result.MinMaxLoc(out Point minLocation, out Point maxLocation);
             #endregion
 
-            Outputs["OutputReScale"].value = ImageProcess.ConvertGrayImg(result.ToImage<Emgu.CV.Structure.Gray, double>(), minValues[0], maxValues[0]).Mat;
+            //Outputs["OutputReScale"].value = ImageProcess.ConvertGrayImg(result.ToImage<Emgu.CV.Structure.Gray, double>(), minValue, maxValue).Mat;
             UIImage.Image = (Mat)Outputs["OutputReScale"].value;
         };
         #endregion

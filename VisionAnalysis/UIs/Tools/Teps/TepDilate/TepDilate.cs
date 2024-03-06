@@ -1,9 +1,6 @@
-﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
+﻿using OpenCvSharp;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,14 +19,14 @@ namespace VisionAnalysis
 
             Mat source = Inputs["InputImage"].value as Mat;
 
-            CvInvoke.Dilate(
+            Cv2.Dilate(
                 source,
                 (Mat)Outputs["Output1"].value,
                 (Mat)Inputs["element"].value,
                 toT<Point>((Dictionary<string, PInput>)Inputs["anchor"].value),
                 (int)Inputs["iterations"].value,
-                TepHelper.getEnum<BorderType>(Inputs["borderType"].value),
-                toT<MCvScalar>((Dictionary<string, PInput>)Inputs["borderValue"].value));
+                TepHelper.getEnum<BorderTypes>(Inputs["borderType"].value),
+                toT<Scalar>((Dictionary<string, PInput>)Inputs["borderValue"].value));
         };
         #endregion
     }

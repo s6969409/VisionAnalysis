@@ -1,10 +1,7 @@
-﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Util;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,8 +15,8 @@ namespace VisionAnalysis
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
-            Inputs["mode"] = new PInput() { value = RetrType.Tree };
-            Inputs["method"] = new PInput() { value = ChainApproxMethod.ChainApproxSimple };
+            Inputs["mode"] = new PInput() { value = RetrievalModes.Tree };
+            Inputs["method"] = new PInput() { value = ContourApproximationModes.ApproxSimple };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             Outputs["Contours"] = new POutput() { value = new List<object>() };
@@ -33,37 +30,41 @@ namespace VisionAnalysis
 
             Mat source = Inputs["InputImage"].value as Mat;
 
-            VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
-            CvInvoke.FindContours(
+            Cv2.FindContours(
                 source, 
-                contours, 
-                null,
-                TepHelper.getEnum<RetrType>(Inputs["mode"].value),
-                TepHelper.getEnum<ChainApproxMethod>(Inputs["method"].value));
+                out Point[][] contours, 
+                out HierarchyIndex[] hierarchies,
+                TepHelper.getEnum<RetrievalModes>(Inputs["mode"].value),
+                TepHelper.getEnum<ContourApproximationModes>(Inputs["method"].value));
 
-            Mat drawMat = new Mat(source.Rows, source.Cols, DepthType.Cv8U, 3);
-            List<VectorOfPoint> cs = new List<VectorOfPoint>();
-            for (int i = 0; i < contours.Size; i++) cs.Add(contours[i]);
+            Mat drawMat = new Mat(source.Rows, source.Cols, MatType.CV_8U, 3);
+            List<Point[]> cs = new List<Point[]>();
+            for (int i = 0; i < contours.Length; i++) cs.Add(contours[i]);
 
             (Outputs["Contours"].value as List<object>).Clear();
-            (Outputs["Contours"].value as List<object>).AddRange(cs.Select((c, Index) => new {
-                Index,
-                Size = contoursRange(c),
-                GravityPt = new Point((int)CvInvoke.Moments(c).GravityCenter.X, (int)CvInvoke.Moments(c).GravityCenter.Y),
-                Area = c.Size
+            (Outputs["Contours"].value as List<object>).AddRange(cs.Select((c, Index) =>
+            {
+                Moments moments = Cv2.Moments(c);
+                return new
+                {
+                    Index,
+                    Size = contoursRange(c),
+                    GravityPt = new Point((int)(moments.M10 / moments.M00), (int)(moments.M01 / moments.M00)),
+                    Area = c.Length
+                };
             }));
 
-            CvInvoke.DrawContours(drawMat, contours, -1, new Emgu.CV.Structure.MCvScalar(255, 255, 0), 1, LineType.FourConnected);
+            Cv2.DrawContours(drawMat, contours, -1, new Scalar(255, 255, 0), 1, LineTypes.Link4);
             updateUIImage((Mat)Outputs["Output1"].value);
             Outputs["Output1"].value = drawMat;
         };
         #endregion
 
-        private Rectangle contoursRange(VectorOfPoint pts)
+        private Rect contoursRange(Point[] pts)
         {
             int minX = pts[0].X, minY = pts[0].Y, maxX = pts[0].X, maxY = pts[0].Y;
 
-            for (int i = 1; i < pts.Size; i++)
+            for (int i = 1; i < pts.Length; i++)
             {
                 if (pts[i].X < minX) minX = pts[i].X;
                 if (pts[i].Y < minY) minY = pts[i].Y;
@@ -71,7 +72,7 @@ namespace VisionAnalysis
                 if (pts[i].Y > maxY) maxY = pts[i].Y;
             }
 
-            return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+            return new Rect(minX, minY, maxX - minX, maxY - minY);
         }
     }
 }

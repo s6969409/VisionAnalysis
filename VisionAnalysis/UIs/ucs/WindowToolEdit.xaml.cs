@@ -1,4 +1,4 @@
-﻿using Emgu.CV;
+﻿using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace VisionAnalysis
     /// <summary>
     /// WindowToolEdit.xaml 的互動邏輯
     /// </summary>
-    public partial class WindowToolEdit : Window
+    public partial class WindowToolEdit : System.Windows.Window
     {
         private IToolEditParas toolEditParas;
         private IEnumerable<Nd> nodes;

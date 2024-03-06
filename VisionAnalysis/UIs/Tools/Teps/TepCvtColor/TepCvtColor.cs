@@ -1,6 +1,5 @@
-﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +14,7 @@ namespace VisionAnalysis
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
-            Inputs["code"] = new PInput() { value = ColorConversion.Bgr2Gray };
+            Inputs["code"] = new PInput() { value = ColorConversionCodes.BGR2GRAY };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             #endregion
@@ -26,10 +25,10 @@ namespace VisionAnalysis
         {
             base.actionProcess();//read paras
 
-            CvInvoke.CvtColor(
+            Cv2.CvtColor(
                 (Mat)Inputs["InputImage"].value,
                 (Mat)Outputs["Output1"].value,
-                TepHelper.getEnum<ColorConversion>(Inputs["code"].value));
+                TepHelper.getEnum<ColorConversionCodes>(Inputs["code"].value));
 
             updateUIImage((Mat)Outputs["Output1"].value);
         };

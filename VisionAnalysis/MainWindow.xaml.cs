@@ -1,5 +1,5 @@
-﻿using Emgu.CV;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using Window = System.Windows.Window;
 
 namespace VisionAnalysis
 {
@@ -191,9 +192,9 @@ namespace VisionAnalysis
             else if (selected.value is POutput)
             {
                 POutput selectedOutput = selected.value as POutput;
-                if (selectedOutput.value is IInputArray)
+                if (selectedOutput.value is Mat)
                 {
-                    loadImg((IInputArray)selectedOutput.value);
+                    loadImg((Mat)selectedOutput.value);
                 }
                 else if (selectedOutput.value is IEnumerable<object>)
                 {
@@ -284,7 +285,7 @@ namespace VisionAnalysis
         }
         #endregion
 
-        private void loadImg(IInputArray inputArray) => img.Image = inputArray == null ? null : inputArray.GetInputArray().GetMat();
+        private void loadImg(Mat mat) => img.Image = mat == null ? null : mat;
 
         private void tvl_Drop(object sender, DragEventArgs e)
         {

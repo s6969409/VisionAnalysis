@@ -1,10 +1,7 @@
-﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
+﻿using OpenCvSharp;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +15,7 @@ namespace VisionAnalysis
             #region para value default...
             Inputs["TargetImage"] = new PInput() { value = new Mat() };
             Inputs["TemplateImage"] = new PInput() { value = new Mat() };
-            Inputs["method"] = new PInput() { value = TemplateMatchingType.CcoeffNormed };
+            Inputs["method"] = new PInput() { value = TemplateMatchModes.CCoeffNormed };
             Inputs["FindVal"] = new PInput() { value = 0 };
 
             Outputs["OutputResult"] = new POutput() { value = null };
@@ -36,50 +33,51 @@ namespace VisionAnalysis
             #region process... & output
             Mat targetImage = Inputs["TargetImage"].value as Mat;
             Mat templateImage = Inputs["TemplateImage"].value as Mat;
-            TemplateMatchingType method = TepHelper.getEnum<TemplateMatchingType>(Inputs["method"].value);
+            TemplateMatchModes method = TepHelper.getEnum<TemplateMatchModes>(Inputs["method"].value);
 
-            Mat result = new Mat(targetImage.Size, DepthType.Cv32F, 1);
+            Mat result = new Mat(targetImage.Size(), MatType.CV_32F);
 
-            CvInvoke.MatchTemplate(targetImage, templateImage, result, method);
+            Cv2.MatchTemplate(targetImage, templateImage, result, method);
             Outputs["OutputResult"].value = result;
-            Outputs["OutputArr"].value = ImageProcess.ConvertDataSets(result);
+            //Outputs["OutputArr"].value = ImageProcess.ConvertDataSets(result);
             #endregion
 
             #region find max & min value
-            result.MinMax(out double[] minValues, out double[] maxValues, out Point[] minLocations, out Point[] maxLocations);
+            result.MinMaxIdx(out double minValue, out double maxValue);
+            result.MinMaxLoc(out Point minLocation, out Point maxLocation);
             #endregion
 
             #region output match locatiom information
             float findVal = (float)Inputs["FindVal"].value;
-            var resultDatas = result.GetData().Cast<float>().Select((val, index) => new { val, x = index % result.Cols, y = index / result.Cols });
-            IEnumerable<Point> findPts = resultDatas.Where(v => v.val == findVal).Select(v => new Point(v.x, v.y));
+            result.GetArray(out float[] resultDatas);
+            IEnumerable<Point> findPts = resultDatas.Select((val, index) => new { val, x = index % result.Cols, y = index / result.Cols }).Where(v => v.val == findVal).Select(v => new Point(v.x, v.y));
 
             Mat OutputMatch = targetImage.Clone();
-            CvInvoke.Rectangle(OutputMatch, new Rectangle(maxLocations[0], templateImage.Size), new MCvScalar(0, 0, 255));
-            CvInvoke.PutText(OutputMatch, $"Max:{maxValues[0]}", maxLocations[0] + new Size(0, 30), FontFace.HersheySimplex, 1, new MCvScalar(0, 0, 255), 2);
+            Cv2.Rectangle(OutputMatch, new Rect(maxLocation, templateImage.Size()), new Scalar(0, 0, 255));
+            Cv2.PutText(OutputMatch, $"Max:{maxValue}", maxLocation + new Point(0, 30), HersheyFonts.HersheySimplex, 1, new Scalar(0, 0, 255), 2);
             foreach (Point pt in findPts)
             {
-                CvInvoke.Rectangle(OutputMatch, new Rectangle(pt, templateImage.Size), new MCvScalar(0, 255, 0));
-                CvInvoke.PutText(OutputMatch, $"FindVal:{findVal}", pt + new Size(0, 30), FontFace.HersheySimplex, 1, new MCvScalar(0, 255, 0), 2);
+                Cv2.Rectangle(OutputMatch, new Rect(pt, templateImage.Size()), new Scalar(0, 255, 0));
+                Cv2.PutText(OutputMatch, $"FindVal:{findVal}", pt + new Point(0, 30), HersheyFonts.HersheySimplex, 1, new Scalar(0, 255, 0), 2);
             }
-            CvInvoke.Rectangle(OutputMatch, new Rectangle(minLocations[0], templateImage.Size), new MCvScalar(255, 0, 0));
-            CvInvoke.PutText(OutputMatch, $"Min:{minValues[0]}", minLocations[0] + new Size(0, 30), FontFace.HersheySimplex, 1, new MCvScalar(255, 0, 0), 2);
+            Cv2.Rectangle(OutputMatch, new Rect(minLocation, templateImage.Size()), new Scalar(255, 0, 0));
+            Cv2.PutText(OutputMatch, $"Min:{minValue}", minLocation + new Point(0, 30), HersheyFonts.HersheySimplex, 1, new Scalar(255, 0, 0), 2);
             Outputs["OutputMatch"].value = OutputMatch;
             UIImage.Image = OutputMatch;
             #endregion
 
             #region output calculate value and turn to gray image by max & min scale value
-            Image<Gray, double> img = result.ToImage<Gray, double>();
+            /*Image<Gray, double> img = result.ToImage<Gray, double>();
             Parallel.For(0, img.Height, y =>
             {
                 for (int x = 0; x < img.Width; x++)
                 {
-                    var intensity = ImageProcess.colorBuilder(img[y, x].Intensity, minValues[0], maxValues[0]);
+                    var intensity = ImageProcess.colorBuilder(img[y, x].Intensity, minValue[0], maxValue[0]);
                     img.Data[y, x, 0] = intensity;
                 }
             });
 
-            Outputs["OutputReScale"].value = img.Convert<Gray, byte>();
+            Outputs["OutputReScale"].value = img.Convert<Gray, byte>();*/
             #endregion
         };
         #endregion
