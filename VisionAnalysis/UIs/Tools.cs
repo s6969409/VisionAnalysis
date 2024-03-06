@@ -52,12 +52,11 @@ namespace VisionAnalysis
 
     public class ObservableRangeCollection<T> : ObservableCollection<T>
     {
-        public delegate void CollectionChange(T item);
-        private event CollectionChange onAddItem, onRemoveItem;
+        private event Action<T> onAddItem, onRemoveItem;
 
         public ObservableRangeCollection() : base() { }
         public ObservableRangeCollection(
-            CollectionChange onAddItem, CollectionChange onRemoveItem
+            Action<T> onAddItem, Action<T> onRemoveItem = null
             ) : base()
         {
             this.onAddItem += onAddItem;
@@ -168,7 +167,7 @@ namespace VisionAnalysis
         {
             w.MouseUp += Window_MouseUp;
             tv.MouseLeave += tv_MouseLeave;
-            this.onMove += onUpdate;
+            onMove += onUpdate;
         }
 
         public void tvi_MouseDown(object sender, MouseButtonEventArgs e)

@@ -12,11 +12,12 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -118,23 +120,40 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UIs\Tools\Teps\TepCanny\TepCanny.cs" />
+    <Compile Include="UIs\Tools\Teps\TepCornerHarris\TepCornerHarris.cs" />
+    <Compile Include="UIs\Tools\Teps\TepCvtColor\TepCvtColor.cs" />
+    <Compile Include="UIs\Tools\Teps\TepMatchTemplate\TepMatchTemplate.cs" />
+    <Compile Include="UIs\Tools\Trasfer\TepDataTransfer\TepObjParser.cs" />
+    <Compile Include="UIs\Tools\Teps\TepDilate\TepDilate.cs" />
+    <Compile Include="UIs\Tools\Teps\TepErode\TepErode.cs" />
+    <Compile Include="UIs\Tools\Teps\TepFindContours\TepFindContours.cs" />
+    <Compile Include="UIs\Tools\Teps\TepGetStructuringElement\TepGetStructuringElement.cs" />
+    <Compile Include="UIs\Tools\Teps\TepTest.cs" />
+    <Compile Include="UIs\ucs\UcImage.xaml.cs">
+      <DependentUpon>UcImage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIs\ucs\UcTable.xaml.cs">
+      <DependentUpon>UcTable.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UIs\ucs\UcText.xaml.cs">
       <DependentUpon>UcText.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIs\ucs\UcTree.xaml.cs">
+      <DependentUpon>UcTree.xaml</DependentUpon>
     </Compile>
     <Compile Include="UIs\ucs\WindowPreference.xaml.cs">
       <DependentUpon>WindowPreference.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UIs\ucToolParas\Tools.cs" />
-    <Compile Include="UIs\ucToolParas\UcParaInputs.xaml.cs">
-      <DependentUpon>UcParaInputs.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UIs\ucToolParas\UcParaThresHold.xaml.cs">
-      <DependentUpon>UcParaThresHold.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="UIs\Tools\Teps\TepAdapter.cs" />
+    <Compile Include="UIs\Tools\Teps\TepCapture\TepCapture.cs" />
+    <Compile Include="UIs\Tools\Teps\TepInputs\TepInputs.cs" />
+    <Compile Include="UIs\Tools\Teps\TepThresHold\TepThresHold.cs" />
+    <Compile Include="UIs\Tools.cs" />
     <Compile Include="WindowToolBox.xaml.cs">
       <DependentUpon>WindowToolBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UIs\WindowToolEdit.xaml.cs">
+    <Compile Include="UIs\ucs\WindowToolEdit.xaml.cs">
       <DependentUpon>WindowToolEdit.xaml</DependentUpon>
     </Compile>
     <Page Include="Dictionary1.xaml">
@@ -153,7 +172,19 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UIs\ucs\UcImage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIs\ucs\UcTable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UIs\ucs\UcText.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIs\ucs\UcTree.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -161,19 +192,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UIs\ucToolParas\UcParaInputs.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UIs\ucToolParas\UcParaThresHold.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="WindowToolBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UIs\WindowToolEdit.xaml">
+    <Page Include="UIs\ucs\WindowToolEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
