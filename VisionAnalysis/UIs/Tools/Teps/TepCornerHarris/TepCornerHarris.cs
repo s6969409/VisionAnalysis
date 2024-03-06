@@ -15,6 +15,8 @@ namespace VisionAnalysis
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
+            Inputs["blockSize"] = new PInput() { value = 3 };
+            Inputs["k"] = new PInput() { value = 0.04 };
 
             Outputs["OutputResult"] = new POutput() { value = new Mat() };
             Outputs["OutputReScale"] = new POutput() { value = new Mat() };
@@ -26,9 +28,11 @@ namespace VisionAnalysis
             base.actionProcess();//read paras
 
             Mat source = Inputs["InputImage"].value as Mat;
+            int blockSize = (int)Inputs["blockSize"].value;
+            double k = (double)Inputs["k"].value;
             Mat result = new Mat();
             //process...
-            CvInvoke.CornerHarris(source, result, 10);
+            CvInvoke.CornerHarris(source, result, blockSize, k: k);
             Outputs["OutputResult"].value = result;
 
             #region find max & min value
@@ -36,6 +40,7 @@ namespace VisionAnalysis
             #endregion
 
             Outputs["OutputReScale"].value = ImageProcess.ConvertGrayImg(result.ToImage<Emgu.CV.Structure.Gray, double>(), minValues[0], maxValues[0]).Mat;
+            UIImage.Image = (Mat)Outputs["OutputReScale"].value;
         };
         #endregion
     }
