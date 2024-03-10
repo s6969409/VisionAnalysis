@@ -37,7 +37,7 @@ namespace VisionAnalysis
                 TepHelper.getEnum<RetrievalModes>(Inputs["mode"].value),
                 TepHelper.getEnum<ContourApproximationModes>(Inputs["method"].value));
 
-            Mat drawMat = new Mat(source.Rows, source.Cols, MatType.CV_8U, 3);
+            Mat drawMat = new Mat(source.Rows, source.Cols, MatType.CV_8UC3);
             List<Point[]> cs = new List<Point[]>();
             for (int i = 0; i < contours.Length; i++) cs.Add(contours[i]);
 

@@ -312,15 +312,17 @@ namespace VisionAnalysis
     {
         public static Mat ConvertGrayImg(Mat mat, double min, double max)
         {
+            Mat newMat = new Mat(mat.Rows,mat.Cols,MatType.CV_8UC1);
             Parallel.For(0, mat.Height, y =>
             {
                 for (int x = 0; x < mat.Width; x++)
                 {
+                    var v = mat.Get<double>(y, x);
                     var intensity = colorBuilder(mat.Get<double>(y, x), min, max);
-                    mat.Set(y, x, intensity);
+                    newMat.Set(y, x, intensity);
                 }
             });
-            return mat;
+            return newMat;
         }
         public static byte colorBuilder(double val, double min, double max) => (byte)((val - min) / (max - min) * byte.MaxValue);
         public static IEnumerable<object> ConvertDataSets(Mat mat)
@@ -330,7 +332,7 @@ namespace VisionAnalysis
             {
                 for (int x = 0; x < mat.Width; x++)
                 {
-                    list.Add(new { x, y, value = mat.Get<double>(y, x, 0) });
+                    list.Add(new { x, y, value = mat.Get<double>(y, x) });
                 }
             });
             return list;

@@ -14,7 +14,7 @@ namespace VisionAnalysis
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
             Inputs["blockSize"] = new PInput() { value = 3 };
-            Inputs["int"] = new PInput() { value = 3 };
+            Inputs["ksize"] = new PInput() { value = 3 };
             Inputs["k"] = new PInput() { value = 0.04 };
 
             Outputs["OutputResult"] = new POutput() { value = new Mat() };
@@ -29,7 +29,7 @@ namespace VisionAnalysis
             Mat source = Inputs["InputImage"].value as Mat;
             int blockSize = (int)Inputs["blockSize"].value;
             int ksize = (int)Inputs["ksize"].value;
-            double k = (double)Inputs["k"].value;
+            float k = (float)Inputs["k"].value;
             Mat result = new Mat();
             //process...
             Cv2.CornerHarris(source, result, blockSize, ksize, k);
@@ -40,8 +40,8 @@ namespace VisionAnalysis
             result.MinMaxLoc(out Point minLocation, out Point maxLocation);
             #endregion
 
-            //Outputs["OutputReScale"].value = ImageProcess.ConvertGrayImg(result.ToImage<Emgu.CV.Structure.Gray, double>(), minValue, maxValue).Mat;
-            UIImage.Image = (Mat)Outputs["OutputReScale"].value;
+            Outputs["OutputReScale"].value = ImageProcess.ConvertGrayImg(result, minValue, maxValue);
+            updateUIImage((Mat)Outputs["OutputReScale"].value);
         };
         #endregion
     }

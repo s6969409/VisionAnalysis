@@ -24,7 +24,7 @@ namespace VisionAnalysis
     {
         public UcImage()
         {
-            InitializeComponent();
+            InitializeComponent(); 
         }
 
         private Mat mat;
@@ -33,11 +33,14 @@ namespace VisionAnalysis
             get => mat;
             set
             {
-                mat = value;
-                img.Source = value == null ? null : value.ToBitmapSource();
+                mat = value; 
+                img.Source = value == null || value.Total() == 0 ? null : value.ToBitmapSource();
                 if (value == null) return;
                 lb_size.Content = $"{value.Width}*{value.Height}*{value.Channels()}";
                 lb_format.Content = $"{value.Depth()},Dims={value.Dims}";
+
+                lb_position.Content = $"pos:-";
+                lb_value.Content = $"value:-";
             }
         }
 
@@ -47,9 +50,9 @@ namespace VisionAnalysis
             {
                 if (Image != null)
                 {
-                    double heightStd = (double)img.Width * Image.Height / Image.Width;//Y/X
-                    if (img.Height > heightStd) return (double)img.Width / Image.Width;
-                    else return (double)img.Height / Image.Height;
+                    double heightStd = (double)img.ActualWidth * Image.Height / Image.Width;//Y/X
+                    if (img.ActualHeight > heightStd) return (double)img.ActualWidth / Image.Width;
+                    else return (double)img.ActualHeight / Image.Height;
                 }
                 else
                 {
@@ -58,37 +61,32 @@ namespace VisionAnalysis
             }
         }
 
-        private void cvIb_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void img_MouseMove(object sender, MouseEventArgs e)
         {
+            var pt = e.GetPosition((System.Windows.Controls.Image)sender);
+
             if (Image == null) return;
-            int offsetX = (int)(Image.Width / scale - mat.Width) / 2;
-            int offsetY = (int)(Image.Height / scale - mat.Height) / 2;
-            int x = (int)(e.X / scale - offsetX);
-            int y = (int)(e.Y / scale - offsetY);
+            int x = (int)(pt.X / scale);
+            int y = (int)(pt.Y / scale);
 
-            if(x < 0 || x >= mat.Width || y < 0 || y >= mat.Height)
-            {
-                lb_position.Content = $"滑鼠座標:-";
-                lb_value.Content = $"value:-";
-                return;
-            }
-            lb_position.Content = $"滑鼠座標:{x},{y}";
-
+            lb_position.Content = $"pos:{x},{y}";
+            
             int channels = Image.Channels();
-            IEnumerable<byte> vs = Enumerable.Range(0, channels)
-                .Select(i => channels == 1 ? mat.Get<byte>(y, x) : mat.Get<byte>(y, x, i));
+
+            var vs = Enumerable.Range(0, channels)
+                .Select(i => Image.Type().IsInteger ? Image.At<Vec3b>(y, x)[i].ToString() : Image.At<Vec3f>(y, x)[i].ToString());
             lb_value.Content = $"value:{string.Join(",", vs)}";
         }
-        private void cvIb_SizeChanged(object sender, EventArgs e)
+        private void img_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            lb_scale.Width = 100;//Content改變不知道為什麼不會改變外觀長度...
-            lb_scale.Content = $"放大倍率:{scale.ToString("0.00")}";
+            btn_scale.Content = $"scale:{scale.ToString("0.00")}";
         }
 
-        private void cvIb_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void btn_scale_Click(object sender, RoutedEventArgs e)
         {
-            //ImageViewer imageViewer = new ImageViewer(Image);
-            //imageViewer.ShowDialog();
+            bool isRealSize = sv_img.VerticalScrollBarVisibility == ScrollBarVisibility.Auto;
+            sv_img.VerticalScrollBarVisibility = isRealSize ? ScrollBarVisibility.Disabled : ScrollBarVisibility.Auto;
+            sv_img.HorizontalScrollBarVisibility = isRealSize ? ScrollBarVisibility.Disabled : ScrollBarVisibility.Auto;
         }
     }
     public interface IMatProperty

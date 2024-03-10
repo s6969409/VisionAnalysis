@@ -192,6 +192,7 @@ namespace VisionAnalysis
             else if (selected.value is POutput)
             {
                 POutput selectedOutput = selected.value as POutput;
+                if (selectedOutput.value == null) return;
                 if (selectedOutput.value is Mat)
                 {
                     loadImg((Mat)selectedOutput.value);

@@ -7,13 +7,19 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="691*"/>
+            <ColumnDefinition Width="109*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <Image x:Name="img"/>
-        <ToolBarTray Grid.Row="1">
+        <ScrollViewer x:Name="sv_img" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" Grid.ColumnSpan="2" Margin="0,0,0,30" Grid.RowSpan="2">
+            <Image x:Name="img" MouseMove="img_MouseMove" SizeChanged="img_SizeChanged"/>
+        </ScrollViewer>
+        <ToolBarTray Grid.Row="1" Grid.ColumnSpan="2">
             <ToolBar>
                 <Label x:Name="lb_size" Content="圖片Size"/>
                 <Separator/>
@@ -23,7 +29,7 @@
                 <Separator/>
                 <Label x:Name="lb_value" Content="亮度"/>
                 <Separator/>
-                <Label x:Name="lb_scale" Content="倍率"/>
+                <Button x:Name="btn_scale" Content="倍率" Click="btn_scale_Click"/>
             </ToolBar>
         </ToolBarTray>
     </Grid>
