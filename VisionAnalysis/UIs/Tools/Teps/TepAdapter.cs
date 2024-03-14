@@ -317,7 +317,6 @@ namespace VisionAnalysis
             {
                 for (int x = 0; x < mat.Width; x++)
                 {
-                    var v = mat.Get<double>(y, x);
                     var intensity = colorBuilder(mat.Get<double>(y, x), min, max);
                     newMat.Set(y, x, intensity);
                 }

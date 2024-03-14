@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using OpenCvSharp;
+﻿using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace VisionAnalysis
 {
-    public class TepTest : BaseToolEditParas
+    public class TepBlob : BaseToolEditParas
     {
-        public TepTest(ObservableRangeCollection<Nd> nodes) : base(nodes)
+        public TepBlob(ObservableRangeCollection<Nd> nodes) : base(nodes)
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
-            Outputs["Output2"] = new POutput() { value = new Rect(100,123,50,70) };
+            Outputs["Count"] = new POutput() { value = 0 };
             #endregion
         }
         #region override BaseToolEditParas member
@@ -27,8 +26,14 @@ namespace VisionAnalysis
             Mat source = Inputs["InputImage"].value as Mat;
 
             //process...
+            ConnectedComponents cc = Cv2.ConnectedComponentsEx(source);
+            Outputs["Count"].value = cc.LabelCount;
 
-            Outputs["Output1"].value = source;
+            Mat result = source.Clone();
+            cc.RenderBlobs(result);
+
+            Outputs["Output1"].value = result;
+            updateUIImage(result);
         };
         #endregion
     }
