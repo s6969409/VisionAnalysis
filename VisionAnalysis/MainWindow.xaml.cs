@@ -193,13 +193,14 @@ namespace VisionAnalysis
             {
                 POutput selectedOutput = selected.value as POutput;
                 if (selectedOutput.value == null) return;
-                if (selectedOutput.value is Mat)
+                if (selectedOutput.value is Mat mat)
                 {
-                    loadImg((Mat)selectedOutput.value);
+                    loadImg(mat);
                 }
-                else if (selectedOutput.value is IEnumerable<object>)
+                else if (selectedOutput.value is IEnumerable<object> items)
                 {
-                    table.update((IEnumerable<object>)selectedOutput.value);
+                    table.update(items);
+                    ti_table.Header = $"table({items.Count()})";
                 }
                 else
                 {

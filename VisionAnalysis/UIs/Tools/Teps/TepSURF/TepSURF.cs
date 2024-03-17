@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
-using OpenCvSharp;
+﻿using OpenCvSharp;
+using OpenCvSharp.XFeatures2D;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,15 +8,17 @@ using System.Threading.Tasks;
 
 namespace VisionAnalysis
 {
-    public class TepTest : BaseToolEditParas
+    internal class TepSURF : BaseToolEditParas
     {
-        public TepTest(ObservableRangeCollection<Nd> nodes) : base(nodes)
+        public TepSURF(ObservableRangeCollection<Nd> nodes) : base(nodes)
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
+            Inputs["hessianThreshold"] = new PInput() { value = 400 };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
-            Outputs["Output2"] = new POutput() { value = new Rect(100,123,50,70) };
+            Outputs["keyPoints"] = new POutput() { value = new List<object>() };
+
             #endregion
         }
         #region override BaseToolEditParas member
@@ -25,20 +27,28 @@ namespace VisionAnalysis
             base.actionProcess();//read paras
 
             Mat source = Inputs["InputImage"].value as Mat;
+            int hessianThreshold = Convert.ToInt32(Inputs["hessianThreshold"].value);
 
             //process...
-            OpenCvSharp.XFeatures2D.SURF surf = OpenCvSharp.XFeatures2D.SURF.Create(400);
+            SURF surf = SURF.Create(hessianThreshold);
             KeyPoint[] keyPoints;
             Mat descriptors = new Mat();
             surf.DetectAndCompute(source, null, out keyPoints, descriptors);
             Mat result = new Mat();
             Cv2.DrawKeypoints(source, keyPoints, result);
 
-            surf.HessianThreshold = 50000;
-            surf.DetectAndCompute(source, null, out keyPoints, descriptors);
-            Cv2.DrawKeypoints(source, keyPoints, result);
-
             Outputs["Output1"].value = result;
+            updateUIImage(result);
+
+            (Outputs["keyPoints"].value as List<object>).Clear();
+            (Outputs["keyPoints"].value as List<object>).AddRange(keyPoints.Select(kpt=>new { 
+                kpt.Octave,
+                kpt.Response,
+                kpt.ClassId,
+                kpt.Angle,
+                kpt.Pt,
+                kpt.Size
+            }));
         };
         #endregion
     }

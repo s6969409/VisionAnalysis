@@ -56,7 +56,7 @@
                 <TabItem Header="Image">
                     <local:UcImage x:Name="img"/>
                 </TabItem>
-                <TabItem Header="Table">
+                <TabItem Header="Table" x:Name="ti_table">
                     <local:UcTable x:Name="table"/>
                 </TabItem>
                 <TabItem Header="Object">
