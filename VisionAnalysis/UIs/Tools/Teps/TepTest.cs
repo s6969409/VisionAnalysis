@@ -27,18 +27,8 @@ namespace VisionAnalysis
             Mat source = Inputs["InputImage"].value as Mat;
 
             //process...
-            OpenCvSharp.XFeatures2D.SURF surf = OpenCvSharp.XFeatures2D.SURF.Create(400);
-            KeyPoint[] keyPoints;
-            Mat descriptors = new Mat();
-            surf.DetectAndCompute(source, null, out keyPoints, descriptors);
-            Mat result = new Mat();
-            Cv2.DrawKeypoints(source, keyPoints, result);
 
-            surf.HessianThreshold = 50000;
-            surf.DetectAndCompute(source, null, out keyPoints, descriptors);
-            Cv2.DrawKeypoints(source, keyPoints, result);
-
-            Outputs["Output1"].value = result;
+            Outputs["Output1"].value = source;
         };
         #endregion
     }
