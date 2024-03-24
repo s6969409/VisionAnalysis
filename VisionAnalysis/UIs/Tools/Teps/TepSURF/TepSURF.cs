@@ -15,6 +15,10 @@ namespace VisionAnalysis
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
             Inputs["hessianThreshold"] = new PInput() { value = 400 };
+            Inputs["nOctaves"] = new PInput() { value = 4 };
+            Inputs["nOctaveLayers"] = new PInput() { value = 2 };
+            Inputs["extended"] = new PInput() { value = true };
+            Inputs["upright"] = new PInput() { value = false };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             Outputs["keyPoints"] = new POutput() { value = new List<object>() };
@@ -25,19 +29,28 @@ namespace VisionAnalysis
         #region override BaseToolEditParas member
         public override Action actionProcess => () =>
         {
+            #region get input para
             base.actionProcess();//read paras
 
             Mat source = Inputs["InputImage"].value as Mat;
             int hessianThreshold = Convert.ToInt32(Inputs["hessianThreshold"].value);
+            int nOctaves = Convert.ToInt32(Inputs["nOctaves"].value);
+            int nOctaveLayers = Convert.ToInt32(Inputs["nOctaveLayers"].value);
+            bool extended = Convert.ToBoolean(Inputs["extended"].value);
+            bool upright = Convert.ToBoolean(Inputs["upright"].value);
+            #endregion
 
-            //process...
-            SURF surf = SURF.Create(hessianThreshold);
+            #region process...
+            SURF surf = SURF.Create(hessianThreshold, nOctaves, nOctaveLayers, extended, upright);
             KeyPoint[] keyPoints;
             Mat descriptors = new Mat();
             surf.DetectAndCompute(source, null, out keyPoints, descriptors);
+            #endregion
+
+            #region output
             Outputs["descriptors"].value = descriptors;
             Mat result = new Mat();
-            Cv2.DrawKeypoints(source, keyPoints, result);
+            Cv2.DrawKeypoints(source, keyPoints, result, flags: DrawMatchesFlags.DrawRichKeypoints);
 
             Outputs["Output1"].value = result;
             updateUIImage(result);
@@ -51,6 +64,7 @@ namespace VisionAnalysis
                 kpt.Pt,
                 kpt.Size
             }));
+            #endregion
         };
         #endregion
     }
