@@ -16,9 +16,13 @@ namespace VisionAnalysis
             Inputs["blockSize"] = new PInput() { value = 3 };
             Inputs["ksize"] = new PInput() { value = 3 };
             Inputs["k"] = new PInput() { value = 0.04 };
+            Inputs["ThredHoldLT"] = new PInput() { value = 0.0 };
+            Inputs["ThredHoldGT"] = new PInput() { value = 0.0 };
 
             Outputs["OutputResult"] = new POutput() { value = new Mat() };
-            Outputs["OutputReScale"] = new POutput() { value = new Mat() };
+            Outputs["OutputResultMaxV"] = new POutput() { value = 0.0 };
+            Outputs["OutputResultMinV"] = new POutput() { value = 0.0 };
+            Outputs["OutputResult2"] = new POutput() { value = new Mat() };
             #endregion
         }
         #region override BaseToolEditParas member
@@ -29,7 +33,10 @@ namespace VisionAnalysis
             Mat source = Inputs["InputImage"].value as Mat;
             int blockSize = (int)Inputs["blockSize"].value;
             int ksize = (int)Inputs["ksize"].value;
-            float k = (float)Inputs["k"].value;
+            double k = Convert.ToDouble(Inputs["k"].value);
+            double ThredHoldLT = Convert.ToDouble(Inputs["ThredHoldLT"].value);
+            double ThredHoldGT = Convert.ToDouble(Inputs["ThredHoldGT"].value);
+
             Mat result = new Mat();
             //process...
             Cv2.CornerHarris(source, result, blockSize, ksize, k);
@@ -38,10 +45,30 @@ namespace VisionAnalysis
             #region find max & min value
             result.MinMaxIdx(out double minValue, out double maxValue);
             result.MinMaxLoc(out Point minLocation, out Point maxLocation);
+            Outputs["OutputResultMaxV"].value = maxValue;
+            Outputs["OutputResultMinV"].value = minValue;
             #endregion
 
-            Outputs["OutputReScale"].value = ImageProcess.ConvertGrayImg(result, minValue, maxValue);
-            updateUIImage((Mat)Outputs["OutputReScale"].value);
+            Mat output = source.CvtColor(ColorConversionCodes.GRAY2BGR);
+            Parallel.For(0, output.Rows, y =>
+            {
+                for (int x = 0; x < output.Cols; x++)
+                {
+                    float val = result.At<float>(y, x);
+                    var f = (byte)((val - minValue) / (maxValue - minValue) * byte.MaxValue);
+                    // 如果結果值大於0.01，繪製紅色
+                    if (val > 0.01)
+                    {
+                        output.Set(y, x, new Vec3b(0, 0, f));
+                    }
+                    // 如果結果值小於-0.01，繪製綠色
+                    else if (val < -0.01)
+                    {
+                        output.Set(y, x, new Vec3b(0, f, 0));
+                    }
+                }
+            });
+            Outputs["OutputResult2"].value = output;
         };
         #endregion
     }

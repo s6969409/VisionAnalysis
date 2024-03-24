@@ -18,6 +18,7 @@ namespace VisionAnalysis
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             Outputs["keyPoints"] = new POutput() { value = new List<object>() };
+            Outputs["descriptors"] = new POutput() { value = new Mat() };
 
             #endregion
         }
@@ -34,6 +35,7 @@ namespace VisionAnalysis
             KeyPoint[] keyPoints;
             Mat descriptors = new Mat();
             surf.DetectAndCompute(source, null, out keyPoints, descriptors);
+            Outputs["descriptors"].value = descriptors;
             Mat result = new Mat();
             Cv2.DrawKeypoints(source, keyPoints, result);
 

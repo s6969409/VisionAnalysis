@@ -21,7 +21,6 @@ namespace VisionAnalysis
             Outputs["OutputResult"] = new POutput() { value = null };
             Outputs["OutputArr"] = new POutput() { value = null };
             Outputs["OutputMatch"] = new POutput() { value = null };
-            Outputs["OutputReScale"] = new POutput() { value = null };
             #endregion
         }
 
@@ -65,10 +64,6 @@ namespace VisionAnalysis
             Outputs["OutputMatch"].value = OutputMatch;
             #endregion
 
-            #region output calculate value and turn to gray image by max & min scale value
-            Outputs["OutputReScale"].value = ImageProcess.ConvertGrayImg(result, minValue, maxValue);
-            updateUIImage((Mat)Outputs["OutputReScale"].value);
-            #endregion
         };
         #endregion
 
