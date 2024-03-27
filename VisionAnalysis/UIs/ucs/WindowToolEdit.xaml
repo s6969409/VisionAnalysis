@@ -65,13 +65,13 @@
 
                             </ScrollViewer>
 
-                            <TreeView Grid.Row="4" x:Name="tv_outputs" ItemTemplate="{StaticResource TreeNode}"/>
+                            <TreeView Grid.Row="4" x:Name="tv_outputs" ItemTemplate="{StaticResource TreeNode}" SelectedItemChanged="tv_outputs_SelectedItemChanged"/>
                         </Grid>
                     </ScrollViewer>
                 </TabItem>
             </TabControl>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" ShowsPreview="true" Width="5"/>
-            <local:UcImage Grid.Column="2" x:Name="img"/>
+            <local:UcAnalysis Grid.Column="2" x:Name="uc_Analysis"/>
         </Grid>
     </Grid>
 </Window>

@@ -52,17 +52,7 @@
             <TreeView x:Name="tvl" ItemTemplate="{StaticResource TreeNode}" MouseDoubleClick="tvl_MouseDoubleClick" SelectedItemChanged="tvl_SelectedItemChanged"  AllowDrop="True" Drop="tvl_Drop" DragEnter="tvl_DragEnter"/>
             <Canvas x:Name="tvlCanvas"/>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" ShowsPreview="true" Width="5"/>
-            <TabControl Grid.Column="3">
-                <TabItem Header="Image">
-                    <local:UcImage x:Name="img"/>
-                </TabItem>
-                <TabItem Header="Table" x:Name="ti_table">
-                    <local:UcTable x:Name="table"/>
-                </TabItem>
-                <TabItem Header="Object">
-                    <local:UcTree x:Name="tv_obj"/>
-                </TabItem>
-            </TabControl>
+            <local:UcAnalysis Grid.Column="3" x:Name="uc_Analysis"/>
         </Grid>
     </Grid>
 </Window>

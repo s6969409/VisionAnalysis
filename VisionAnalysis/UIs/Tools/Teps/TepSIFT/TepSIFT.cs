@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VisionAnalysis.UIs.Tools.Teps.TepSIFT
+namespace VisionAnalysis
 {
     public class TepSIFT : BaseToolEditParas
     {

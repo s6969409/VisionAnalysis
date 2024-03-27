@@ -178,45 +178,9 @@ namespace VisionAnalysis
         #region show by selected para
         private void tvl_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            loadImg(null);
             Nd selected = tvl.SelectedItem as Nd;
-            if (selected == null) return; 
-            if (selected.value is PInput)
-            {
-                PInput selectedInput = selected.value as PInput;
-                if (selectedInput.value is Mat)
-                {
-                    loadImg((Mat)selectedInput.value);
-                }
-            }
-            else if (selected.value is POutput)
-            {
-                POutput selectedOutput = selected.value as POutput;
-                if (selectedOutput.value == null) return;
-                if (selectedOutput.value is Mat mat)
-                {
-                    loadImg(mat);
-                }
-                else if (selectedOutput.value is IEnumerable<object> items)
-                {
-                    table.update(items);
-                    ti_table.Header = $"table({items.Count()})";
-                }
-                else
-                {
-                    tv_obj.update(selectedOutput.value);
-                }
-            }
-            else if (selected.value is IToolEditParas)
-            {
-
-            }
-            else
-            {
-                throw new ArgumentException($"{selected.value} 沒有定義處理函數");
-            }
-
-
+            if (selected == null) return;
+            uc_Analysis.update(selected.value);
         }
         #endregion
         #region events for TreeViewItem remove by MenuItem mouse click
@@ -286,8 +250,6 @@ namespace VisionAnalysis
             return toolName;
         }
         #endregion
-
-        private void loadImg(Mat mat) => img.Image = mat == null ? null : mat;
 
         private void tvl_Drop(object sender, DragEventArgs e)
         {

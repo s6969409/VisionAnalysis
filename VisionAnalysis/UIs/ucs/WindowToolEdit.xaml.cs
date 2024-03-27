@@ -35,7 +35,7 @@ namespace VisionAnalysis
             cc_valueUIInit();
 
             this.toolEditParas = toolEditParas;
-            toolEditParas.UIImage = img;
+            toolEditParas.UIImage = uc_Analysis.img;
 
             Nd ndInput = new Nd("Inputs", null);
             ndInput.childNodes.AddRange(toolEditParas.Inputs.Select(i => TepHelper.NdBuild(i)));
@@ -83,7 +83,7 @@ namespace VisionAnalysis
             }
             else if (val.value is Mat)
             {
-                img.Image = val.value as Mat;
+                uc_Analysis.update(val);
 
                 textBox.IsEnabled = false;
                 cc_value.Content = textBox;
@@ -93,6 +93,13 @@ namespace VisionAnalysis
                 textBox.IsEnabled = true;
                 cc_value.Content = textBox;
             }
+        }
+
+        private void tv_outputs_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            Nd selected = tv_outputs.SelectedItem as Nd;
+            if (selected == null) return;
+            uc_Analysis.update(selected.value);
         }
 
         #region ContentControl cc_value used
@@ -105,5 +112,6 @@ namespace VisionAnalysis
             comboBox.SetBinding(ComboBox.SelectedItemProperty, binding);
         }
         #endregion
+
     }
 }
