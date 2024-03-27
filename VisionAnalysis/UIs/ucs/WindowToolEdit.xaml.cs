@@ -37,10 +37,14 @@ namespace VisionAnalysis
             this.toolEditParas = toolEditParas;
             toolEditParas.UIImage = img;
 
-            Nd nd1 = new Nd("Inputs", null);
-            nd1.childNodes.AddRange(toolEditParas.Inputs.Select(i => TepHelper.NdBuild(i)));
-            tv_inputs.ItemsSource = nd1.childNodes;
+            Nd ndInput = new Nd("Inputs", null);
+            ndInput.childNodes.AddRange(toolEditParas.Inputs.Select(i => TepHelper.NdBuild(i)));
+            tv_inputs.ItemsSource = ndInput.childNodes;
 
+            Nd udOutput = new Nd("Outputs", null);
+            udOutput.childNodes.AddRange(toolEditParas.Outputs.Select(i => TepHelper.NdBuild(i)));
+            tv_outputs.ItemsSource = udOutput.childNodes;
+            
             this.nodes = nodes;
 
             cb_ToolName.ItemsSource = new string[] { "" }.Concat(nodes.Select(nd => nd.name).Where(name => name != toolEditParas.ToolName));
