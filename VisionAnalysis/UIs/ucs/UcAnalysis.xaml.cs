@@ -29,7 +29,8 @@ namespace VisionAnalysis
         private void focus(DependencyObject dependencyObject)
         {
             TabItem tabItem = LogicalTreeHelper.GetParent(dependencyObject) as TabItem;
-            tabItem.Focus();
+            TabControl tabControl = LogicalTreeHelper.GetParent(tabItem) as TabControl;
+            tabControl.SelectedItem = tabItem;
         }
         private void loadImg(Mat mat)
         {
@@ -38,7 +39,6 @@ namespace VisionAnalysis
         }
         public void update(object value)
         {
-            loadImg(null);
             if (value is PInput pInput)
             {
                 if(pInput.value is Mat mat) loadImg(mat);
@@ -51,7 +51,7 @@ namespace VisionAnalysis
                 {
                     table.update(items);
                     ti_table.Header = $"table({items.Count()})";
-                    focus(table);
+                    ti_table.Focus();//focus(table);
                 }
                 else
                 {
