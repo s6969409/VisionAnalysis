@@ -20,7 +20,6 @@ namespace VisionAnalysis
             Inputs["sigma"] = new PInput() { value = 1.6 };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
-            Outputs["Output2"] = new POutput() { value = new Rect(100, 123, 50, 70) };
             Outputs["descriptors"] = new POutput() { value = new Mat() };
             Outputs["keyPoints"] = new POutput() { value = new List<object>() };
             #endregion
