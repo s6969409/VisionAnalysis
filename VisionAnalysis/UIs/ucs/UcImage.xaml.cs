@@ -33,6 +33,8 @@ namespace VisionAnalysis
             get => mat;
             set
             {
+                changeImgZoomType(true);
+
                 mat = value; 
                 img.Source = value == null || value.Total() == 0 ? null : value.ToBitmapSource();
                 if (value == null) return;
@@ -84,9 +86,25 @@ namespace VisionAnalysis
 
         private void btn_scale_Click(object sender, RoutedEventArgs e)
         {
-            bool isRealSize = sv_img.VerticalScrollBarVisibility == ScrollBarVisibility.Auto;
-            sv_img.VerticalScrollBarVisibility = isRealSize ? ScrollBarVisibility.Disabled : ScrollBarVisibility.Auto;
-            sv_img.HorizontalScrollBarVisibility = isRealSize ? ScrollBarVisibility.Disabled : ScrollBarVisibility.Auto;
+            bool isRealSize = sv_img.VerticalScrollBarVisibility == ScrollBarVisibility.Disabled;
+            changeImgZoomType(!isRealSize);
+        }
+
+        private void changeImgZoomType(bool useRealSize)
+        {
+            sv_img.VerticalScrollBarVisibility = useRealSize ? ScrollBarVisibility.Disabled : ScrollBarVisibility.Auto;
+            sv_img.HorizontalScrollBarVisibility = useRealSize ? ScrollBarVisibility.Disabled : ScrollBarVisibility.Auto;
+
+            img.Height = double.NaN;
+            img.Width = double.NaN;
+        }
+
+        private void img_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (sv_img.VerticalScrollBarVisibility == ScrollBarVisibility.Disabled) return;
+            double zoomScale = e.Delta > 0 ? 1.5 : 0.5;
+            img.Height = img.ActualHeight * zoomScale;
+            img.Width = img.ActualWidth * zoomScale;
         }
     }
     public interface IMatProperty
