@@ -132,6 +132,7 @@ namespace VisionAnalysis
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             string savePath = PathSelector.getUserSelectPath(PathSelector.PathRequest.SaveFile);
+            if (savePath == null) return;
             string imgDirPath = $@"{Path.GetDirectoryName(savePath)}\Images";
             if (!Directory.Exists(imgDirPath)) Directory.CreateDirectory(imgDirPath);
             foreach(string path in Directory.GetFiles(imgDirPath))

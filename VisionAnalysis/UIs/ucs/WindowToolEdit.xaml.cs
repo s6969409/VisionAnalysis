@@ -69,6 +69,7 @@ namespace VisionAnalysis
             }
         }
 
+        private bool[] boolValues = {false, true}; 
         private void tv_inputs_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             cb_ToolName.IsEnabled = true;
@@ -87,6 +88,11 @@ namespace VisionAnalysis
 
                 textBox.IsEnabled = false;
                 cc_value.Content = textBox;
+            }
+            else if (val.value is bool)
+            {
+                cc_value.Content = comboBox;
+                comboBox.ItemsSource = boolValues;
             }
             else
             {

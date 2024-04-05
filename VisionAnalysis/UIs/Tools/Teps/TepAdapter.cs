@@ -133,7 +133,7 @@ namespace VisionAnalysis
                 value = Enum.Parse(type, (string)jToken["value"]);
             }
             else if (jToken["value"].Type == JTokenType.Boolean) value = (bool)jToken["value"];
-            else if (jToken["value"].Type == JTokenType.Float) value = (float)jToken["value"];
+            else if (jToken["value"].Type == JTokenType.Float) value = (double)jToken["value"];
             else if (jToken["value"].Type == JTokenType.Integer) value = (int)jToken["value"];
             else if (jToken["value"].Type == JTokenType.String) value = (string)jToken["value"];
             else throw new InvalidCastException($"jToken[value].Type = {jToken["value"].Type} + type = {type} 目前尚未實做!!");
@@ -278,8 +278,9 @@ namespace VisionAnalysis
                 ((Mat)pi.value).SaveImage(imgPath);
                 jobject["value"] = imgPath;
             }
-            else if (pi.value is int) jobject["value"] = (int)pi.value;
-            else if (pi.value is float) jobject["value"] = (float)pi.value;
+            else if (pi.value is int intVal) jobject["value"] = intVal;
+            else if (pi.value is double doubleVal) jobject["value"] = doubleVal;
+            else if (pi.value is bool boolVal) jobject["value"] = boolVal;
             else jobject["value"] = pi.value == null ? null : pi.value.ToString();
 
             return jobject;

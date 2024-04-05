@@ -14,7 +14,7 @@ namespace VisionAnalysis
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
-            Inputs["hessianThreshold"] = new PInput() { value = 400 };
+            Inputs["hessianThreshold"] = new PInput() { value = 0.1 };
             Inputs["nOctaves"] = new PInput() { value = 4 };
             Inputs["nOctaveLayers"] = new PInput() { value = 2 };
             Inputs["extended"] = new PInput() { value = true };
@@ -33,7 +33,7 @@ namespace VisionAnalysis
             base.actionProcess();//read paras
 
             Mat source = Inputs["InputImage"].value as Mat;
-            int hessianThreshold = Convert.ToInt32(Inputs["hessianThreshold"].value);
+            double hessianThreshold = Convert.ToDouble(Inputs["hessianThreshold"].value);
             int nOctaves = Convert.ToInt32(Inputs["nOctaves"].value);
             int nOctaveLayers = Convert.ToInt32(Inputs["nOctaveLayers"].value);
             bool extended = Convert.ToBoolean(Inputs["extended"].value);
