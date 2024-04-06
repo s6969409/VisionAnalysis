@@ -285,7 +285,7 @@ namespace VisionAnalysis
             else if (pi.value is bool boolVal) jobject["value"] = boolVal;
             else if (pi.value is string strVal) jobject["value"] = strVal;
             else if (pi.value == null) jobject["value"] = null;
-            else throw new Exception($"{pi.value.GetType().FullName} not define saveMethod!");
+            //else throw new Exception($"{pi.value.GetType().FullName} not define saveMethod!");
 
             return jobject;
         }
