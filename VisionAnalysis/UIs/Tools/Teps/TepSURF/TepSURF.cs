@@ -21,9 +21,8 @@ namespace VisionAnalysis
             Inputs["upright"] = new PInput() { value = false };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
-            Outputs["keyPoints"] = new POutput() { value = new List<object>() };
             Outputs["descriptors"] = new POutput() { value = new Mat() };
-
+            Outputs["keyPoints"] = new POutput() { value = new KeyPoint[] { } };
             #endregion
         }
         #region override BaseToolEditParas member
@@ -42,9 +41,8 @@ namespace VisionAnalysis
 
             #region process...
             SURF surf = SURF.Create(hessianThreshold, nOctaves, nOctaveLayers, extended, upright);
-            KeyPoint[] keyPoints;
             Mat descriptors = new Mat();
-            surf.DetectAndCompute(source, null, out keyPoints, descriptors);
+            surf.DetectAndCompute(source, null, out KeyPoint[] keyPoints, descriptors);
             #endregion
 
             #region output
@@ -54,16 +52,7 @@ namespace VisionAnalysis
 
             Outputs["Output1"].value = result;
             updateUIImage(result);
-
-            (Outputs["keyPoints"].value as List<object>).Clear();
-            (Outputs["keyPoints"].value as List<object>).AddRange(keyPoints.Select(kpt=>new { 
-                kpt.Octave,
-                kpt.Response,
-                kpt.ClassId,
-                kpt.Angle,
-                kpt.Pt,
-                kpt.Size
-            }));
+            Outputs["keyPoints"].value = keyPoints;
             #endregion
         };
         #endregion

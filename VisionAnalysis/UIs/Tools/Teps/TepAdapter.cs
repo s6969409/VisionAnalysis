@@ -119,7 +119,8 @@ namespace VisionAnalysis
         {
             object value;
 
-            if (jToken["value"].Type == JTokenType.Object)
+            if (jToken["value"] == null) value = null;
+            else if(jToken["value"].Type == JTokenType.Object)
             {
                 Dictionary<string, PInput> pInput = new Dictionary<string, PInput>();
                 foreach (JProperty jProperty in jToken["value"].ToObject<JObject>().Properties())
@@ -136,6 +137,7 @@ namespace VisionAnalysis
             else if (jToken["value"].Type == JTokenType.Float) value = (double)jToken["value"];
             else if (jToken["value"].Type == JTokenType.Integer) value = (int)jToken["value"];
             else if (jToken["value"].Type == JTokenType.String) value = (string)jToken["value"];
+            else if(jToken["value"].Type == JTokenType.Null)value = null;
             else throw new InvalidCastException($"jToken[value].Type = {jToken["value"].Type} + type = {type} 目前尚未實做!!");
 
             return BuildCrossReference(jToken, value);
@@ -176,7 +178,7 @@ namespace VisionAnalysis
                 string[] keyNames = { "v0", "v1", "v2", "v3" };
                 return keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ps[index] } }).ToDictionary(item => item.Key, item => item.Value);
             }
-            else throw new Exception();
+            else throw new Exception($"{typeof(T).Name} not define method in ParaDictBuilder!");
         }
         protected static T toT<T>(Dictionary<string, PInput> dict)
         {
@@ -196,7 +198,7 @@ namespace VisionAnalysis
         }
         private static T Base<T>(Dictionary<string, PInput> dict)
         {
-            return (T)Activator.CreateInstance(typeof(T), dict.Values.Select(v => v.value).ToArray());
+            return (T)Activator.CreateInstance(typeof(T), dict.Values.Select(kvPair => kvPair.value).ToArray());
         }
         #endregion
     }
@@ -272,16 +274,18 @@ namespace VisionAnalysis
                     jobject["value"][p.Key] = getJObjectAndSaveImg(p.Value, imgDirPath);
                 }
             }
-            else if (pi.value is Mat)
+            else if (pi.value is Mat matVal && matVal.Data != IntPtr.Zero)
             {
                 string imgPath = $@"{imgDirPath}\{Directory.GetFiles(imgDirPath).Length}.bmp";
-                ((Mat)pi.value).SaveImage(imgPath);
+                matVal.SaveImage(imgPath);
                 jobject["value"] = imgPath;
             }
             else if (pi.value is int intVal) jobject["value"] = intVal;
             else if (pi.value is double doubleVal) jobject["value"] = doubleVal;
             else if (pi.value is bool boolVal) jobject["value"] = boolVal;
-            else jobject["value"] = pi.value == null ? null : pi.value.ToString();
+            else if (pi.value is string strVal) jobject["value"] = strVal;
+            else if (pi.value == null) jobject["value"] = null;
+            else throw new Exception($"{pi.value.GetType().FullName} not define saveMethod!");
 
             return jobject;
         }
@@ -326,17 +330,23 @@ namespace VisionAnalysis
             return newMat;
         }
         public static byte colorBuilder(double val, double min, double max) => (byte)((val - min) / (max - min) * byte.MaxValue);
-        public static IEnumerable<object> ConvertDataSets(Mat mat)
+        public static IEnumerable<MatVal> ConvertDataSets(Mat mat)
         {
-            ConcurrentBag<object> list = new ConcurrentBag<object>();
+            ConcurrentBag<MatVal> list = new ConcurrentBag<MatVal>();
             Parallel.For(0, mat.Height, y =>
             {
                 for (int x = 0; x < mat.Width; x++)
                 {
-                    list.Add(new { x, y, value = mat.Get<double>(y, x) });
+                    list.Add(new MatVal() { X = x, Y = y, Value = mat.Get<double>(y, x) });
                 }
             });
             return list;
+        }
+        public struct MatVal
+        {
+            public int X;
+            public int Y;
+            public object Value;
         }
     }
 }

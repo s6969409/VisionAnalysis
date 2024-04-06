@@ -1,4 +1,5 @@
 ﻿using OpenCvSharp;
+using OpenCvSharp.Features2D;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace VisionAnalysis
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             Outputs["descriptors"] = new POutput() { value = new Mat() };
-            Outputs["keyPoints"] = new POutput() { value = new List<object>() };
+            Outputs["keyPoints"] = new POutput() { value = new KeyPoint[] { } };
             #endregion
         }
 
@@ -40,10 +41,9 @@ namespace VisionAnalysis
             #endregion
 
             #region process...
-            OpenCvSharp.Features2D.SIFT sIFT = OpenCvSharp.Features2D.SIFT.Create(nFeatures, nOctaveLayers, contrastThreshold, edgeThreshold, sigma);
-            KeyPoint[] keyPoints;
+            SIFT sIFT = SIFT.Create(nFeatures, nOctaveLayers, contrastThreshold, edgeThreshold, sigma);
             Mat descriptors = new Mat();
-            sIFT.DetectAndCompute(source, null, out keyPoints, descriptors);
+            sIFT.DetectAndCompute(source, null, out KeyPoint[] keyPoints, descriptors);
             #endregion
 
             #region output
@@ -52,15 +52,7 @@ namespace VisionAnalysis
             Cv2.DrawKeypoints(source, keyPoints, result, flags: DrawMatchesFlags.DrawRichKeypoints);
             Outputs["Output1"].value = result;
             updateUIImage(result);
-            (Outputs["keyPoints"].value as List<object>).Clear();
-            (Outputs["keyPoints"].value as List<object>).AddRange(keyPoints.Select(kpt => new {
-                kpt.Octave,
-                kpt.Response,
-                kpt.ClassId,
-                kpt.Angle,
-                kpt.Pt,
-                kpt.Size
-            }));
+            Outputs["keyPoints"].value = keyPoints;
             #endregion
         };
         #endregion

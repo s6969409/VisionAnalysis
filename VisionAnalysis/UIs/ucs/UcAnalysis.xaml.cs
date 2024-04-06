@@ -47,11 +47,11 @@ namespace VisionAnalysis
             {
                 if (pOutput.value == null) return;
                 if (pOutput.value is Mat mat) loadImg(mat);
-                else if (pOutput.value is IEnumerable<object> items)
+                else if (pOutput.value is System.Collections.IEnumerable items)
                 {
                     table.update(items);
-                    ti_table.Header = $"table({items.Count()})";
-                    ti_table.Focus();//focus(table);
+                    ti_table.Header = $"table({items.Cast<object>().Count()})";
+                    ti_table.Focus();
                 }
                 else
                 {

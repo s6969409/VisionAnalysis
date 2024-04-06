@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
@@ -26,9 +27,22 @@ namespace VisionAnalysis
             InitializeComponent();
         }
 
-        public void update(IEnumerable<object> data)
+        public void update(System.Collections.IEnumerable data)
         {
-            dg.ItemsSource = data;
+            IQueryable queryable = data.AsQueryable();
+            IEnumerable<string> columnNames = queryable.ElementType.GetFields().Select(r => r.Name);
+            DataTable dataTable = new DataTable();
+            foreach (var item in columnNames)
+            {
+                dataTable.Columns.Add(item);
+            }
+            foreach (var item in queryable)
+            {
+                var args = item.GetType().GetFields().Select(r=>r.GetValue(item)).ToArray();
+                dataTable.Rows.Add(args);
+            }
+            dg.IsReadOnly = true;
+            dg.ItemsSource = dataTable.DefaultView;
         }
     }
 }
