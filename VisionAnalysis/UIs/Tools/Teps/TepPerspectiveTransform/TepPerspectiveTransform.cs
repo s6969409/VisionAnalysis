@@ -65,8 +65,8 @@ namespace VisionAnalysis
             #endregion
 
             #region match process
-            int MIN_MATCH_COUNT = 0;
-            if (good.Count > MIN_MATCH_COUNT)
+            int MIN_MATCH_COUNT = 4;
+            if (good.Count >= MIN_MATCH_COUNT)
             {
                 Point2d[] src_pts = good.Select(m => Point2d.FromPoint(keypoints1.ElementAt(m.QueryIdx).Pt.ToPoint())).ToArray();
                 Point2d[] dst_pts = good.Select(m => Point2d.FromPoint(keypoints2.ElementAt(m.TrainIdx).Pt.ToPoint())).ToArray();
@@ -81,7 +81,7 @@ namespace VisionAnalysis
             }
             else
             {
-                Outputs["Match"].value = null;
+                Outputs["Match"].value = img2;
             }
             #endregion
 

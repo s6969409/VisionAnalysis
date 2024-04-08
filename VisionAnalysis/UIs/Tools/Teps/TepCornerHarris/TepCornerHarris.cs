@@ -16,8 +16,8 @@ namespace VisionAnalysis
             Inputs["blockSize"] = new PInput() { value = 3 };
             Inputs["ksize"] = new PInput() { value = 3 };
             Inputs["k"] = new PInput() { value = 0.04 };
-            Inputs["ThredHoldLT"] = new PInput() { value = 0.0 };
-            Inputs["ThredHoldGT"] = new PInput() { value = 0.0 };
+            Inputs["ThredHoldLT"] = new PInput() { value = -0.01 };
+            Inputs["ThredHoldGT"] = new PInput() { value = 0.01 };
 
             Outputs["OutputResult"] = new POutput() { value = new Mat() };
             Outputs["OutputResultMaxV"] = new POutput() { value = 0.0 };
@@ -56,13 +56,13 @@ namespace VisionAnalysis
                 {
                     float val = result.At<float>(y, x);
                     var f = (byte)((val - minValue) / (maxValue - minValue) * byte.MaxValue);
-                    // 如果結果值大於0.01，繪製紅色
-                    if (val > 0.01)
+                    // 如果結果值大於ThredHoldGT，繪製紅色(角點)
+                    if (val > ThredHoldGT)
                     {
                         output.Set(y, x, new Vec3b(0, 0, f));
                     }
-                    // 如果結果值小於-0.01，繪製綠色
-                    else if (val < -0.01)
+                    // 如果結果值小於ThredHoldLT，繪製綠色(邊)
+                    else if (val < ThredHoldLT)
                     {
                         output.Set(y, x, new Vec3b(0, f, 0));
                     }
