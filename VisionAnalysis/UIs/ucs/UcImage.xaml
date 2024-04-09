@@ -26,6 +26,8 @@
                 <Label x:Name="lb_value" Content="亮度"/>
                 <Separator/>
                 <Button x:Name="btn_scale" Content="倍率" Click="btn_scale_Click"/>
+                <Separator/>
+                <Button x:Name="btn_save" Content="另存" Click="btnSave_Click" IsEnabled="False"/>
             </ToolBar>
         </ToolBarTray>
     </Grid>

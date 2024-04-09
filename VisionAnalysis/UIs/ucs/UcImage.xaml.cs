@@ -43,6 +43,8 @@ namespace VisionAnalysis
 
                 lb_position.Content = $"pos:-";
                 lb_value.Content = $"value:-";
+
+                btn_save.IsEnabled = value != null && value.Width != 0 && value.Height != 0;
             }
         }
 
@@ -105,6 +107,13 @@ namespace VisionAnalysis
             double zoomScale = e.Delta > 0 ? 1.5 : 0.5;
             img.Height = img.ActualHeight * zoomScale;
             img.Width = img.ActualWidth * zoomScale;
+        }
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            string savePath = PathSelector.getUserSelectPath(PathSelector.PathRequest.SaveFile);
+            if (savePath == null) return;
+            Image.ImWrite(savePath);
         }
     }
     public interface IMatProperty
