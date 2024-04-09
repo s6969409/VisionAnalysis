@@ -39,15 +39,11 @@ namespace VisionAnalysis
         }
         public void update(object value)
         {
-            if (value is PInput pInput)
+            if (value is IParaValue pv)
             {
-                if(pInput.value is Mat mat) loadImg(mat);
-            }
-            else if (value is POutput pOutput)
-            {
-                if (pOutput.value == null) return;
-                if (pOutput.value is Mat mat) loadImg(mat);
-                else if (pOutput.value is System.Collections.IEnumerable items)
+                if (pv.value == null) return;
+                if (pv.value is Mat mat) loadImg(mat);
+                else if (pv.value is System.Collections.IEnumerable items)
                 {
                     table.update(items);
                     ti_table.Header = $"table({items.Cast<object>().Count()})";
@@ -55,7 +51,7 @@ namespace VisionAnalysis
                 }
                 else
                 {
-                    tv_obj.update(pOutput.value);
+                    tv_obj.update(pv.value);
                     focus(tv_obj);
                 }
             }
