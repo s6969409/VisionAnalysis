@@ -76,7 +76,7 @@ namespace VisionAnalysis
                 Point2d[] pts = new Point2d[] { new Point(0, 0), new Point(0, h - 1), new Point(w - 1, h - 1), new Point(w - 1, 0) };
                 Point2d[] ptsPT = Cv2.PerspectiveTransform(pts, homographyMask);
                 Mat matMatch = img2.Clone();
-                Cv2.Polylines(matMatch, new List<Point[]> { ptsPT.Select(p => p.ToPoint()).ToArray() }, true, new Scalar(0, 0, 255), 3, LineTypes.AntiAlias);
+                Cv2.Polylines(matMatch, new List<Point[]> { ptsPT.Select(p => p.ToPoint()).ToArray() }, true, new Scalar(0, 0, 255), 1, LineTypes.AntiAlias);
                 Outputs["Match"].value = matMatch;
             }
             else
