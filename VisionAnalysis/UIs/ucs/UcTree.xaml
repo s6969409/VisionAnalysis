@@ -11,7 +11,7 @@
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{Binding name}"/>
                 <Label Content=":"/>
-                <TextBlock Text="{Binding value}"/>
+                <TextBox Text="{Binding value}" IsReadOnly="True"/>
             </StackPanel>
         </HierarchicalDataTemplate>
 

@@ -25,22 +25,28 @@ namespace VisionAnalysis
         public UcTree()
         {
             InitializeComponent();
+            tv.ItemsSource = node.childNodes;
         }
 
         public void update(object obj)
         {
             node.value = obj;
             node.childNodes.Clear();
+            if (obj.GetType() == typeof(string) || obj.GetType() == typeof(int) || obj.GetType() == typeof(double))
+            {
+                Node newNd = new Node() { name = "", value = obj };
+                node.childNodes.Add(newNd);
+            }
             buildObjStruct(node, obj);
-            if (tv.ItemsSource == null) tv.ItemsSource = node.childNodes;
         }
         private void buildObjStruct(Node node, object obj)
         {
-            PropertyInfo[] properties = obj.GetType().GetProperties();
-            if (!(obj is string) && properties.Length > 0)
+            FieldInfo[] fields = obj.GetType().GetFields();
+            if (!(obj is string) && fields.Length > 0)
             {
-                foreach (var p in properties)
+                foreach (var p in fields)
                 {
+                    if (!p.IsPublic || p.IsStatic) continue;
                     object val = p.GetValue(obj);
                     Node newNd = new Node() { name = p.Name, value = val };
                     node.childNodes.Add(newNd);
