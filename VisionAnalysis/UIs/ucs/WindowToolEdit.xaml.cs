@@ -76,6 +76,8 @@ namespace VisionAnalysis
             Nd selectedNd = tv_inputs.SelectedItem as Nd;
             string paraName = selectedNd.name;
             PInput val = selectedNd.value as PInput;
+            DataContext = null;
+            DataContext = val;
             if (val.value is Enum)
             {
                 cc_value.Content = comboBox;
@@ -98,8 +100,6 @@ namespace VisionAnalysis
                 textBox.IsEnabled = true;
                 cc_value.Content = textBox;
             }
-            DataContext = null;
-            DataContext = val;
         }
 
         private void tv_outputs_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
