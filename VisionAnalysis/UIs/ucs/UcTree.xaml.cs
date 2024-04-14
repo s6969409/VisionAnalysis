@@ -32,7 +32,7 @@ namespace VisionAnalysis
         {
             node.value = obj;
             node.childNodes.Clear();
-            if (obj.GetType() == typeof(string) || obj.GetType() == typeof(int) || obj.GetType() == typeof(double))
+            if (obj.GetType() == typeof(string) || obj.GetType() == typeof(int) || obj.GetType() == typeof(double) || obj.GetType().IsArray)
             {
                 Node newNd = new Node() { name = "", value = obj };
                 node.childNodes.Add(newNd);

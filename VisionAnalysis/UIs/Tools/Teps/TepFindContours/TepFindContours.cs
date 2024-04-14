@@ -19,7 +19,8 @@ namespace VisionAnalysis
             Inputs["method"] = new PInput() { value = ContourApproximationModes.ApproxSimple };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
-            Outputs["Contours"] = new POutput() { value = new List<object>() };
+            Outputs["ContoursDetail"] = new POutput() { value = new List<object>() };
+            Outputs["Contours"] = new POutput();
             #endregion
         }
 
@@ -36,8 +37,8 @@ namespace VisionAnalysis
                 out HierarchyIndex[] hierarchies,
                 TepHelper.getEnum<RetrievalModes>(Inputs["mode"].value),
                 TepHelper.getEnum<ContourApproximationModes>(Inputs["method"].value));
-
-            Outputs["Contours"].value = contours.Select((c, Index) =>
+            Outputs["Contours"].value = contours;
+            Outputs["ContoursDetail"].value = contours.Select((c, Index) =>
             {
                 Moments moments = Cv2.Moments(c);
                 return new Contour()
