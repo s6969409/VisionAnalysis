@@ -55,6 +55,7 @@ namespace VisionAnalysis
             });
 
             Mat drawMat = new Mat(source.Rows, source.Cols, MatType.CV_8UC3);
+            Cv2.BitwiseAnd(drawMat, Scalar.All(0), drawMat);
             Cv2.DrawContours(drawMat, contours, -1, new Scalar(255, 255, 0), 1, LineTypes.Link4);
             updateUIImage((Mat)Outputs["Output1"].value);
             Outputs["Output1"].value = drawMat;

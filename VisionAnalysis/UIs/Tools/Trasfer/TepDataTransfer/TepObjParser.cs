@@ -14,7 +14,7 @@ namespace VisionAnalysis
             #region para value default...
             Inputs["Obj"] = new PInput();
             Inputs["PropertyName"] = new PInput() { value = "" };
-            Outputs["Output1"] = new POutput() { value = "" };
+            Outputs["Output1"] = new POutput();
             #endregion
         }
         #region override BaseToolEditParas member
@@ -74,7 +74,7 @@ namespace VisionAnalysis
 
                 }
             }
-            Outputs["Output1"].value = properties.FirstOrDefault(p =>
+            Outputs["Output1"].value = PropertyName == "" ? obj : properties.FirstOrDefault(p =>
             p.Name == PropertyName
             ).GetValue(obj);
         };

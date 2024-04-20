@@ -120,6 +120,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UIs\Tools\Teps\TepMatchShapes\TepMatchShapes.cs" />
     <Compile Include="UIs\Tools\Teps\TepPerspectiveTransform\TepPerspectiveTransform.cs" />
     <Compile Include="UIs\Tools\Teps\TepBFMatcher\TepBFMatcher.cs" />
     <Compile Include="UIs\Tools\Teps\TepBlob\TepBlob.cs" />
