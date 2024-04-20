@@ -65,7 +65,7 @@ namespace VisionAnalysis
         Dictionary<string, POutput> Outputs { get; }
         Action actionProcess { get; }
         Func<string, JObject> getJObjectAndSaveImg { get; }
-        Action<JObject> loadParas { get; }
+        Action<JObject, string> loadParas { get; }
     }
     public class BaseToolEditParas : IToolEditParas
     {
@@ -87,7 +87,7 @@ namespace VisionAnalysis
 
             return jobject;
         };
-        public virtual Action<JObject> loadParas => (jobject) => 
+        public virtual Action<JObject, string> loadParas => (jobject, imgDirPath) =>
         {
             ToolName = (string)jobject["ToolName"];
             JObject inputs = (JObject)jobject["Inputs"];
@@ -97,7 +97,7 @@ namespace VisionAnalysis
             {
                 if (Inputs[key].value is Mat)
                 {
-                    Inputs[key] = BuildMatByCrossReference(inputs[key]);
+                    Inputs[key] = BuildMatByCrossReference(inputs[key], imgDirPath);
                 }
                 else if (Inputs[key].value is Enum)
                 {
@@ -113,6 +113,10 @@ namespace VisionAnalysis
         {
             if (UIImage != null) UIImage.Image = mat;
         };
+        public static string PathImgDir(string pathJson)
+        {
+            return $@"{Path.GetDirectoryName(pathJson)}\Images";
+        }
 
         #region BaseTypeTranfer
         public static PInput JObjectToPInput(JToken jToken, Type type = null)
@@ -120,7 +124,7 @@ namespace VisionAnalysis
             object value;
 
             if (jToken["value"] == null) value = null;
-            else if(jToken["value"].Type == JTokenType.Object)
+            else if (jToken["value"].Type == JTokenType.Object)
             {
                 Dictionary<string, PInput> pInput = new Dictionary<string, PInput>();
                 foreach (JProperty jProperty in jToken["value"].ToObject<JObject>().Properties())
@@ -137,7 +141,7 @@ namespace VisionAnalysis
             else if (jToken["value"].Type == JTokenType.Float) value = (double)jToken["value"];
             else if (jToken["value"].Type == JTokenType.Integer) value = (int)jToken["value"];
             else if (jToken["value"].Type == JTokenType.String) value = (string)jToken["value"];
-            else if(jToken["value"].Type == JTokenType.Null)value = null;
+            else if (jToken["value"].Type == JTokenType.Null) value = null;
             else throw new InvalidCastException($"jToken[value].Type = {jToken["value"].Type} + type = {type} 目前尚未實做!!");
 
             return BuildCrossReference(jToken, value);
@@ -148,12 +152,16 @@ namespace VisionAnalysis
             ParaName = jToken["ParaName"] == null ? null : jToken["ParaName"].ToString(),
             value = value
         };
-        public static PInput BuildMatByCrossReference(JToken jToken) => new PInput()
+        public static PInput BuildMatByCrossReference(JToken jToken, string imgDirPath)
         {
-            ToolName = jToken["ToolName"] == null ? null : jToken["ToolName"].ToString(),
-            ParaName = jToken["ParaName"] == null ? null : jToken["ParaName"].ToString(),
-            value = File.Exists((string)jToken["value"]) ? new Mat((string)jToken["value"]) : null
-        };
+            string imgPath = Path.IsPathRooted((string)jToken["value"]) ? (string)jToken["value"] : $@"{imgDirPath}\{(string)jToken["value"]}";
+            return new PInput()
+            {
+                ToolName = jToken["ToolName"] == null ? null : jToken["ToolName"].ToString(),
+                ParaName = jToken["ParaName"] == null ? null : jToken["ParaName"].ToString(),
+                value = File.Exists(imgPath) ? new Mat(imgPath) : null
+            };
+        }
         #endregion
         #region paraType Tranfer
         protected static Dictionary<string, PInput> ParaDictBuilder<T>(params object[] ps)
@@ -278,7 +286,7 @@ namespace VisionAnalysis
             {
                 string imgPath = $@"{imgDirPath}\{Directory.GetFiles(imgDirPath).Length}.bmp";
                 matVal.SaveImage(imgPath);
-                jobject["value"] = imgPath;
+                jobject["value"] = Path.GetFileName(imgPath);
             }
             else if (pi.value is int intVal) jobject["value"] = intVal;
             else if (pi.value is double doubleVal) jobject["value"] = doubleVal;

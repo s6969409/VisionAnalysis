@@ -114,6 +114,7 @@ namespace VisionAnalysis
             string loadPath = PathSelector.getUserSelectPath(PathSelector.PathRequest.ReadFile);
             if (!File.Exists(loadPath)) return;
 
+            string imgDirPath = BaseToolEditParas.PathImgDir(loadPath);
             nodes.Clear();
             string str = File.ReadAllText(loadPath);
             JArray jArray = JArray.Parse(str);
@@ -125,7 +126,7 @@ namespace VisionAnalysis
                 if (type == null) throw new Exception($"無法解析ToolType:\n{toolType}\n程式沒寫!?");
 
                 IToolEditParas input = Activator.CreateInstance(type, new object[] { nodes }) as IToolEditParas;
-                input.loadParas(jobject);
+                input.loadParas(jobject, imgDirPath);
                 nodes.Add(new Nd(input));
             }
         }
@@ -133,7 +134,7 @@ namespace VisionAnalysis
         {
             string savePath = PathSelector.getUserSelectPath(PathSelector.PathRequest.SaveFile);
             if (savePath == null) return;
-            string imgDirPath = $@"{Path.GetDirectoryName(savePath)}\Images";
+            string imgDirPath = BaseToolEditParas.PathImgDir(savePath);
             if (!Directory.Exists(imgDirPath)) Directory.CreateDirectory(imgDirPath);
             foreach(string path in Directory.GetFiles(imgDirPath))
             {
