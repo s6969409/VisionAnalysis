@@ -62,7 +62,7 @@ namespace VisionAnalysis
         };
         #endregion
 
-        private Rect contoursRange(Point[] pts)
+        public static Rect contoursRange(Point[] pts)
         {
             int minX = pts[0].X, minY = pts[0].Y, maxX = pts[0].X, maxY = pts[0].Y;
 
