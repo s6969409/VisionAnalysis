@@ -46,7 +46,7 @@ namespace VisionAnalysis
                     Index = Index,
                     Rect = contoursRange(c),
                     GravityPt = new Point((int)(moments.M10 / moments.M00), (int)(moments.M01 / moments.M00)),
-                    Area = c.Length,
+                    Area = Cv2.ContourArea(c),
                     HierarchyNext = hierarchies[Index].Next,
                     HierarchyPrevious = hierarchies[Index].Previous,
                     HierarchyChild = hierarchies[Index].Child,
@@ -81,7 +81,7 @@ namespace VisionAnalysis
             public int Index;
             public Rect Rect;
             public Point GravityPt;
-            public int Area;
+            public double Area;
 
             public int HierarchyNext;
             public int HierarchyPrevious;
