@@ -17,6 +17,7 @@ namespace VisionAnalysis
             Inputs["contour"] = new PInput();
             Inputs["contours"] = new PInput();
             Inputs["method"] = new PInput() { value = ShapeMatchModes.I1 };
+            Inputs["range"] = new PInput() { value = 0.1 };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             Outputs["values"] = new POutput();
@@ -27,20 +28,29 @@ namespace VisionAnalysis
         #region override BaseToolEditParas member
         public override Action actionProcess => () =>
         {
+            #region get input para
             base.actionProcess();//read paras
 
             Mat source = Inputs["InputImage"].value as Mat;
             Point[] contour = Inputs["contour"].value as Point[];
             Point[][] contours = Inputs["contours"].value as Point[][];
             ShapeMatchModes method = TepHelper.getEnum<ShapeMatchModes>(Inputs["method"].value);
-            //process...
-            Point[][] filtContours = contours.Where(c => Cv2.ContourArea(c) > Cv2.ContourArea(contour) / 4).ToArray();
+            double range = Convert.ToDouble(Inputs["range"].value);
+            #endregion
 
-            RotatedRect rotatedRect1 = Cv2.FitEllipse(contour);
+            #region process...
+            Point[][] filtContours = contours.Where(c =>
+            {
+                double as1 = axisScale(c);
+                double as2 = axisScale(contour);
+
+                return as1 >= as2 * (1 - range) && as1 <= as2 * (1 + range);
+            }).ToArray();
+            RotatedRect rotatedRect1 = Cv2.MinAreaRect(contour);
 
             var values = filtContours.Select((c, i) =>
             {
-                RotatedRect rRect = Cv2.FitEllipse(c);
+                RotatedRect rRect = Cv2.MinAreaRect(c);
                 Point pt = (rRect.Center - rotatedRect1.Center).ToPoint();
                 double templateLongAxis = Math.Max(rotatedRect1.Size.Width, rotatedRect1.Size.Height);
                 double templateShortAxis = Math.Min(rotatedRect1.Size.Width, rotatedRect1.Size.Height);
@@ -63,7 +73,6 @@ namespace VisionAnalysis
             });
             Outputs["values"].value = values;
 
-
             int index = values.OrderBy(c => c.Similarity).First().Index;
 
             Mat result = source.Clone();
@@ -73,10 +82,11 @@ namespace VisionAnalysis
 
             Outputs["Output1"].value = result;
 
-            RotatedRect rotatedRect2 = Cv2.FitEllipse(filtContours.ElementAt(index));
+            RotatedRect rotatedRect2 = Cv2.MinAreaRect(filtContours.ElementAt(index));
 
             Outputs["rotatedRect1"].value = rotatedRect1;
             Outputs["rotatedRect2"].value = rotatedRect2;
+            #endregion
         };
         #endregion
         private class Contour
@@ -90,6 +100,13 @@ namespace VisionAnalysis
             public double Angle;
             public double Scale;
             public double SizeScale;
+        }
+        private double axisScale(Point[] contour)
+        {
+            RotatedRect rRect = Cv2.MinAreaRect(contour);
+            double LongAxis = Math.Max(rRect.Size.Width, rRect.Size.Height);
+            double ShortAxis = Math.Min(rRect.Size.Width, rRect.Size.Height);
+            return LongAxis / ShortAxis;
         }
         private void drawAll(Mat mat, Point[][] contours, IEnumerable<Contour> ctMsg)
         {
