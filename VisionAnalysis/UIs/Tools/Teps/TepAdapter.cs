@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace VisionAnalysis
 {
@@ -110,7 +109,7 @@ namespace VisionAnalysis
                 }
                 else
                 {
-                    MessageBox.Show($"ToolName:{ToolName} in saveFile not contain parameter:[{key}], system will use default.");
+                    System.Windows.MessageBox.Show($"ToolName:{ToolName} in saveFile not contain parameter:[{key}], system will use default.");
                 }
             }
         };
