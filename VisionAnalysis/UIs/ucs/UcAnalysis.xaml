@@ -16,5 +16,8 @@
         <TabItem Header="Object">
             <local:UcTree x:Name="tv_obj"/>
         </TabItem>
+        <TabItem Header="Chart">
+            <local:UcChart x:Name="chart"/>
+        </TabItem>
     </TabControl>
 </UserControl>

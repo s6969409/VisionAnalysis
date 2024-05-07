@@ -48,6 +48,7 @@ namespace VisionAnalysis
                     table.update(items);
                     ti_table.Header = $"table({items.Cast<object>().Count()})";
                     focus(table);
+                    chart.update(items);
                 }
                 else
                 {

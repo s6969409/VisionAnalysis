@@ -100,6 +100,7 @@
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -139,6 +140,9 @@
     <Compile Include="UIs\Tools\Teps\TepTest.cs" />
     <Compile Include="UIs\ucs\UcAnalysis.xaml.cs">
       <DependentUpon>UcAnalysis.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIs\ucs\UcChart.xaml.cs">
+      <DependentUpon>UcChart.xaml</DependentUpon>
     </Compile>
     <Compile Include="UIs\ucs\UcImage.xaml.cs">
       <DependentUpon>UcImage.xaml</DependentUpon>
@@ -183,6 +187,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="UIs\ucs\UcAnalysis.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIs\ucs\UcChart.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
