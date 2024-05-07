@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace VisionAnalysis
 {
@@ -103,9 +104,13 @@ namespace VisionAnalysis
                 {
                     Inputs[key] = JObjectToPInput(inputs[key], Inputs[key].value.GetType());
                 }
-                else
+                else if(inputs[key] != null)
                 {
                     Inputs[key] = JObjectToPInput(inputs[key]);
+                }
+                else
+                {
+                    MessageBox.Show($"ToolName:{ToolName} in saveFile not contain parameter:[{key}], system will use default.");
                 }
             }
         };
