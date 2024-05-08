@@ -21,6 +21,7 @@ namespace VisionAnalysis
             Inputs["thresholdType"] = new PInput() { value = ThresholdTypes.Binary };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
+            Outputs["threshold"] = new POutput() { value = 0.0 };
             #endregion
         }
 
@@ -29,7 +30,7 @@ namespace VisionAnalysis
         {
             base.actionProcess();//read paras
 
-            Cv2.Threshold(
+            Outputs["threshold"].value = Cv2.Threshold(
                 (Mat)Inputs["InputImage"].value,
                 (Mat)Outputs["Output1"].value,
                 (int)Inputs["threshold"].value,
