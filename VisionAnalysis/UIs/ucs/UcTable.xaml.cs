@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -30,11 +31,11 @@ namespace VisionAnalysis
         public void update(System.Collections.IEnumerable data)
         {
             IQueryable queryable = data.AsQueryable();
-            IEnumerable<string> columnNames = queryable.ElementType.GetFields().Select(r => r.Name);
+            FieldInfo[] colsF = queryable.ElementType.GetFields();
             DataTable dataTable = new DataTable();
-            foreach (var item in columnNames)
+            foreach (FieldInfo fInfo in colsF)
             {
-                dataTable.Columns.Add(item);
+                dataTable.Columns.Add(fInfo.Name, fInfo.FieldType);
             }
             foreach (var item in queryable)
             {
