@@ -48,7 +48,8 @@ namespace VisionAnalysis
                     table.update(items);
                     ti_table.Header = $"table({items.Cast<object>().Count()})";
                     focus(table);
-                    chart.update(items);
+                    bool useChart = WindowPreference.getCfgValue<bool>(WindowPreference.useChart);
+                    if(useChart) chart.update(items);
                 }
                 else
                 {

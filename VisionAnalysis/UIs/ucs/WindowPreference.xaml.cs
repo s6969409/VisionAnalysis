@@ -55,6 +55,7 @@ namespace VisionAnalysis
         public static readonly string fontSize = nameof(fontSize);
         public static readonly string runException = nameof(runException);
         public static readonly string language = nameof(language);
+        public static readonly string useChart = nameof(useChart);
         public enum Languages { Default, zhCn, enUs }
 
         #endregion
@@ -97,14 +98,6 @@ namespace VisionAnalysis
                 return jObject[propertyName].ToObject<T>();
             }
             return default(T);
-        }
-
-        public static bool isUserDuke
-        {
-            get
-            {
-                return Environment.MachineName.Equals("YJECNB-HSIEN");
-            }
         }
 
         #endregion
