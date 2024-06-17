@@ -100,6 +100,8 @@ namespace VisionAnalysis
                 textBox.IsEnabled = true;
                 cc_value.Content = textBox;
             }
+
+            toolEditParas.paraSelect(val);
         }
 
         private void tv_outputs_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -107,6 +109,8 @@ namespace VisionAnalysis
             Nd selected = tv_outputs.SelectedItem as Nd;
             if (selected == null) return;
             uc_Analysis.update(selected.value);
+
+            toolEditParas.paraSelect((PInput)selected.value);
         }
 
         #region ContentControl cc_value used

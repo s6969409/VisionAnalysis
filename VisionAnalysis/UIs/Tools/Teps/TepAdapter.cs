@@ -60,12 +60,13 @@ namespace VisionAnalysis
     public interface IToolEditParas
     {
         string ToolName { get; set; }
-        IMatProperty UIImage { get; set; }
+        UcImage UIImage { get; set; }
         Dictionary<string, PInput> Inputs { get; }
         Dictionary<string, POutput> Outputs { get; }
         Action actionProcess { get; }
         Func<string, JObject> getJObjectAndSaveImg { get; }
         Action<JObject, string> loadParas { get; }
+        Action<PInput> paraSelect { get; }
     }
     public class BaseToolEditParas : IToolEditParas
     {
@@ -74,7 +75,7 @@ namespace VisionAnalysis
         public BaseToolEditParas(ObservableRangeCollection<Nd> nodes) { this.nodes = nodes; }
 
         public virtual string ToolName { get; set; }
-        public virtual IMatProperty UIImage { get; set; }
+        public virtual UcImage UIImage { get; set; }
         public virtual Dictionary<string, PInput> Inputs { get; } = new Dictionary<string, PInput>();
         public virtual Dictionary<string, POutput> Outputs { get; } = new Dictionary<string, POutput>();
         public virtual Action actionProcess => () => TepHelper.readInputs(this, nodes);
@@ -84,7 +85,7 @@ namespace VisionAnalysis
             jobject["ToolType"] = GetType().FullName;
             jobject["ToolName"] = ToolName;
             jobject["Inputs"] = PInput.getJObjectAndSaveImg(Inputs, imgDirPath);
-
+            
             return jobject;
         };
         public virtual Action<JObject, string> loadParas => (jobject, imgDirPath) =>
@@ -103,7 +104,7 @@ namespace VisionAnalysis
                 {
                     Inputs[key] = JObjectToPInput(inputs[key], Inputs[key].value.GetType());
                 }
-                else if(inputs[key] != null)
+                else if (inputs[key] != null)
                 {
                     Inputs[key] = JObjectToPInput(inputs[key]);
                 }
@@ -117,6 +118,9 @@ namespace VisionAnalysis
         {
             if (UIImage != null) UIImage.Image = mat;
         };
+
+        public virtual Action<PInput> paraSelect => (p) => {};
+
         public static string PathImgDir(string pathJson)
         {
             return $@"{Path.GetDirectoryName(pathJson)}\Images";
