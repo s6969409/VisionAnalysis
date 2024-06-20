@@ -110,7 +110,7 @@ namespace VisionAnalysis
             if (selected == null) return;
             uc_Analysis.update(selected.value);
 
-            toolEditParas.paraSelect((PInput)selected.value);
+            toolEditParas.paraSelect((POutput)selected.value);
         }
 
         #region ContentControl cc_value used

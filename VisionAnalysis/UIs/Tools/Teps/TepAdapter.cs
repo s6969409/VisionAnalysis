@@ -66,7 +66,7 @@ namespace VisionAnalysis
         Action actionProcess { get; }
         Func<string, JObject> getJObjectAndSaveImg { get; }
         Action<JObject, string> loadParas { get; }
-        Action<PInput> paraSelect { get; }
+        Action<IParaValue> paraSelect { get; }
     }
     public class BaseToolEditParas : IToolEditParas
     {
@@ -119,7 +119,7 @@ namespace VisionAnalysis
             if (UIImage != null) UIImage.Image = mat;
         };
 
-        public virtual Action<PInput> paraSelect => (p) => {};
+        public virtual Action<IParaValue> paraSelect => (p) => {};
 
         public static string PathImgDir(string pathJson)
         {
