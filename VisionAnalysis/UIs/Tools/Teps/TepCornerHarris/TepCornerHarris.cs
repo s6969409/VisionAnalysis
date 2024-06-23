@@ -1,5 +1,6 @@
 ﻿using OpenCvSharp;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,60 +17,85 @@ namespace VisionAnalysis
             Inputs["blockSize"] = new PInput() { value = 3 };
             Inputs["ksize"] = new PInput() { value = 3 };
             Inputs["k"] = new PInput() { value = 0.04 };
-            Inputs["ThredHoldLT"] = new PInput() { value = -0.01 };
-            Inputs["ThredHoldGT"] = new PInput() { value = 0.01 };
 
-            Outputs["OutputResult"] = new POutput() { value = new Mat() };
-            Outputs["OutputResultMaxV"] = new POutput() { value = 0.0 };
-            Outputs["OutputResultMinV"] = new POutput() { value = 0.0 };
-            Outputs["OutputResult2"] = new POutput() { value = new Mat() };
+            Outputs["Output"] = new POutput() { value = new Mat() };
+            Outputs["OutputMaxV"] = new POutput() { value = 0.0 };
+            Outputs["OutputMinV"] = new POutput() { value = 0.0 };
+            Outputs["Corner"] = new POutput() { value = new Mat() };
+            Outputs["CornerDetail"] = new POutput() { value = new Mat() };
+            Outputs["Edge"] = new POutput() { value = new Mat() };
+            Outputs["EdgeDetail"] = new POutput() { value = new Mat() };
             #endregion
         }
         #region override BaseToolEditParas member
         public override Action actionProcess => () =>
         {
+            #region get input para
             base.actionProcess();//read paras
 
             Mat source = Inputs["InputImage"].value as Mat;
             int blockSize = (int)Inputs["blockSize"].value;
             int ksize = (int)Inputs["ksize"].value;
             double k = Convert.ToDouble(Inputs["k"].value);
-            double ThredHoldLT = Convert.ToDouble(Inputs["ThredHoldLT"].value);
-            double ThredHoldGT = Convert.ToDouble(Inputs["ThredHoldGT"].value);
+            #endregion
 
             Mat result = new Mat();
             //process...
             Cv2.CornerHarris(source, result, blockSize, ksize, k);
-            Outputs["OutputResult"].value = result;
+            Outputs["Output"].value = result;
 
             #region find max & min value
             result.MinMaxIdx(out double minValue, out double maxValue);
             result.MinMaxLoc(out Point minLocation, out Point maxLocation);
-            Outputs["OutputResultMaxV"].value = maxValue;
-            Outputs["OutputResultMinV"].value = minValue;
+            Outputs["OutputMaxV"].value = maxValue;
+            Outputs["OutputMinV"].value = minValue;
             #endregion
 
-            Mat output = source.CvtColor(ColorConversionCodes.GRAY2BGR);
-            Parallel.For(0, output.Rows, y =>
+            Mat corner = new Mat(source.Size(), MatType.CV_8UC3);
+            Mat edge = new Mat(source.Size(), MatType.CV_8UC3);
+            ConcurrentBag<ImgPtV> imgPtVsCorner = new ConcurrentBag<ImgPtV>();
+            ConcurrentBag<ImgPtV> imgPtVsEdge = new ConcurrentBag<ImgPtV>();
+            Parallel.For(0, corner.Rows, y =>
             {
-                for (int x = 0; x < output.Cols; x++)
+                for (int x = 0; x < corner.Cols; x++)
                 {
                     float val = result.At<float>(y, x);
                     var f = (byte)((val - minValue) / (maxValue - minValue) * byte.MaxValue);
-                    // 如果結果值大於ThredHoldGT，繪製紅色(角點)
-                    if (val > ThredHoldGT)
+                    // 如果結果值大於0，繪製紅色(角點)
+                    if (val > 0)
                     {
-                        output.Set(y, x, new Vec3b(0, 0, f));
+                        corner.Set(y, x, new Vec3b(0, 0, f));
+                        imgPtVsCorner.Add(new ImgPtV()
+                        {
+                            X = x,
+                            Y = y,
+                            Value = f
+                        });
                     }
-                    // 如果結果值小於ThredHoldLT，繪製綠色(邊)
-                    else if (val < ThredHoldLT)
+                    // 如果結果值小於0，繪製綠色(邊)
+                    else if (val < 0)
                     {
-                        output.Set(y, x, new Vec3b(0, f, 0));
+                        edge.Set(y, x, new Vec3b(0, f, 0));
+                        imgPtVsEdge.Add(new ImgPtV()
+                        {
+                            X = x,
+                            Y = y,
+                            Value = f
+                        });
                     }
                 }
             });
-            Outputs["OutputResult2"].value = output;
+            Mat baseSrc = source.CvtColor(ColorConversionCodes.GRAY2BGR);
+            Outputs["Corner"].value = (Mat)(baseSrc + corner);
+            Outputs["Edge"].value = (Mat)(baseSrc + edge);
+            Outputs["CornerDetail"].value = imgPtVsCorner;
+            Outputs["EdgeDetail"].value = imgPtVsEdge;
         };
         #endregion
+        private struct ImgPtV
+        {
+            public int X, Y;
+            public double Value;
+        }
     }
 }
