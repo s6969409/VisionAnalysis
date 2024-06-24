@@ -51,8 +51,8 @@ namespace VisionAnalysis
             Outputs["OutputMinV"].value = minValue;
             #endregion
 
-            Mat corner = new Mat(source.Size(), MatType.CV_8UC3);
-            Mat edge = new Mat(source.Size(), MatType.CV_8UC3);
+            Mat corner = new Mat(source.Size(), MatType.CV_8UC3, Scalar.Black);
+            Mat edge = new Mat(source.Size(), MatType.CV_8UC3, Scalar.Black);
             ConcurrentBag<ImgPtV> imgPtVsCorner = new ConcurrentBag<ImgPtV>();
             ConcurrentBag<ImgPtV> imgPtVsEdge = new ConcurrentBag<ImgPtV>();
             Parallel.For(0, corner.Rows, y =>
@@ -85,9 +85,8 @@ namespace VisionAnalysis
                     }
                 }
             });
-            Mat baseSrc = source.CvtColor(ColorConversionCodes.GRAY2BGR);
-            Outputs["Corner"].value = (Mat)(baseSrc + corner);
-            Outputs["Edge"].value = (Mat)(baseSrc + edge);
+            Outputs["Corner"].value = corner;
+            Outputs["Edge"].value = edge;
             Outputs["CornerDetail"].value = imgPtVsCorner;
             Outputs["EdgeDetail"].value = imgPtVsEdge;
         };
