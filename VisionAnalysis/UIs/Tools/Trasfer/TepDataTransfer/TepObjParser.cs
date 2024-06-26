@@ -64,14 +64,7 @@ namespace VisionAnalysis
 
             object obj = objs.ElementAt(index);
             PropertyInfo[] properties = obj.GetType().GetProperties();
-            if (!(obj is string) && properties.Length > 0)
-            {
-                foreach (var p in properties)
-                {
-                    object val = p.GetValue(obj);
 
-                }
-            }
             Outputs["Output1"].value = PropertyName == "" ? obj : properties.FirstOrDefault(p =>
             p.Name == PropertyName
             ).GetValue(obj);

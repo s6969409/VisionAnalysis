@@ -16,7 +16,8 @@ namespace VisionAnalysis
             Inputs["contours"] = new PInput();
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
-            Outputs["rects"] = new POutput() { value = new Mat() };
+            Outputs["rects"] = new POutput();
+            Outputs["rImgs"] = new POutput();
             #endregion
         }
         #region override BaseToolEditParas member
@@ -35,6 +36,7 @@ namespace VisionAnalysis
             Array.ForEach(rects, rect => result.Rectangle(rect, Scalar.RandomColor()));
             Outputs["Output1"].value = result;
             Outputs["rects"].value = rects;
+            Outputs["rImgs"].value = rects.Select(rect => new Mat(source, rect));
         };
         #endregion
     }
