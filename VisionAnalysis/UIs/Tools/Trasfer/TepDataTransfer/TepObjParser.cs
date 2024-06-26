@@ -58,8 +58,6 @@ namespace VisionAnalysis
             base.actionProcess();//read paras
 
             //process...
-            var aa = Inputs["Array"].value;
-
             IEnumerable<object> objs = Inputs["Array"].value as IEnumerable<object>;
             int index = (int)Inputs["Index"].value;
             string PropertyName = Inputs["PropertyName"].value as string;

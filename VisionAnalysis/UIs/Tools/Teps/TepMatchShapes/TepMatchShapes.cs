@@ -21,8 +21,9 @@ namespace VisionAnalysis
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             Outputs["values"] = new POutput();
-            Outputs["rotatedRect1"] = new POutput();
-            Outputs["rotatedRect2"] = new POutput();
+            Outputs["rotatedTemplate"] = new POutput();
+            Outputs["filtContours"] = new POutput();
+            Outputs["rotateds"] = new POutput();
             #endregion
         }
         #region override BaseToolEditParas member
@@ -30,7 +31,7 @@ namespace VisionAnalysis
         {
             #region get input para
             base.actionProcess();//read paras
-
+            
             Mat source = Inputs["InputImage"].value as Mat;
             Point[] contour = Inputs["contour"].value as Point[];
             Point[][] contours = Inputs["contours"].value as Point[][];
@@ -45,15 +46,19 @@ namespace VisionAnalysis
                 double as2 = axisScale(contour);
 
                 return as1 >= as2 * (1 - range) && as1 <= as2 * (1 + range);
+            }).Where(c => 
+            {
+                RotatedRect rRect = Cv2.MinAreaRect(c);
+                return rRect.Size.Width >= 1 && rRect.Size.Height >= 1;
             }).ToArray();
-            RotatedRect rotatedRect1 = Cv2.MinAreaRect(contour);
+            RotatedRect rotatedTemplate = Cv2.MinAreaRect(contour);
 
             var values = filtContours.Select((c, i) =>
             {
                 RotatedRect rRect = Cv2.MinAreaRect(c);
-                Point pt = (rRect.Center - rotatedRect1.Center).ToPoint();
-                double templateLongAxis = Math.Max(rotatedRect1.Size.Width, rotatedRect1.Size.Height);
-                double templateShortAxis = Math.Min(rotatedRect1.Size.Width, rotatedRect1.Size.Height);
+                Point pt = (rRect.Center - rotatedTemplate.Center).ToPoint();
+                double templateLongAxis = Math.Max(rotatedTemplate.Size.Width, rotatedTemplate.Size.Height);
+                double templateShortAxis = Math.Min(rotatedTemplate.Size.Width, rotatedTemplate.Size.Height);
                 double LongAxis = Math.Max(rRect.Size.Width, rRect.Size.Height);
                 double ShortAxis = Math.Min(rRect.Size.Width, rRect.Size.Height);
                 double scale = (LongAxis / templateLongAxis + ShortAxis / templateShortAxis) / 2;
@@ -82,10 +87,9 @@ namespace VisionAnalysis
 
             Outputs["Output1"].value = result;
 
-            RotatedRect rotatedRect2 = Cv2.MinAreaRect(filtContours.ElementAt(index));
-
-            Outputs["rotatedRect1"].value = rotatedRect1;
-            Outputs["rotatedRect2"].value = rotatedRect2;
+            Outputs["rotatedTemplate"].value = rotatedTemplate;
+            Outputs["filtContours"].value = filtContours;
+            Outputs["rotateds"].value = filtContours.Select(c => Cv2.MinAreaRect(c));
             #endregion
         };
         #endregion
