@@ -38,13 +38,15 @@ namespace VisionAnalysis
                 matExpr = source1 * source2;
             else if (optMethod == OptMethod.Division)
                 matExpr = source1 / source2;
+            else if (optMethod == OptMethod.Inverse)
+                matExpr = ~source1;
 
             Outputs["Output1"].value = (Mat)matExpr;
         };
         #endregion
         public enum OptMethod
         {
-            Addition, Subtraction, Multiplication, Division
+            Addition, Subtraction, Multiplication, Division, Inverse
         }
     }
 }
