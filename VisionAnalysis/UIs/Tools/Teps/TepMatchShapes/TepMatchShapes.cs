@@ -87,9 +87,25 @@ namespace VisionAnalysis
 
             Outputs["Output1"].value = result;
 
+            RotatedRect rr = Cv2.MinAreaRect(contour);
+            double xat = contour.Average(p => p.X - rr.Center.X);
+            double yat = contour.Average(p => p.Y - rr.Center.Y);
+
             Outputs["rotatedTemplate"].value = rotatedTemplate;
             Outputs["filtContours"].value = filtContours;
-            Outputs["rotateds"].value = filtContours.Select(c => Cv2.MinAreaRect(c));
+            Outputs["rotateds"].value = filtContours.Select(c => {
+                RotatedRect rotatedRect = Cv2.MinAreaRect(c);
+                double xt = c.Average(p => p.X - rotatedRect.Center.X);
+                double yt = c.Average(p => p.Y - rotatedRect.Center.Y);
+                double theta = Math.Atan(xt / yt);
+                return new TT(){ rotatedRect=rotatedRect, xt= xt, yt=yt, theta=theta };
+            }).Concat(new TT[] { new TT() {
+                rotatedRect = rr,
+                xt = xat,
+                yt = yat,
+                theta = Math.Atan(xat / yat)
+            } });
+
             #endregion
         };
         #endregion
@@ -135,7 +151,14 @@ namespace VisionAnalysis
             Cv2.PutText(mat, $"Scale:{ct.Scale.ToString("0.000")}", sPt, HersheyFonts.HersheyScriptSimplex, 1, scalar, thickness);
             Point ssPt = new Point(ct.Pt.X, ct.Pt.Y + 90);
             Cv2.PutText(mat, $"SizeScale:{ct.SizeScale.ToString("0.000")}", ssPt, HersheyFonts.HersheyScriptSimplex, 1, scalar, thickness);
-            Cv2.Ellipse(mat, new RotatedRect(ct.Pt, ct.Size, (float)ct.Angle), scalar, thickness);
+            //Cv2.Ellipse(mat, new RotatedRect(ct.Pt, ct.Size, (float)ct.Angle), scalar, thickness);
+        }
+        private class TT
+        {
+            public RotatedRect rotatedRect;
+            public double xt;
+            public double yt;
+            public double theta;
         }
     }
 }

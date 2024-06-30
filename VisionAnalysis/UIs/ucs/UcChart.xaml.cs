@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OpenCvSharp;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -52,6 +54,36 @@ namespace VisionAnalysis
                         chart1.Series[i].Points.AddY(y.ToString());
                     }
                 }
+            }
+        }
+        public void update(Mat mat)
+        {
+            if (!mat.Type().IsInteger) return;
+            byte[] data0 = new byte[256];
+            byte[] data1 = new byte[256];
+            byte[] data2 = new byte[256];
+            Parallel.For(0, mat.Rows, y =>
+            {
+                for (int x = 0; x < mat.Cols; x++)
+                {
+                    Vec3b val = mat.At<Vec3b>(y, x);
+                    data0[val.Item0]++;
+                    data1[val.Item1]++;
+                    data2[val.Item2]++;
+                }
+            });
+
+            chart1.Series.Clear();
+            for (int i = 0; i < mat.Channels(); i++)
+            {
+                chart1.Series.Add(sCrt($"Channel {i}"));
+            }
+
+            for (int i = 0; i < 256; i++)
+            {
+                chart1.Series[0].Points.AddY(data0[i]);
+                chart1.Series[1].Points.AddY(data1[i]);
+                chart1.Series[2].Points.AddY(data2[i]);
             }
         }
 

@@ -36,6 +36,8 @@ namespace VisionAnalysis
         {
             img.Image = mat == null ? null : mat;
             focus(img);
+            bool useChart = WindowPreference.getCfgValue<bool>(WindowPreference.useChart);
+            if (useChart) chart.update(mat);
         }
         public void update(object value)
         {
