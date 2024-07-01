@@ -10,6 +10,9 @@
     <Grid>
         <WindowsFormsHost>
             <formDV:Chart x:Name="chart1">
+                <formDV:Chart.Legends>
+                    <formDV:Legend/>
+                </formDV:Chart.Legends>
                 <formDV:Chart.ChartAreas>
                     <formDV:ChartArea/>
                 </formDV:Chart.ChartAreas>
