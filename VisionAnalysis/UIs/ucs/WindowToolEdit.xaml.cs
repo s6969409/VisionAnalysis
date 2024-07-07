@@ -37,12 +37,12 @@ namespace VisionAnalysis
             this.toolEditParas = toolEditParas;
             toolEditParas.UIImage = uc_Analysis.img;
 
-            Nd ndInput = new Nd("Inputs", null);
-            ndInput.childNodes.AddRange(toolEditParas.Inputs.Select(i => TepHelper.NdBuild(i)));
+            Nd ndInput = new Nd(toolEditParas, "Inputs", null);
+            ndInput.childNodes.AddRange(toolEditParas.Inputs.Select(i => TepHelper.NdBuild(toolEditParas, i)));
             tv_inputs.ItemsSource = ndInput.childNodes;
 
-            Nd udOutput = new Nd("Outputs", null);
-            udOutput.childNodes.AddRange(toolEditParas.Outputs.Select(i => TepHelper.NdBuild(i)));
+            Nd udOutput = new Nd(toolEditParas, "Outputs", null);
+            udOutput.childNodes.AddRange(toolEditParas.Outputs.Select(i => TepHelper.NdBuild(toolEditParas, i)));
             tv_outputs.ItemsSource = udOutput.childNodes;
             
             this.nodes = nodes;
@@ -101,7 +101,7 @@ namespace VisionAnalysis
                 cc_value.Content = textBox;
             }
 
-            toolEditParas.paraSelect(val);
+            toolEditParas.paraSelect(val, uc_Analysis);
         }
 
         private void tv_outputs_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -110,7 +110,7 @@ namespace VisionAnalysis
             if (selected == null) return;
             uc_Analysis.update(selected.value);
 
-            toolEditParas.paraSelect((POutput)selected.value);
+            toolEditParas.paraSelect((POutput)selected.value, uc_Analysis);
         }
 
         #region ContentControl cc_value used

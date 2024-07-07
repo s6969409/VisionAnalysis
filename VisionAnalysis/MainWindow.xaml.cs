@@ -53,9 +53,6 @@ namespace VisionAnalysis
 
             Mat mat = new Mat();
             nodes.Clear();
-            
-            Nd input = new Nd(new TepInputs(nodes) { ToolName = "Inputs" });
-            nodes.Add(input);
 
             tvl.ItemsSource = nodes;
         }
@@ -180,9 +177,12 @@ namespace VisionAnalysis
         #region show by selected para
         private void tvl_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            Nd selected = tvl.SelectedItem as Nd;
-            if (selected == null) return;
-            uc_Analysis.update(selected.value);
+            Nd selectNd = tvl.SelectedItem as Nd;
+            if (selectNd == null) return;
+            uc_Analysis.update(selectNd.value);
+
+            if (selectNd?.value is IToolEditParas) return;
+            selectNd.tool.paraSelect((IParaValue)selectNd.value, uc_Analysis);
         }
         #endregion
         #region events for TreeViewItem remove by MenuItem mouse click
@@ -294,6 +294,7 @@ namespace VisionAnalysis
     public class Nd : IUITreeViewItem, INotifyPropertyChanged
     {
         public ObservableRangeCollection<IUITreeViewItem> childNodes { get; set; } = new ObservableRangeCollection<IUITreeViewItem>();
+        public IToolEditParas tool;
 
         private string _name;
         public string name
@@ -317,7 +318,7 @@ namespace VisionAnalysis
         {
             get
             {
-                if(value is IParaValue)
+                if (value is IParaValue)
                 {
                     IParaValue paraVal = value as IParaValue;
                     if (paraVal.value == null) return "null";
@@ -340,22 +341,26 @@ namespace VisionAnalysis
             value = valueDefault;
             foreach (var item in valueDefault.Inputs)
             {
-                childNodes.Add(buildParaNd(item));
+                childNodes.Add(buildParaNd(valueDefault, item));
             }
             foreach (var item in valueDefault.Outputs)
             {
-                childNodes.Add(buildParaNd(item));
+                childNodes.Add(buildParaNd(valueDefault, item));
             }
         }
-        public Nd(string name, object value) { _name = name; this.value = value; }
-        private Nd buildParaNd<T>(KeyValuePair<string, T> item)where T: IParaValue
+        public Nd(IToolEditParas tool, string name, object value) {
+            this.tool = tool;
+            _name = name;
+            this.value = value;
+        }
+        private Nd buildParaNd<T>(IToolEditParas tool, KeyValuePair<string, T> item)where T: IParaValue
         {
-            Nd nd = new Nd(item.Key, item.Value);
+            Nd nd = new Nd(tool, item.Key, item.Value);
             if (item.Value.value is Dictionary<string, T>)
             {
                 foreach (KeyValuePair<string, T> i in (Dictionary<string, T>)item.Value.value)
                 {
-                    nd.childNodes.Add(buildParaNd(i));
+                    nd.childNodes.Add(buildParaNd(tool, i));
                 }
             }
             return nd;

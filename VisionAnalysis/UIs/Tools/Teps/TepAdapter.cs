@@ -44,13 +44,13 @@ namespace VisionAnalysis
             string code = arg.ToString();
             return (T)Enum.Parse(typeof(T), code);
         }
-        public static Nd NdBuild<T>(KeyValuePair<string,T> kvInput)where T: IParaValue
+        public static Nd NdBuild<T>(IToolEditParas tool, KeyValuePair<string,T> kvInput)where T: IParaValue
         {
-            Nd nd = new Nd(kvInput.Key, kvInput.Value);
+            Nd nd = new Nd(tool, kvInput.Key, kvInput.Value);
             if (kvInput.Value.value is Dictionary<string, T>)
             {
                 Dictionary<string, T> childs = kvInput.Value.value as Dictionary<string, T>;
-                nd.childNodes.AddRange(childs.Select(child => NdBuild(child)));
+                nd.childNodes.AddRange(childs.Select(child => NdBuild(tool, child)));
             }
             return nd;
         }
@@ -66,7 +66,7 @@ namespace VisionAnalysis
         Action actionProcess { get; }
         Func<string, JObject> getJObjectAndSaveImg { get; }
         Action<JObject, string> loadParas { get; }
-        Action<IParaValue> paraSelect { get; }
+        Action<IParaValue, UcAnalysis> paraSelect { get; }
     }
     public class BaseToolEditParas : IToolEditParas
     {
@@ -119,7 +119,7 @@ namespace VisionAnalysis
             if (UIImage != null) UIImage.Image = mat;
         };
 
-        public virtual Action<IParaValue> paraSelect => (p) => {};
+        public virtual Action<IParaValue, UcAnalysis> paraSelect => (p, u) => {};
 
         public static string PathImgDir(string pathJson)
         {
