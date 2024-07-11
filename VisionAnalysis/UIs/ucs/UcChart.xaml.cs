@@ -81,9 +81,10 @@ namespace VisionAnalysis
 
             for (int i = 0; i < 256; i++)
             {
-                chart1.Series[0].Points.AddY(data0[i]);
-                chart1.Series[1].Points.AddY(data1[i]);
-                chart1.Series[2].Points.AddY(data2[i]);
+                for (int j = 0; j < chart1.Series.Count; j++)
+                {
+                    chart1.Series[j].Points.AddY(data0[i]);
+                }
             }
         }
 
