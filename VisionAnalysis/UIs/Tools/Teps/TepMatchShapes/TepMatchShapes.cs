@@ -17,6 +17,7 @@ namespace VisionAnalysis
             Inputs["contour"] = new PInput();
             Inputs["contours"] = new PInput();
             Inputs["method"] = new PInput() { value = ShapeMatchModes.I1 };
+            Inputs["thMS"] = new PInput() { value = 0.1 };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             Outputs["values"] = new POutput();
@@ -32,12 +33,14 @@ namespace VisionAnalysis
             Point[] contour = Inputs["contour"].value as Point[];
             Point[][] contours = Inputs["contours"].value as Point[][];
             ShapeMatchModes method = TepHelper.getEnum<ShapeMatchModes>(Inputs["method"].value);
+            double thMS = (double)Inputs["thMS"].value;
             #endregion
 
             #region process...
             RotatedRect rotatedTemplate = Cv2.MinAreaRect(contour);
 
-            var values = contours.Select((c, i) =>
+            var values = contours.Where(c => Cv2.MatchShapes(contour, c, method) < thMS)
+            .Select((c, i) =>
             {
                 RotatedRect rRect = Cv2.MinAreaRect(c);
                 Point pt = (rRect.Center - rotatedTemplate.Center).ToPoint();
@@ -57,7 +60,7 @@ namespace VisionAnalysis
                     Size = rRect.Size,
                     Angle = rRect.Angle,
                     Scale = scale,
-                    SizeScale = LongAxis/ShortAxis
+                    SizeScale = LongAxis / ShortAxis
                 };
             });
             Outputs["values"].value = values;

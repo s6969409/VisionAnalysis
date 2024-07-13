@@ -91,10 +91,10 @@ namespace VisionAnalysis
                 double xt = c.Average(p => p.X - rotatedRect.Center.X);
                 double yt = c.Average(p => p.Y - rotatedRect.Center.Y);
                 double theta = Math.Atan(xt / yt);
-                return new TT() { Index = i, rotatedRect = rotatedRect, xt = xt - xat, yt = yt - yat, theta = theta - thetaa };
+                return new TT() { Index = i, nums = c.Length, xc = rotatedRect.Center.X, yc = rotatedRect.Center.Y, xt = xt - xat, yt = yt - yat, theta = theta - thetaa };
             }).Concat(new TT[] { new TT() {
-                Index = 0,
-                rotatedRect = rr,
+                Index = 0, nums = contour.Length,
+                xc = rr.Center.X, yc = rr.Center.Y,
                 xt = xat,
                 yt = yat,
                 theta = thetaa
@@ -159,7 +159,9 @@ namespace VisionAnalysis
         private class TT
         {
             public int Index;
-            public RotatedRect rotatedRect;
+            public int nums;
+            public double xc;
+            public double yc;
             public double xt;
             public double yt;
             public double theta;
