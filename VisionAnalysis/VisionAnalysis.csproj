@@ -124,6 +124,7 @@
     <Compile Include="UIs\Tools\Teps\TepAlgorithms\TepAlgorithms.cs" />
     <Compile Include="UIs\Tools\Teps\TepBoundingRect\TepBoundingRect.cs" />
     <Compile Include="UIs\Tools\Teps\TepFast\TepFast.cs" />
+    <Compile Include="UIs\Tools\Teps\TepHough\TepHoughs.cs" />
     <Compile Include="UIs\Tools\Teps\TepMatchShapes\TepMatchShapes.cs" />
     <Compile Include="UIs\Tools\Teps\TepMatOperator\TepMatOperator.cs" />
     <Compile Include="UIs\Tools\Teps\TepPerspectiveTransform\TepPerspectiveTransform.cs" />
