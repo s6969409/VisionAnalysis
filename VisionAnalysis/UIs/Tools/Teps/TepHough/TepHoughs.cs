@@ -50,4 +50,52 @@ namespace VisionAnalysis
         };
         #endregion
     }
+
+    public class TepHoughCircles : BaseToolEditParas
+    {
+        public TepHoughCircles(ObservableRangeCollection<Nd> nodes) : base(nodes)
+        {
+            #region para value default...
+            Inputs["InputImage"] = new PInput() { value = new Mat() };
+            Inputs["method"] = new PInput() { value = HoughModes.Gradient };
+            Inputs["dp"] = new PInput() { value = 1.0 };
+            Inputs["minDist"] = new PInput() { value = 1.0 };
+            Inputs["param1"] = new PInput() { value = 100.0 };
+            Inputs["param2"] = new PInput() { value = 100.0 };
+            Inputs["minRadius"] = new PInput() { value = 0 };
+            Inputs["maxRadius"] = new PInput() { value = 0 };
+
+            Outputs["Output1"] = new POutput() { value = new Mat() };
+            Outputs["Lines"] = new POutput();
+            #endregion
+        }
+        #region override BaseToolEditParas member
+        public override Action actionProcess => () =>
+        {
+            #region get input para
+            base.actionProcess();//read paras
+
+            Mat source = Inputs["InputImage"].value as Mat;
+            HoughModes method = TepHelper.getEnum<HoughModes>(Inputs["method"].value);
+            double dp = Convert.ToDouble(Inputs["dp"].value);
+            double minDist = Convert.ToDouble(Inputs["minDist"].value);
+            double param1 = Convert.ToDouble(Inputs["param1"].value);
+            double param2 = Convert.ToDouble(Inputs["param2"].value);
+            int minRadius = Convert.ToInt32(Inputs["minRadius"].value);
+            int maxRadius = Convert.ToInt32(Inputs["maxRadius"].value);
+            #endregion
+
+            //process...
+            CircleSegment[] circles = Cv2.HoughCircles(source, method, dp, minDist, param1, param2, minRadius, maxRadius);
+            Mat result = new Mat(source.Size(), MatType.CV_8UC3, Scalar.Black);
+            foreach (CircleSegment circle in circles)
+            {
+                result.Circle(circle.Center.ToPoint(), (int)circle.Radius, Scalar.RandomColor());
+            }
+            Outputs["Output1"].value = result;
+            updateUIImage(result);
+            Outputs["Lines"].value = circles;
+        };
+        #endregion
+    }
 }
