@@ -38,7 +38,6 @@ namespace VisionAnalysis
             {
                 chart1.Series.Add(sCrt(colsF[i].Name));
             }
-
             foreach (var item in queryable)
             {
                 FieldInfo[] fields = item.GetType().GetFields();
@@ -96,5 +95,11 @@ namespace VisionAnalysis
             ChartType = SeriesChartType.Line,
             Color = System.Drawing.Color.FromArgb(random.Next(256), random.Next(256), random.Next(256))
         };
+
+        private void chart1_Click(object sender, EventArgs e)
+        {
+            foreach (Series s in chart1.Series) 
+                s.ChartType = SeriesChartType.Stock;
+        }
     }
 }

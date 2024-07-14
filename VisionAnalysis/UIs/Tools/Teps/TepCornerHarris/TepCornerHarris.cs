@@ -25,6 +25,7 @@ namespace VisionAnalysis
             Outputs["CornerDetail"] = new POutput() { value = new Mat() };
             Outputs["Edge"] = new POutput() { value = new Mat() };
             Outputs["EdgeDetail"] = new POutput() { value = new Mat() };
+            Outputs["total"] = new POutput() { value = new Mat() };
             #endregion
         }
         #region override BaseToolEditParas member
@@ -53,6 +54,7 @@ namespace VisionAnalysis
 
             Mat corner = new Mat(source.Size(), MatType.CV_8UC3, Scalar.Black);
             Mat edge = new Mat(source.Size(), MatType.CV_8UC3, Scalar.Black);
+            Mat total = new Mat(source.Size(), MatType.CV_8UC3, Scalar.Black);
             ConcurrentBag<ImgPtV> imgPtVsCorner = new ConcurrentBag<ImgPtV>();
             ConcurrentBag<ImgPtV> imgPtVsEdge = new ConcurrentBag<ImgPtV>();
             Parallel.For(0, corner.Rows, y =>
@@ -65,6 +67,7 @@ namespace VisionAnalysis
                     if (val > 0)
                     {
                         corner.Set(y, x, new Vec3b(0, 0, f));
+                        total.Set(y, x, new Vec3b(0, 0, f));
                         imgPtVsCorner.Add(new ImgPtV()
                         {
                             X = x,
@@ -76,6 +79,7 @@ namespace VisionAnalysis
                     else if (val < 0)
                     {
                         edge.Set(y, x, new Vec3b(0, f, 0));
+                        total.Set(y, x, new Vec3b(0, f, 0));
                         imgPtVsEdge.Add(new ImgPtV()
                         {
                             X = x,
@@ -89,6 +93,7 @@ namespace VisionAnalysis
             Outputs["Edge"].value = edge;
             Outputs["CornerDetail"].value = imgPtVsCorner;
             Outputs["EdgeDetail"].value = imgPtVsEdge;
+            Outputs["total"].value = total;
         };
         #endregion
         private struct ImgPtV

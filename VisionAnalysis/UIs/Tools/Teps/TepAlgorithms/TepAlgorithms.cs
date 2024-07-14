@@ -74,7 +74,7 @@ namespace VisionAnalysis
             });
             Outputs["values"].value = values;
 
-            Mat result = source.Clone();
+            Mat result = source.Channels() > 1 ? source.Clone() : source.CvtColor(ColorConversionCodes.GRAY2BGR);
             drawAll(result, filtContours, values);
 
             Outputs["Output1"].value = result;
@@ -211,7 +211,7 @@ namespace VisionAnalysis
             RotatedRect rotatedTemplate = Cv2.MinAreaRect(contour);
 
             var values = filtContours.Select(c => pts2Mat(c));
-
+            if (values.Count() == 0) return;
             Outputs["Output1"].value = values.ElementAt(index);
             updateUIImage(values.ElementAt(index));
             Inputs["index"].value = index < values.Count() ? index + 1 : 0;

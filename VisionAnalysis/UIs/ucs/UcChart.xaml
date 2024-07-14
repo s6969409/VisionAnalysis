@@ -9,7 +9,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <WindowsFormsHost>
-            <formDV:Chart x:Name="chart1">
+            <formDV:Chart x:Name="chart1" Click="chart1_Click">
                 <formDV:Chart.Legends>
                     <formDV:Legend/>
                 </formDV:Chart.Legends>
