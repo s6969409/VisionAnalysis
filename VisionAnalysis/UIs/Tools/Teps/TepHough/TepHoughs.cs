@@ -7,6 +7,65 @@ using System.Threading.Tasks;
 
 namespace VisionAnalysis
 {
+    public class TepHoughLines : BaseToolEditParas
+    {
+        public TepHoughLines(ObservableRangeCollection<Nd> nodes) : base(nodes)
+        {
+            #region para value default...
+            Inputs["InputImage"] = new PInput() { value = new Mat() };
+            Inputs["rho"] = new PInput() { value = 1.0 };
+            Inputs["theta"] = new PInput() { value = 0.0175 };
+            Inputs["threshold"] = new PInput() { value = 100 };
+            Inputs["minLineLength"] = new PInput() { value = 0.0 };
+            Inputs["maxLineGap"] = new PInput() { value = 0.0 };
+
+            Outputs["Output1"] = new POutput() { value = new Mat() };
+            Outputs["Lines"] = new POutput();
+            #endregion
+        }
+        #region override BaseToolEditParas member
+        public override Action actionProcess => () =>
+        {
+            #region get input para
+            base.actionProcess();//read paras
+
+            Mat source = Inputs["InputImage"].value as Mat;
+            double rho = Convert.ToDouble(Inputs["rho"].value);
+            double theta = Convert.ToDouble(Inputs["theta"].value);
+            int threshold = Convert.ToInt32(Inputs["threshold"].value);
+            double srn = Convert.ToDouble(Inputs["minLineLength"].value);
+            double stn = Convert.ToDouble(Inputs["maxLineGap"].value);
+            #endregion
+
+            //process...
+            LineSegmentPolar[] lines = Cv2.HoughLines(source, rho, theta, threshold, srn, stn);
+            Mat result = new Mat(source.Size(), MatType.CV_8UC3, Scalar.Black);
+            double maxLength = Math.Sqrt(source.Width * source.Width + source.Height * source.Height);
+            foreach (LineSegmentPolar line in lines)
+            {
+                double a = Math.Cos(line.Theta);
+                double b = Math.Sin(line.Theta);
+                double x0 = a * line.Rho;
+                double y0 = b * line.Rho;
+
+                Point p1 = new Point(
+                    (int)(x0 + maxLength * (-b)),
+                    (int)(y0 + maxLength * (a))
+                );
+                Point p2 = new Point(
+                    (int)(x0 - maxLength * (-b)),
+                    (int)(y0 - maxLength * (a))
+                );
+
+                result.Line(p1, p2, Scalar.RandomColor());
+            }
+            Outputs["Output1"].value = result;
+            updateUIImage(result);
+            Outputs["Lines"].value = lines;
+        };
+        #endregion
+    }
+
     public class TepHoughLinesP : BaseToolEditParas
     {
         public TepHoughLinesP(ObservableRangeCollection<Nd> nodes) : base(nodes)
