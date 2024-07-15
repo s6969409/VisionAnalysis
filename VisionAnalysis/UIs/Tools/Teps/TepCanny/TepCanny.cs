@@ -14,8 +14,8 @@ namespace VisionAnalysis
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
-            Inputs["threshold1"] = new PInput() { value = 200 };
-            Inputs["threshold2"] = new PInput() { value = 255 };
+            Inputs["threshold1"] = new PInput() { value = 100 };
+            Inputs["threshold2"] = new PInput() { value = 200 };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             #endregion
