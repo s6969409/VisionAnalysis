@@ -346,24 +346,6 @@ namespace VisionAnalysis
             });
             return newMat;
         }
-        public static byte colorBuilder(double val, double min, double max) => (byte)((val - min) / (max - min) * byte.MaxValue);
-        public static IEnumerable<MatVal> ConvertDataSets(Mat mat)
-        {
-            ConcurrentBag<MatVal> list = new ConcurrentBag<MatVal>();
-            Parallel.For(0, mat.Height, y =>
-            {
-                for (int x = 0; x < mat.Width; x++)
-                {
-                    list.Add(new MatVal() { X = x, Y = y, Value = mat.Get<double>(y, x) });
-                }
-            });
-            return list;
-        }
-        public struct MatVal
-        {
-            public int X;
-            public int Y;
-            public object Value;
-        }
+        private static byte colorBuilder(double val, double min, double max) => (byte)((val - min) / (max - min) * byte.MaxValue);
     }
 }
