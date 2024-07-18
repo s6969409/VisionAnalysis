@@ -11,6 +11,8 @@ namespace VisionAnalysis
 {
     public class TepInputs : BaseToolEditParas
     {
+        private int index = 0;
+
         public TepInputs(ObservableRangeCollection<Nd> nodes) : base(nodes)
         {
             #region para value default...
@@ -24,12 +26,19 @@ namespace VisionAnalysis
         {
             base.actionProcess();//read paras
 
-            if (File.Exists(Inputs["ImageUrl"].value.ToString()))
+            string ImageUrl = Inputs["ImageUrl"].value.ToString();
+
+            if (Directory.Exists(ImageUrl))
             {
-                Outputs["SourceImage"].value = new Mat(Inputs["ImageUrl"].value.ToString());
+                string[] fs = Directory.GetFiles(ImageUrl);
+                if (++index >= fs.Length) index = 0;
+                ImageUrl = fs[index];
+            }
+            if (File.Exists(ImageUrl))
+            {
+                Outputs["SourceImage"].value = new Mat(ImageUrl);
                 updateUIImage((Mat)Outputs["SourceImage"].value);
             }
-
         };
         #endregion
     }
