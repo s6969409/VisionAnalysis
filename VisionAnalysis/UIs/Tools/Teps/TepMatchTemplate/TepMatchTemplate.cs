@@ -15,13 +15,14 @@ namespace VisionAnalysis
             #region para value default...
             Inputs["TargetImage"] = new PInput() { value = new Mat() };
             Inputs["TemplateImage"] = new PInput() { value = new Mat() };
-            Inputs["method"] = new PInput() { value = TemplateMatchModes.CCoeffNormed };
+            Inputs["method"] = new PInput() { value = TemplateMatchModes.SqDiffNormed };
             Inputs["outlierRatio"] = new PInput() { value = 0.7 };
             Inputs["ptNums"] = new PInput() { value = 0 };
 
             Outputs["OutputResult"] = new POutput() { value = null };
             Outputs["OutputArr"] = new POutput() { value = null };
-            Outputs["OutputMatch"] = new POutput() { value = null };
+            Outputs["OutputMatch"] = new POutput() { value = null }; 
+            Outputs["findPts"] = new POutput() { value = null };
             #endregion
         }
 
@@ -58,6 +59,7 @@ namespace VisionAnalysis
             ptNums = ptNums == 0? (int)Math.Sqrt(outputArr.Count()) : ptNums;
             IEnumerable<MatVal> sortPts = sortByMethod(outputArr);
             IEnumerable<MatVal> findPts = findFeaturePt(sortPts.Take(outputArr.Count() / ptNums), outlierRatio);
+            Outputs["findPts"].value = findPts;
             #endregion
 
             Mat OutputMatch = targetImage.Clone();
