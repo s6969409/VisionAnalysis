@@ -40,10 +40,9 @@ namespace VisionAnalysis
 
             #region process... & output
 
-            Mat result = new Mat(targetImage.Size(), MatType.CV_32F);
+            Mat result = new Mat(targetImage.Size(), MatType.CV_32F, Scalar.Black);
 
             Cv2.MatchTemplate(targetImage, templateImage, result, method);
-            Outputs["OutputResult"].value = result;
             IEnumerable<MatVal> outputArr = ConvertDataSets(result);
             Outputs["OutputArr"].value = outputArr;
             #endregion
@@ -51,23 +50,31 @@ namespace VisionAnalysis
             #region find max & min value
             result.MinMaxIdx(out double minValue, out double maxValue);
             result.MinMaxLoc(out Point minLocation, out Point maxLocation);
+            Outputs["OutputResult"].value = ConvertGrayImg(result, minValue, maxValue);
             #endregion
 
             #region output match locatiom information
+            #region sort calculate value by method
             ptNums = ptNums == 0? (int)Math.Sqrt(outputArr.Count()) : ptNums;
-            IEnumerable<MatVal> findPts = findFeaturePt(outputArr.OrderBy(v => v.Value).Take(outputArr.Count()/ ptNums), outlierRatio);
+            IEnumerable<MatVal> sortPts = sortByMethod(outputArr);
+            IEnumerable<MatVal> findPts = findFeaturePt(sortPts.Take(outputArr.Count() / ptNums), outlierRatio);
+            #endregion
 
             Mat OutputMatch = targetImage.Clone();
+            #region draw max
             Cv2.Rectangle(OutputMatch, new Rect(maxLocation, templateImage.Size()), Scalar.Red);
             Cv2.PutText(OutputMatch, $"Max:{maxValue}", maxLocation + new Point(0, 30), HersheyFonts.HersheySimplex, 1, Scalar.Red, 2);
+            #endregion
             for (int i = 0; i < findPts.Count(); i++)
             {
                 Point pt = new Point(findPts.ElementAt(i).X, findPts.ElementAt(i).Y);
                 Cv2.Rectangle(OutputMatch, new Rect(pt, templateImage.Size()), Scalar.Green);
                 Cv2.PutText(OutputMatch, $"FindVal{i}:{findPts.ElementAt(i).Value}", pt + new Point(0, 30), HersheyFonts.HersheySimplex, 1, Scalar.Green, 2);
             };
+            #region draw min
             Cv2.Rectangle(OutputMatch, new Rect(minLocation, templateImage.Size()), Scalar.Blue);
             Cv2.PutText(OutputMatch, $"Min:{minValue}", minLocation + new Point(0, 30), HersheyFonts.HersheySimplex, 1, Scalar.Blue, 2);
+            #endregion
             Outputs["OutputMatch"].value = OutputMatch;
             updateUIImage(OutputMatch);
             #endregion
@@ -75,14 +82,14 @@ namespace VisionAnalysis
         };
         #endregion
 
-        private IEnumerable<MatVal> ConvertDataSets(Mat mat)
+        private static IEnumerable<MatVal> ConvertDataSets(Mat mat)
         {
             ConcurrentBag<MatVal> list = new ConcurrentBag<MatVal>();
             Parallel.For(0, mat.Height, y =>
             {
                 for (int x = 0; x < mat.Width; x++)
                 {
-                    list.Add(new MatVal() { X = x, Y = y, Value = mat.Get<double>(y, x) });
+                    list.Add(new MatVal() { X = x, Y = y, Value = mat.Get<float>(y, x) });
                 }
             });
             return list;
@@ -145,6 +152,28 @@ namespace VisionAnalysis
                 return new MatVal() { X = x, Y = y, Value = v };
             });
             return c;
+        }
+        public static Mat ConvertGrayImg(Mat mat, double min, double max)
+        {
+            Mat newMat = new Mat(mat.Rows, mat.Cols, MatType.CV_8UC1, Scalar.Black);
+            Parallel.For(0, mat.Height, y =>
+            {
+                for (int x = 0; x < mat.Width; x++)
+                {
+                    byte intensity = colorBuilder(mat.Get<float>(y, x), min, max);
+                    newMat.Set(y, x, intensity);
+                }
+            });
+            return newMat;
+        }
+        private static byte colorBuilder(double val, double min, double max) => (byte)((val - min) / (max - min) * byte.MaxValue);
+        private IEnumerable<MatVal> sortByMethod(IEnumerable<MatVal> data)
+        {
+            TemplateMatchModes method = TepHelper.getEnum<TemplateMatchModes>(Inputs["method"].value);
+            Mat templateImage = Inputs["TemplateImage"].value as Mat;
+            Mat result = new Mat(1, 1, MatType.CV_32F, 0);
+            Cv2.MatchTemplate(templateImage, templateImage, result, method);
+            return data.OrderBy(v => Math.Abs(v.Value - result.Get<float>(0, 0)));
         }
     }
 }

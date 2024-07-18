@@ -329,23 +329,4 @@ namespace VisionAnalysis
         protected void onPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
     #endregion
-
-    public class ImageProcess
-    {
-        public static Mat ConvertGrayImg(Mat mat, double min, double max)
-        {
-            Mat newMat = new Mat(mat.Rows,mat.Cols,MatType.CV_8UC1);
-            Parallel.For(0, mat.Height, y =>
-            {
-                for (int x = 0; x < mat.Width; x++)
-                {
-                    var f = mat.Get<double>(y, x);
-                    var intensity = colorBuilder(mat.Get<double>(y, x), min, max);
-                    newMat.Set(y, x, intensity);
-                }
-            });
-            return newMat;
-        }
-        private static byte colorBuilder(double val, double min, double max) => (byte)((val - min) / (max - min) * byte.MaxValue);
-    }
 }
