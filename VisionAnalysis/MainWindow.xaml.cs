@@ -105,6 +105,14 @@ namespace VisionAnalysis
                     }
                 }
             }
+
+            #region update to UI by selected output param
+            Nd selected = tvl.SelectedItem as Nd;
+            if(selected != null && toolBox != null && selected.value is POutput pOutput)
+            {
+                uc_Analysis.update(pOutput);
+            }
+            #endregion
         }
         private void Load_Click(object sender, RoutedEventArgs e)
         {
