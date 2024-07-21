@@ -54,12 +54,9 @@ namespace VisionAnalysis
             List<DMatch> good = new List<DMatch>();
             foreach (DMatch[] matchPair in matches)
             {
-                foreach (DMatch match in matchPair)
+                if (matchPair[0].Distance < 0.7 * matchPair[1].Distance)
                 {
-                    if (match.Distance < 0.7 * matchPair[1].Distance)
-                    {
-                        good.Add(match);
-                    }
+                    good.Add(matchPair[0]);
                 }
             }
             #endregion
