@@ -58,6 +58,7 @@ namespace VisionAnalysis
         public void update(Mat mat)
         {
             if (!mat.Type().IsInteger) return;
+
             byte[] data0 = new byte[256];
             byte[] data1 = new byte[256];
             byte[] data2 = new byte[256];
@@ -78,11 +79,12 @@ namespace VisionAnalysis
                 chart1.Series.Add(sCrt($"Channel {i}"));
             }
 
+            byte[][] bytes = new byte[][] { data0, data1, data2 };
             for (int i = 0; i < 256; i++)
             {
                 for (int j = 0; j < chart1.Series.Count; j++)
                 {
-                    chart1.Series[j].Points.AddY(data0[i]);
+                    chart1.Series[j].Points.AddY(bytes[j][i]);
                 }
             }
         }

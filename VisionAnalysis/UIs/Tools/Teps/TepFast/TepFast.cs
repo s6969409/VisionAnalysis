@@ -16,6 +16,7 @@ namespace VisionAnalysis
             Inputs["InputImage"] = new PInput() { value = new Mat() };
             Inputs["threshold"] = new PInput() { value = 10 };
             Inputs["nonmaxSuppression"] = new PInput() { value = true };
+            Inputs["Type"] = new PInput() { value = 2 };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             Outputs["keyPoints"] = new POutput();
@@ -29,15 +30,18 @@ namespace VisionAnalysis
             Mat source = Inputs["InputImage"].value as Mat;
             int threshold = (int)Inputs["threshold"].value;
             bool nonmaxSuppression = (bool)Inputs["nonmaxSuppression"].value;
+            int Type = (int)Inputs["Type"].value;
 
             //process...
             FastFeatureDetector fastFeatureDetector = FastFeatureDetector.Create(threshold, nonmaxSuppression);
+            fastFeatureDetector.Type = Type;
             KeyPoint[] keyPoints = fastFeatureDetector.Detect(source);
             Outputs["keyPoints"].value = keyPoints;
             Mat result = new Mat();
             Cv2.DrawKeypoints(source, keyPoints, result, flags: DrawMatchesFlags.NotDrawSinglePoints);
 
             Outputs["Output1"].value = result;
+            updateUIImage(result);
         };
         #endregion
     }
