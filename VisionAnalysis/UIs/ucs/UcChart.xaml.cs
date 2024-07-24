@@ -37,16 +37,18 @@ namespace VisionAnalysis
             for (int i = 0; i < colsF.Length; i++)
             {
                 chart1.Series.Add(sCrt(colsF[i].Name));
+                chart1.Series[i].ToolTip = "X = #VALX, Y = #VALY";
             }
-            foreach (var item in queryable)
+            object[] objs = data.Cast<object>().ToArray();
+            for (int x = 0; x < data.Cast<object>().Count(); x++)
             {
-                FieldInfo[] fields = item.GetType().GetFields();
+                FieldInfo[] fields = objs[x].GetType().GetFields();
                 for (int i = 0; i < fields.Length; i++)
                 {
-                    var y = item.GetType().GetFields()[i].GetValue(item);
+                    var y = objs[x].GetType().GetFields()[i].GetValue(objs[x]);
                     try
                     {
-                        chart1.Series[i].Points.AddY(y);
+                        chart1.Series[i].Points.AddXY(x,y);
                     }
                     catch(Exception e)
                     {

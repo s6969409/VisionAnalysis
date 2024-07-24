@@ -105,7 +105,6 @@ namespace VisionAnalysis
         private IEnumerable<MatVal> findFeaturePt(IEnumerable<MatVal> pts,double outlierRatio, int threshold = 1)
         {
             List<List<MatVal>> groups = new List<List<MatVal>>();
-            List<MatVal> list = new List<MatVal>();
 
             foreach (MatVal pv in pts)
             {

@@ -25,14 +25,16 @@ namespace VisionAnalysis
         #region override BaseToolEditParas member
         public override Action actionProcess => () =>
         {
+            #region get input para
             base.actionProcess();//read paras
 
             Mat source = Inputs["InputImage"].value as Mat;
             int threshold = (int)Inputs["threshold"].value;
             bool nonmaxSuppression = (bool)Inputs["nonmaxSuppression"].value;
             int Type = (int)Inputs["Type"].value;
+            #endregion
 
-            //process...
+            #region process... & output
             FastFeatureDetector fastFeatureDetector = FastFeatureDetector.Create(threshold, nonmaxSuppression);
             fastFeatureDetector.Type = Type;
             KeyPoint[] keyPoints = fastFeatureDetector.Detect(source);
@@ -42,6 +44,7 @@ namespace VisionAnalysis
 
             Outputs["Output1"].value = result;
             updateUIImage(result);
+            #endregion
         };
         #endregion
     }
