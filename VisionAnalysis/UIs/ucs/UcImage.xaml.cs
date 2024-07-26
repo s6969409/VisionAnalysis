@@ -39,7 +39,7 @@ namespace VisionAnalysis
                 img.Source = value == null || value.Total() == 0 ? null : value.ToBitmapSource();
                 if (value == null) return;
                 lb_size.Content = $"{value.Width}*{value.Height}*{value.Channels()}";
-                lb_format.Content = $"{value.Depth()},Dims={value.Dims}";
+                lb_format.Content = $"{value.Depth()},{value.Type()}";
 
                 lb_position.Content = $"pos:-";
                 lb_value.Content = $"value:-";

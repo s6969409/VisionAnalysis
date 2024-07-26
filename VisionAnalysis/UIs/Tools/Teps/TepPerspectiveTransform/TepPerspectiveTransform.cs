@@ -20,6 +20,7 @@ namespace VisionAnalysis
             Inputs["keypoints2"] = new PInput() { value = { } };
 
             Outputs["ProjectLink"] = new POutput() { value = new Mat() };
+            Outputs["ProjectLink2"] = new POutput() { value = new Mat() };
             Outputs["Match"] = new POutput() { value = new Mat() };
             #endregion
         }
@@ -47,16 +48,16 @@ namespace VisionAnalysis
             searchParams.SetInt("Checks", 50);
             FlannBasedMatcher flann = new FlannBasedMatcher(indexParams, searchParams);
 
-            DMatch[][] matches = flann.KnnMatch(queryDescriptors, trainDescriptors, k: 2);
+            DMatch[][] matches = flann.KnnMatch(queryDescriptors, trainDescriptors, k: 3);
             #endregion
 
             #region feature filt
             List<DMatch> good = new List<DMatch>();
-            foreach (DMatch[] matchPair in matches)
+            foreach (DMatch[] match in matches)
             {
-                if (matchPair[0].Distance < 0.7 * matchPair[1].Distance)
+                if (match[0].Distance < 0.7 * match[1].Distance)
                 {
-                    good.Add(matchPair[0]);
+                    good.Add(match[0]);
                 }
             }
             #endregion
@@ -86,6 +87,20 @@ namespace VisionAnalysis
             Mat result = new Mat();
             Cv2.DrawMatches(img1, keypoints1, img2, keypoints2, good, result);
             Outputs["ProjectLink"].value = result;
+            #endregion
+
+            #region ProjectLink2 test
+            List<DMatch> good2 = new List<DMatch>();
+            foreach (DMatch[] match in matches)
+            {
+                if (match[1].Distance < 0.7 * match[2].Distance)
+                {
+                    good2.Add(match[1]);
+                }
+            }
+            Mat result2 = new Mat();
+            Cv2.DrawMatches(img1, keypoints1, img2, keypoints2, good2, result2);
+            Outputs["ProjectLink2"].value = result2;
             #endregion
         };
         #endregion

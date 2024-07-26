@@ -59,7 +59,11 @@ namespace VisionAnalysis
         }
         public void update(Mat mat)
         {
-            if (!mat.Type().IsInteger) return;
+            if (!mat.Type().IsInteger)
+            {
+                chart1.Series.Clear();
+                return;
+            }
 
             byte[] data0 = new byte[256];
             byte[] data1 = new byte[256];
