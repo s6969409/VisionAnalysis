@@ -53,6 +53,7 @@ namespace VisionAnalysis
             else return;
 
             Outputs["Output1"].value = newMat;
+            updateUIImage(newMat);
         };
         #endregion
         public enum OptMethod
