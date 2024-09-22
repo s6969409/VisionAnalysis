@@ -54,6 +54,22 @@ namespace VisionAnalysis
             }
             return nd;
         }
+
+        public static byte colorBuilder(double val, double min, double max) => (byte)((val - min) / (max - min) * byte.MaxValue);
+        public static Mat ConvertGrayImg<T>(Mat mat, double min, double max) where T : struct
+        {
+            Mat newMat = new Mat(mat.Rows, mat.Cols, MatType.CV_8UC1, Scalar.Black);
+            Parallel.For(0, mat.Height, y =>
+            {
+                for (int x = 0; x < mat.Width; x++)
+                {
+                    var a = mat.Get<T>(y, x);
+                    byte intensity = colorBuilder(Convert.ToDouble(mat.Get<T>(y, x)), min, max);
+                    newMat.Set(y, x, intensity);
+                }
+            });
+            return newMat;
+        }
     }
 
     #region IToolEditParas interface & base sample implement
@@ -300,8 +316,8 @@ namespace VisionAnalysis
             else if (pi.value is double doubleVal) jobject["value"] = doubleVal;
             else if (pi.value is bool boolVal) jobject["value"] = boolVal;
             else if (pi.value is string strVal) jobject["value"] = strVal;
-            else if (pi.value.GetType().IsEnum) jobject["value"] = pi.value.ToString();
             else if (pi.value == null) jobject["value"] = null;
+            else if (pi.value.GetType().IsEnum) jobject["value"] = pi.value.ToString();
             //else throw new Exception($"{pi.value.GetType().FullName} not define saveMethod!");
 
             return jobject;

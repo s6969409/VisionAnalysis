@@ -51,7 +51,7 @@ namespace VisionAnalysis
             #region find max & min value
             result.MinMaxIdx(out double minValue, out double maxValue);
             result.MinMaxLoc(out Point minLocation, out Point maxLocation);
-            Outputs["OutputResult"].value = ConvertGrayImg(result, minValue, maxValue);
+            Outputs["OutputResult"].value = TepHelper.ConvertGrayImg<float>(result, minValue, maxValue);
             #endregion
 
             #region output match locatiom information
@@ -154,20 +154,6 @@ namespace VisionAnalysis
             });
             return c;
         }
-        public static Mat ConvertGrayImg(Mat mat, double min, double max)
-        {
-            Mat newMat = new Mat(mat.Rows, mat.Cols, MatType.CV_8UC1, Scalar.Black);
-            Parallel.For(0, mat.Height, y =>
-            {
-                for (int x = 0; x < mat.Width; x++)
-                {
-                    byte intensity = colorBuilder(mat.Get<float>(y, x), min, max);
-                    newMat.Set(y, x, intensity);
-                }
-            });
-            return newMat;
-        }
-        private static byte colorBuilder(double val, double min, double max) => (byte)((val - min) / (max - min) * byte.MaxValue);
         private IEnumerable<MatVal> sortByMethod(IEnumerable<MatVal> data)
         {
             TemplateMatchModes method = TepHelper.getEnum<TemplateMatchModes>(Inputs["method"].value);

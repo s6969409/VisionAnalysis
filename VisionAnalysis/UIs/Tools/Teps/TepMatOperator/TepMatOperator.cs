@@ -29,24 +29,35 @@ namespace VisionAnalysis
             OptMethod optMethod = TepHelper.getEnum<OptMethod>(Inputs["OptMethod"].value);
 
             //process...
-            MatExpr matExpr = null;
-            if (optMethod== OptMethod.Addition)
-                matExpr = source1 + source2;
-            else if (optMethod== OptMethod.Subtraction)
-                matExpr = source1 - source2;
+            Mat newMat;
+            if (optMethod == OptMethod.Addition)
+                newMat = (Mat)(source1 + source2);
+            else if (optMethod == OptMethod.Subtraction)
+                newMat = (Mat)(source1 - source2);
             else if (optMethod == OptMethod.Multiplication)
-                matExpr = source1 * source2;
+                newMat = (Mat)(source1 * source2);
             else if (optMethod == OptMethod.Division)
-                matExpr = source1 / source2;
+                newMat = (Mat)(source1 / source2);
             else if (optMethod == OptMethod.Inverse)
-                matExpr = ~source1;
+                newMat = ~source1;
+            else if (optMethod == OptMethod.ReScaleValue)
+            {
+                source1.MinMaxIdx(out double minV, out double maxV);
+                newMat = TepHelper.ConvertGrayImg<byte>(source1, minV, maxV);
+            }
+            else if (optMethod == OptMethod.Absdiff)
+            {
+                newMat = new Mat();
+                Cv2.Absdiff(source1, source2, newMat);
+            }
+            else return;
 
-            Outputs["Output1"].value = (Mat)matExpr;
+            Outputs["Output1"].value = newMat;
         };
         #endregion
         public enum OptMethod
         {
-            Addition, Subtraction, Multiplication, Division, Inverse
+            Addition, Subtraction, Multiplication, Division, Inverse, ReScaleValue, Absdiff
         }
     }
 }
