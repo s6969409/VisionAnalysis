@@ -16,6 +16,7 @@ namespace VisionAnalysis
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             Outputs["Count"] = new POutput() { value = 0 };
+            Outputs["BlobRects"] = new POutput();
             #endregion
         }
         #region override BaseToolEditParas member
@@ -31,6 +32,7 @@ namespace VisionAnalysis
 
             Mat result = source.Clone();
             cc.RenderBlobs(result);
+            Outputs["BlobRects"].value = cc.Blobs.Select((b,index)=> b.Rect);
 
             Outputs["Output1"].value = result;
             updateUIImage(result);
