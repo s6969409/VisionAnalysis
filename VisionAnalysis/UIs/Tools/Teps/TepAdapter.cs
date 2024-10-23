@@ -195,6 +195,14 @@ namespace VisionAnalysis
                 string[] keyNames = { "p1", "p2" };
                 return keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ParaDictBuilder<Point>(ps[index * 2], ps[index * 2 + 1]) } }).ToDictionary(item => item.Key, item => item.Value);
             }
+            else if (typeof(T) == typeof(RotatedRect))
+            {
+                string[] keyNames = { "rect", "angle" };
+                Dictionary<string, PInput> dict = new Dictionary<string, PInput>();
+                dict["rect"] = new PInput() { value = ps[0] };
+                dict["angle"] = new PInput() { value = ps[1] };
+                return dict;
+            }
             else if (typeof(T) == typeof(Point))
             {
                 string[] keyNames = { "x", "y" };
@@ -222,6 +230,13 @@ namespace VisionAnalysis
                 Size size = new Size(diff.X, diff.Y);
 
                 return (T)(object)new Rect(p1, size);
+            }
+            else if (typeof(T) == typeof(RotatedRect))
+            {
+                Rect rect = toT<Rect>((Dictionary<string, PInput>)dict["rect"].value);
+                double angle = (double)dict["angle"].value;
+                Point2f ct = new Point2f(rect.Location.Y + rect.Size.Width / 2, rect.Location.X + rect.Size.Height / 2);
+                return (T)(object)new RotatedRect(ct, rect.Size, (float)angle);
             }
             else
             {

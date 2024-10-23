@@ -32,6 +32,18 @@ namespace VisionAnalysis
 
             Outputs["Output1"].value = new Mat(inputImage, roi);
             updateUIImage((Mat)Outputs["Output1"].value);
+        }; 
+        public override Action<IParaValue, UcAnalysis> paraSelect => (p, u) =>
+        {
+            if (p.value != Inputs["ROI"].value) return;
+            Dictionary<string, PInput> dictROI = (Dictionary<string, PInput>)Inputs["ROI"].value;
+            Rect roi = toT<Rect>(dictROI);
+            Mat source = Inputs["InputImage"].value as Mat;
+
+            Mat draw = source.Clone();
+            draw.Rectangle(roi, Scalar.Red);
+
+            u.img.Image = draw;
         };
         #endregion
     }
