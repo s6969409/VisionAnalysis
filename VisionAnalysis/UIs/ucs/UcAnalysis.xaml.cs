@@ -34,8 +34,8 @@ namespace VisionAnalysis
         }
         private void loadImg(Mat mat)
         {
-            img.Image = mat == null ? null : mat;
-            focus(img);
+            ucImg.Image = mat == null ? null : mat;
+            focus(ucImg);
             bool useChart = WindowPreference.getCfgValue<bool>(WindowPreference.useChart);
             if (useChart) chart.update(mat);
         }
@@ -45,7 +45,7 @@ namespace VisionAnalysis
             {
                 if (pv.value == null) return;
                 if (pv.value is Mat mat) loadImg(mat);
-                else if (pv.value is Dictionary<string, PInput>) focus(img);
+                else if (pv.value is Dictionary<string, PInput>) focus(ucImg);
                 else if (!(pv.value is string) && pv.value is System.Collections.IEnumerable items && !items.AsQueryable().ElementType.IsArray)
                 {
                     table.update(items);

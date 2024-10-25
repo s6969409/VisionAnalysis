@@ -35,7 +35,7 @@ namespace VisionAnalysis
             cc_valueUIInit();
 
             this.toolEditParas = toolEditParas;
-            toolEditParas.UIImage = uc_Analysis.img;
+            toolEditParas.UIImage = uc_Analysis.ucImg;
 
             Nd ndInput = new Nd(toolEditParas, "Inputs", null);
             ndInput.childNodes.AddRange(toolEditParas.Inputs.Select(i => TepHelper.NdBuild(toolEditParas, i)));

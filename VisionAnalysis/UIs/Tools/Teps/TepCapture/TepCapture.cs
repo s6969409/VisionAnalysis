@@ -43,7 +43,7 @@ namespace VisionAnalysis
             Mat draw = source.Clone();
             draw.Rectangle(roi, Scalar.Red);
 
-            u.img.Image = draw;
+            u.ucImg.Image = draw;
         };
         #endregion
     }
