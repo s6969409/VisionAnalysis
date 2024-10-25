@@ -135,6 +135,7 @@
     <Compile Include="UIs\Tools\Teps\TepCornerHarris\TepCornerHarris.cs" />
     <Compile Include="UIs\Tools\Teps\TepCvtColor\TepCvtColor.cs" />
     <Compile Include="UIs\Tools\Teps\TepMatchTemplate\TepMatchTemplate.cs" />
+    <Compile Include="UIs\Tools\Teps\TepResize\TepResize.cs" />
     <Compile Include="UIs\Tools\Teps\TepSIFT\TepSIFT.cs" />
     <Compile Include="UIs\Tools\Teps\TepSURF\TepSURF.cs" />
     <Compile Include="UIs\Tools\Trasfer\TepDataTransfer\TepObjParser.cs" />
