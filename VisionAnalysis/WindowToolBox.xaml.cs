@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,7 +21,7 @@ namespace VisionAnalysis
     public partial class WindowToolBox : Window
     {
         private Action<Type> addTool;
-        ObservableRangeCollection<ToolBoxShow> tools = new ObservableRangeCollection<ToolBoxShow>();
+        private ObservableRangeCollection<ToolBoxShow> tools = new ObservableRangeCollection<ToolBoxShow>();
 
         public WindowToolBox(Action<Type> addTool)
         {
@@ -36,10 +37,9 @@ namespace VisionAnalysis
 
         private void tv_Loaded(object sender, RoutedEventArgs e)
         {
-            #region ToolThresHold 重想一下結構
-            ToolBoxShow ToolThresHold = new ToolBoxShow(typeof(UcParaThresHold));
-            tools.Add(ToolThresHold);
-            #endregion
+            Type[] toolTypes = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.Namespace == "VisionAnalysis" && t.Name.Contains("Tep")).ToArray();
+            tools.AddRange(toolTypes.Select(t => new ToolBoxShow(t)));
 
             tv.ItemsSource = tools;
         }

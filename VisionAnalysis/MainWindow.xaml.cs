@@ -1,5 +1,5 @@
-﻿using Emgu.CV;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using Window = System.Windows.Window;
 
 namespace VisionAnalysis
 {
@@ -52,9 +53,6 @@ namespace VisionAnalysis
 
             Mat mat = new Mat();
             nodes.Clear();
-            
-            Nd input = new Nd(new UcParaInputs(nodes) { ToolName = "Inputs" });
-            nodes.Add(input);
 
             tvl.ItemsSource = nodes;
         }
@@ -82,7 +80,7 @@ namespace VisionAnalysis
         {
             Nd selectNd = tvl.SelectedItem as Nd;
             if(selectNd != null && selectNd.value is IToolEditParas)
-                new WindowToolEdit((UserControl)selectNd.value) { Title = selectNd.name }.Show();
+                new WindowToolEdit((IToolEditParas)selectNd.value, nodes) { Title = selectNd.name }.Show();
         }
 
         #region ToolBar click event
@@ -107,12 +105,21 @@ namespace VisionAnalysis
                     }
                 }
             }
+
+            #region update to UI by selected output param
+            Nd selected = tvl.SelectedItem as Nd;
+            if(selected != null && toolBox != null && selected.value is POutput pOutput)
+            {
+                uc_Analysis.update(pOutput);
+            }
+            #endregion
         }
         private void Load_Click(object sender, RoutedEventArgs e)
         {
             string loadPath = PathSelector.getUserSelectPath(PathSelector.PathRequest.ReadFile);
-            string imgDirPath = $@"{Path.GetDirectoryName(loadPath)}\Images";
+            if (!File.Exists(loadPath)) return;
 
+            string imgDirPath = BaseToolEditParas.PathImgDir(loadPath);
             nodes.Clear();
             string str = File.ReadAllText(loadPath);
             JArray jArray = JArray.Parse(str);
@@ -120,33 +127,24 @@ namespace VisionAnalysis
             foreach(JObject jobject in jArray)
             {
                 string toolType = (string)jobject["ToolType"];
-                string toolName = (string)jobject["ToolName"];
-                JObject inputs = (JObject)jobject["Inputs"];
-                JObject outputs = (JObject)jobject["Outputs"];
-                if (typeof(UcParaInputs).FullName.Equals(toolType))
-                {
-                    Nd input = new Nd(new UcParaInputs(nodes, inputs) { ToolName = toolName });
-                    nodes.Add(input);
-                }
-                else if (typeof(UcParaThresHold).FullName.Equals(toolType))
-                {
-                    Nd ToolThresHold = new Nd(new UcParaThresHold(nodes, inputs) { ToolName = toolName });
-                    nodes.Add(ToolThresHold);
-                }
-                else throw new Exception($"無法解析ToolType:\n{toolType}\n程式沒寫!?");
+                Type type = Type.GetType(toolType);
+                if (type == null) throw new Exception($"無法解析ToolType:\n{toolType}\n程式沒寫!?");
 
+                IToolEditParas input = Activator.CreateInstance(type, new object[] { nodes }) as IToolEditParas;
+                input.loadParas(jobject, imgDirPath);
+                nodes.Add(new Nd(input));
             }
         }
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            string savePath = PathSelector.getUserSelectPath(PathSelector.PathRequest.ReadFile);
-            string imgDirPath = $@"{Path.GetDirectoryName(savePath)}\Images";
+            string savePath = PathSelector.getUserSelectPath(PathSelector.PathRequest.SaveFile);
+            if (savePath == null) return;
+            string imgDirPath = BaseToolEditParas.PathImgDir(savePath);
             if (!Directory.Exists(imgDirPath)) Directory.CreateDirectory(imgDirPath);
             foreach(string path in Directory.GetFiles(imgDirPath))
             {
                 File.Delete(path);
             }
-
 
             JArray jArray = new JArray(); 
             foreach(Nd nd in nodes)
@@ -187,42 +185,12 @@ namespace VisionAnalysis
         #region show by selected para
         private void tvl_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            Nd selected = tvl.SelectedItem as Nd;
-            if (selected == null) return;
-            if(selected.value is Mat)
-            {
-                img.Source = Tools.ToBitmapSource((Mat)selected.value);
-            }
-            else if (selected.value is PInput)
-            {
-                PInput selectedInput = selected.value as PInput;
-                if (selectedInput.value is Mat)
-                {
-                    img.Source = Tools.ToBitmapSource((Mat)selectedInput.value);
-                }
-                else
-                {
-                    img.Source = null;
-                }
-            }
-            else if (selected.value is POutput)
-            {
-                POutput selectedInput = selected.value as POutput;
-                if (selectedInput.value is Mat)
-                {
-                    img.Source = Tools.ToBitmapSource((Mat)selectedInput.value);
-                }
-                else
-                {
-                    img.Source = null;
-                }
-            }
-            else
-            {
-                img.Source = null;
-            }
+            Nd selectNd = tvl.SelectedItem as Nd;
+            if (selectNd == null) return;
+            uc_Analysis.update(selectNd.value);
 
-
+            if (selectNd?.value is IToolEditParas) return;
+            selectNd.tool.paraSelect((IParaValue)selectNd.value, uc_Analysis);
         }
         #endregion
         #region events for TreeViewItem remove by MenuItem mouse click
@@ -264,6 +232,13 @@ namespace VisionAnalysis
         #region window API for other window
         private void addTool(Type type)
         {
+            IToolEditParas iTool = Activator.CreateInstance(type, new object[] { nodes }) as IToolEditParas;
+            iTool.ToolName = toolNameGenerate(type);
+            Nd addNd = new Nd(iTool);
+            nodes.Add(addNd);
+        }
+        private string toolNameGenerate(Type type)
+        {
             int num = 1;
             string toolName = $"{type.Name}{num}";
             bool hasSameName = true;
@@ -282,22 +257,33 @@ namespace VisionAnalysis
                     }
                 }
             }
-
-            Nd addNd;
-            if (type == typeof(UcParaThresHold))
-            {
-                addNd = new Nd(new UcParaThresHold(nodes) { ToolName = toolName });
-            }
-            else { addNd = null; }
-
-            nodes.Add(addNd);
+            return toolName;
         }
         #endregion
 
+        private void tvl_Drop(object sender, DragEventArgs e)
+        {
+            string[] paths = e.Data.GetData(DataFormats.FileDrop) as string[];
+            if (paths.Length != 1) return;
 
+            IToolEditParas iTool = new TepInputs(nodes);
+            iTool.ToolName = toolNameGenerate(typeof(TepInputs));
+            iTool.Inputs["ImageUrl"].value = paths[0];
+            iTool.actionProcess();
+            Nd addNd = new Nd(iTool);
+            nodes.Add(addNd);
+        }
+
+        private void tvl_DragEnter(object sender, DragEventArgs e)
+        {
+
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effects = DragDropEffects.Link;
+            else e.Effects = DragDropEffects.None;
+        }
     }
 
-    public interface IPara
+    public interface IUIPara
     {
         string name { get; }
         object value { get; set; }
@@ -316,6 +302,7 @@ namespace VisionAnalysis
     public class Nd : IUITreeViewItem, INotifyPropertyChanged
     {
         public ObservableRangeCollection<IUITreeViewItem> childNodes { get; set; } = new ObservableRangeCollection<IUITreeViewItem>();
+        public IToolEditParas tool;
 
         private string _name;
         public string name
@@ -335,20 +322,57 @@ namespace VisionAnalysis
         }
         public object value { get; set; }
         public bool isExpanded { get; set; } = true;
+        public string tip
+        {
+            get
+            {
+                if (value is IParaValue)
+                {
+                    IParaValue paraVal = value as IParaValue;
+                    if (paraVal.value == null) return "null";
+                    else return $"type: {paraVal.value.GetType()}\nvalue: {paraVal.value}";
+                }
+                else if (value is IToolEditParas)
+                {
+                    IToolEditParas val = value as IToolEditParas;
+                    return $"type: {val.GetType()}\nname: {val.ToolName}";
+                }
+                else
+                {
+                    throw new Exception("UI Node value is not {IParaValue} or {IToolEditParas}");
+                }
+            }
+        }
 
         public Nd(IToolEditParas valueDefault)
         {
             value = valueDefault;
             foreach (var item in valueDefault.Inputs)
             {
-                childNodes.Add(new Nd(item.Key, item.Value));
+                childNodes.Add(buildParaNd(valueDefault, item));
             }
             foreach (var item in valueDefault.Outputs)
             {
-                childNodes.Add(new Nd(item.Key, item.Value));
+                childNodes.Add(buildParaNd(valueDefault, item));
             }
         }
-        public Nd(string name, object value) { _name = name; this.value = value; }
+        public Nd(IToolEditParas tool, string name, object value) {
+            this.tool = tool;
+            _name = name;
+            this.value = value;
+        }
+        private Nd buildParaNd<T>(IToolEditParas tool, KeyValuePair<string, T> item)where T: IParaValue
+        {
+            Nd nd = new Nd(tool, item.Key, item.Value);
+            if (item.Value.value is Dictionary<string, T>)
+            {
+                foreach (KeyValuePair<string, T> i in (Dictionary<string, T>)item.Value.value)
+                {
+                    nd.childNodes.Add(buildParaNd(tool, i));
+                }
+            }
+            return nd;
+        }
 
         public bool CanExpand => childNodes.Count != 0;
         public int FontSize { get => WindowPreference.getCfgValue<int>(WindowPreference.fontSize); }

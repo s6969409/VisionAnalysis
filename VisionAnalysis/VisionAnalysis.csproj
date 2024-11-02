@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\OpenCvSharp4.runtime.win.4.8.0.20230708\build\net48\OpenCvSharp4.runtime.win.props" Condition="Exists('..\packages\OpenCvSharp4.runtime.win.4.8.0.20230708\build\net48\OpenCvSharp4.runtime.win.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,11 +13,14 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,6 +28,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -35,20 +40,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Emgu.CV, Version=4.8.0.5324, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
-      <HintPath>..\packages\Emgu.CV.4.8.0.5324\lib\netstandard2.0\Emgu.CV.dll</HintPath>
-    </Reference>
-    <Reference Include="Emgu.CV.Bitmap, Version=4.8.0.5324, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
-      <HintPath>..\packages\Emgu.CV.Bitmap.4.8.0.5324\lib\netstandard2.0\Emgu.CV.Bitmap.dll</HintPath>
-    </Reference>
-    <Reference Include="Emgu.CV.Platform.NetFramework, Version=4.8.0.5324, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
-      <HintPath>..\packages\Emgu.CV.UI.4.8.0.5324\lib\net461\Emgu.CV.Platform.NetFramework.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.7.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp4.4.8.0.20230708\lib\net48\OpenCvSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp4.Extensions.4.8.0.20230708\lib\net48\OpenCvSharp.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.WpfExtensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp4.WpfExtensions.4.8.0.20230708\lib\net48\OpenCvSharp.WpfExtensions.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -59,11 +64,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Drawing.Common, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Drawing.Common.7.0.0\lib\net462\System.Drawing.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Drawing.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Drawing.Primitives.4.3.0\lib\net45\System.Drawing.Primitives.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
@@ -85,6 +85,7 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Text.Encodings.Web, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Text.Encodings.Web.7.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
     </Reference>
@@ -97,7 +98,9 @@
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -118,23 +121,59 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UIs\Tools\Teps\TepAlgorithms\TepAlgorithms.cs" />
+    <Compile Include="UIs\Tools\Teps\TepBoundingRect\TepBoundingRect.cs" />
+    <Compile Include="UIs\Tools\Teps\TepFast\TepFast.cs" />
+    <Compile Include="UIs\Tools\Teps\TepFilter\TepFilter.cs" />
+    <Compile Include="UIs\Tools\Teps\TepHough\TepHoughs.cs" />
+    <Compile Include="UIs\Tools\Teps\TepMatchShapes\TepMatchShapes.cs" />
+    <Compile Include="UIs\Tools\Teps\TepMatOperator\TepMatOperator.cs" />
+    <Compile Include="UIs\Tools\Teps\TepPerspectiveTransform\TepPerspectiveTransform.cs" />
+    <Compile Include="UIs\Tools\Teps\TepBFMatcher\TepBFMatcher.cs" />
+    <Compile Include="UIs\Tools\Teps\TepBlob\TepBlob.cs" />
+    <Compile Include="UIs\Tools\Teps\TepCanny\TepCanny.cs" />
+    <Compile Include="UIs\Tools\Teps\TepCornerHarris\TepCornerHarris.cs" />
+    <Compile Include="UIs\Tools\Teps\TepCvtColor\TepCvtColor.cs" />
+    <Compile Include="UIs\Tools\Teps\TepMatchTemplate\TepMatchTemplate.cs" />
+    <Compile Include="UIs\Tools\Teps\TepResize\TepResize.cs" />
+    <Compile Include="UIs\Tools\Teps\TepSIFT\TepSIFT.cs" />
+    <Compile Include="UIs\Tools\Teps\TepSURF\TepSURF.cs" />
+    <Compile Include="UIs\Tools\Trasfer\TepDataTransfer\TepObjParser.cs" />
+    <Compile Include="UIs\Tools\Teps\TepDilate\TepDilate.cs" />
+    <Compile Include="UIs\Tools\Teps\TepErode\TepErode.cs" />
+    <Compile Include="UIs\Tools\Teps\TepFindContours\TepFindContours.cs" />
+    <Compile Include="UIs\Tools\Teps\TepGetStructuringElement\TepGetStructuringElement.cs" />
+    <Compile Include="UIs\Tools\Teps\TepTest.cs" />
+    <Compile Include="UIs\ucs\UcAnalysis.xaml.cs">
+      <DependentUpon>UcAnalysis.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIs\ucs\UcChart.xaml.cs">
+      <DependentUpon>UcChart.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIs\ucs\UcImage.xaml.cs">
+      <DependentUpon>UcImage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIs\ucs\UcTable.xaml.cs">
+      <DependentUpon>UcTable.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UIs\ucs\UcText.xaml.cs">
       <DependentUpon>UcText.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIs\ucs\UcTree.xaml.cs">
+      <DependentUpon>UcTree.xaml</DependentUpon>
     </Compile>
     <Compile Include="UIs\ucs\WindowPreference.xaml.cs">
       <DependentUpon>WindowPreference.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UIs\ucToolParas\Tools.cs" />
-    <Compile Include="UIs\ucToolParas\UcParaInputs.xaml.cs">
-      <DependentUpon>UcParaInputs.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UIs\ucToolParas\UcParaThresHold.xaml.cs">
-      <DependentUpon>UcParaThresHold.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="UIs\Tools\Teps\TepAdapter.cs" />
+    <Compile Include="UIs\Tools\Teps\TepCapture\TepCapture.cs" />
+    <Compile Include="UIs\Tools\Teps\TepInputs\TepInputs.cs" />
+    <Compile Include="UIs\Tools\Teps\TepThresHold\TepThresHold.cs" />
+    <Compile Include="UIs\Tools.cs" />
     <Compile Include="WindowToolBox.xaml.cs">
       <DependentUpon>WindowToolBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UIs\WindowToolEdit.xaml.cs">
+    <Compile Include="UIs\ucs\WindowToolEdit.xaml.cs">
       <DependentUpon>WindowToolEdit.xaml</DependentUpon>
     </Compile>
     <Page Include="Dictionary1.xaml">
@@ -153,7 +192,27 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UIs\ucs\UcAnalysis.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIs\ucs\UcChart.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIs\ucs\UcImage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIs\ucs\UcTable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UIs\ucs\UcText.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIs\ucs\UcTree.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -161,19 +220,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UIs\ucToolParas\UcParaInputs.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UIs\ucToolParas\UcParaThresHold.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="WindowToolBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UIs\WindowToolEdit.xaml">
+    <Page Include="UIs\ucs\WindowToolEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -206,4 +257,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>此專案參考這部電腦上所缺少的 NuGet 套件。請啟用 NuGet 套件還原，以下載該套件。如需詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的檔案是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\OpenCvSharp4.runtime.win.4.8.0.20230708\build\net48\OpenCvSharp4.runtime.win.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenCvSharp4.runtime.win.4.8.0.20230708\build\net48\OpenCvSharp4.runtime.win.props'))" />
+  </Target>
 </Project>
