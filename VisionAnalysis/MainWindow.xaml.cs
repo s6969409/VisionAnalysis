@@ -31,6 +31,7 @@ namespace VisionAnalysis
         public MainWindow()
         {
             InitializeComponent();
+            uc_Analysis.ucImg.actionScaleChanged = ucImg_ScaleChanged;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -185,6 +186,15 @@ namespace VisionAnalysis
         #region show by selected para
         private void tvl_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            updatePara();
+        }
+        private void ucImg_ScaleChanged()
+        {
+            updatePara();
+        }
+        private void updatePara()
+        {
+            uc_Analysis.ucImg.cvs.Children.Clear();
             Nd selectNd = tvl.SelectedItem as Nd;
             if (selectNd == null) return;
             uc_Analysis.update(selectNd.value);

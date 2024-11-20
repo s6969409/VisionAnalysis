@@ -24,7 +24,7 @@ namespace VisionAnalysis
     {
         public UcImage()
         {
-            InitializeComponent(); 
+            InitializeComponent();
         }
 
         private Mat mat;
@@ -48,7 +48,7 @@ namespace VisionAnalysis
             }
         }
 
-        private double scale
+        public double Scale
         {
             get
             {
@@ -65,13 +65,15 @@ namespace VisionAnalysis
             }
         }
 
+        public Action actionScaleChanged;
+
         private void img_MouseMove(object sender, MouseEventArgs e)
         {
             var pt = e.GetPosition((System.Windows.Controls.Image)sender);
 
             if (Image == null) return;
-            int x = (int)(pt.X / scale);
-            int y = (int)(pt.Y / scale);
+            int x = (int)(pt.X / Scale);
+            int y = (int)(pt.Y / Scale);
 
             lb_position.Content = $"pos:{x},{y}";
             
@@ -81,15 +83,18 @@ namespace VisionAnalysis
                 .Select(i => Image.Type().IsInteger ? Image.At<Vec3b>(y, x)[i].ToString() : Image.At<Vec3f>(y, x)[i].ToString());
             lb_value.Content = $"value:{string.Join(",", vs)}";
         }
+
+
         private void img_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            btn_scale.Content = $"scale:{scale.ToString("0.00")}";
+            btn_scale.Content = $"Scale:{Scale.ToString("0.00")}";
         }
 
         private void btn_scale_Click(object sender, RoutedEventArgs e)
         {
             bool isRealSize = sv_img.VerticalScrollBarVisibility == ScrollBarVisibility.Disabled;
             changeImgZoomType(!isRealSize);
+            actionScaleChanged?.Invoke();
         }
 
         private void changeImgZoomType(bool useRealSize)
@@ -114,6 +119,11 @@ namespace VisionAnalysis
             string savePath = PathSelector.getUserSelectPath(PathSelector.PathRequest.SaveFile);
             if (savePath == null) return;
             Image.ImWrite(savePath);
+        }
+
+        private void uc_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            actionScaleChanged();
         }
     }
     public interface IMatProperty

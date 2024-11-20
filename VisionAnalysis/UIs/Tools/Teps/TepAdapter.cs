@@ -82,7 +82,9 @@ namespace VisionAnalysis
         Action actionProcess { get; }
         Func<string, JObject> getJObjectAndSaveImg { get; }
         Action<JObject, string> loadParas { get; }
+        #region for UI
         Action<IParaValue, UcAnalysis> paraSelect { get; }
+        #endregion
     }
     public class BaseToolEditParas : IToolEditParas
     {

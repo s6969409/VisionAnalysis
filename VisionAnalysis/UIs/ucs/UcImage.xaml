@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:VisionAnalysis"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800" SizeChanged="uc_SizeChanged">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -13,7 +13,10 @@
         </Grid.RowDefinitions>
 
         <ScrollViewer x:Name="sv_img" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" Grid.ColumnSpan="2" Margin="0,0,0,30" Grid.RowSpan="2">
-            <Image x:Name="img" MouseMove="img_MouseMove" SizeChanged="img_SizeChanged" MouseWheel="img_MouseWheel"/>
+            <Grid>
+                <Image x:Name="img" MouseMove="img_MouseMove" SizeChanged="img_SizeChanged" MouseWheel="img_MouseWheel"/>
+                <Canvas x:Name="cvs"/>
+            </Grid>
         </ScrollViewer>
         <ToolBarTray Grid.Row="1" Grid.ColumnSpan="2">
             <ToolBar>

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UI = System.Windows;
 
 namespace VisionAnalysis
 {
@@ -35,15 +36,19 @@ namespace VisionAnalysis
         }; 
         public override Action<IParaValue, UcAnalysis> paraSelect => (p, u) =>
         {
+            u.ucImg.cvs.Children.Clear();
             if (p.value != Inputs["ROI"].value) return;
             Dictionary<string, PInput> dictROI = (Dictionary<string, PInput>)Inputs["ROI"].value;
             Rect roi = toT<Rect>(dictROI);
-            Mat source = Inputs["InputImage"].value as Mat;
 
-            Mat draw = source.Clone();
-            draw.Rectangle(roi, Scalar.Red);
+            if (u.ucImg.Image == null) return;
+            double x = u.ucImg.cvs.ActualWidth - u.ucImg.Image.Width * u.ucImg.Scale;
+            double y = u.ucImg.cvs.ActualHeight - u.ucImg.Image.Height * u.ucImg.Scale;
 
-            u.ucImg.Image = draw;
+            u.ucImg.cvs.Children.Add(VisualHost.draw(dc =>
+            {
+                dc.DrawRectangle(null, new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Rect(roi.X * u.ucImg.Scale + x / 2, roi.Y * u.ucImg.Scale + y / 2, roi.Width * u.ucImg.Scale, roi.Height * u.ucImg.Scale));
+            }));
         };
         #endregion
     }

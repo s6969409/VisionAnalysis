@@ -26,6 +26,7 @@ namespace VisionAnalysis
         {
             InitializeComponent();
 
+            uc_Analysis.ucImg.actionScaleChanged = ucImg_ScaleChanged;
             #region initial fronSize
             int fontSize = WindowPreference.getCfgValue<int>(
                 WindowPreference.fontSize);
@@ -116,6 +117,7 @@ namespace VisionAnalysis
         #region ContentControl cc_value used
         private TextBox textBox = new TextBox();
         private ComboBox comboBox = new ComboBox();
+
         private void cc_valueUIInit()
         {
             Binding binding = new Binding("value");
@@ -124,5 +126,12 @@ namespace VisionAnalysis
         }
         #endregion
 
+        private void ucImg_ScaleChanged()
+        {
+            Nd selected = tv_inputs.SelectedItem as Nd;
+            if (selected == null) return; 
+
+            toolEditParas.paraSelect((IParaValue)selected.value, uc_Analysis);
+        }
     }
 }
