@@ -88,6 +88,7 @@ namespace VisionAnalysis
         private void img_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             btn_scale.Content = $"Scale:{Scale.ToString("0.00")}";
+            actionScaleChanged();
         }
 
         private void btn_scale_Click(object sender, RoutedEventArgs e)
@@ -101,6 +102,7 @@ namespace VisionAnalysis
         {
             sv_img.VerticalScrollBarVisibility = useRealSize ? ScrollBarVisibility.Disabled : ScrollBarVisibility.Auto;
             sv_img.HorizontalScrollBarVisibility = useRealSize ? ScrollBarVisibility.Disabled : ScrollBarVisibility.Auto;
+            sv_img.UpdateLayout();
 
             img.Height = double.NaN;
             img.Width = double.NaN;
@@ -119,11 +121,6 @@ namespace VisionAnalysis
             string savePath = PathSelector.getUserSelectPath(PathSelector.PathRequest.SaveFile);
             if (savePath == null) return;
             Image.ImWrite(savePath);
-        }
-
-        private void uc_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            actionScaleChanged();
         }
     }
     public interface IMatProperty
