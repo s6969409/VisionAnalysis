@@ -86,7 +86,7 @@ namespace VisionAnalysis
         Action<IParaValue, UcAnalysis> paraSelect { get; }
         #endregion
     }
-    public class BaseToolEditParas : IToolEditParas
+    public class BaseToolEditParas : IToolEditParas, IToolTip
     {
         protected ObservableRangeCollection<Nd> nodes;
 
@@ -120,11 +120,11 @@ namespace VisionAnalysis
                 }
                 else if (Inputs[key].value is Enum)
                 {
-                    Inputs[key] = JObjectToPInput(inputs[key], Inputs[key].value.GetType());
+                    Inputs[key] = JObjectToPInput(inputs[key], Inputs[key]);
                 }
                 else if (inputs[key] != null)
                 {
-                    Inputs[key] = JObjectToPInput(inputs[key]);
+                    Inputs[key] = JObjectToPInput(inputs[key], Inputs[key]);
                 }
                 else
                 {
@@ -145,39 +145,31 @@ namespace VisionAnalysis
         }
 
         #region BaseTypeTranfer
-        public static PInput JObjectToPInput(JToken jToken, Type type = null)
+        public static PInput JObjectToPInput(JToken jToken, PInput pInput)
         {
-            object value;
+            Type type = pInput.Type;
 
-            if (jToken["value"] == null) value = null;
-            else if (jToken["value"].Type == JTokenType.Object)
+            if (jToken["value"] == null || jToken["value"].Type == JTokenType.Null) pInput.value = null;
+            else if (jToken["value"].Type == JTokenType.Object && pInput.value is Dictionary<string, PInput> dict)
             {
-                Dictionary<string, PInput> pInput = new Dictionary<string, PInput>();
                 foreach (JProperty jProperty in jToken["value"].ToObject<JObject>().Properties())
                 {
-                    pInput[jProperty.Name] = JObjectToPInput(jProperty.Value);
+                    dict[jProperty.Name] = JObjectToPInput(jProperty.Value, dict[jProperty.Name]);
                 }
-                value = pInput;
+                pInput.value = dict;
             }
             else if (type != null && type.IsEnum && (jToken["value"].Type == JTokenType.String || jToken["value"].Type == JTokenType.Integer))
             {
-                value = Enum.Parse(type, (string)jToken["value"]);
+                pInput.value = Enum.Parse(type, (string)jToken["value"]);
             }
-            else if (jToken["value"].Type == JTokenType.Boolean) value = (bool)jToken["value"];
-            else if (jToken["value"].Type == JTokenType.Float) value = (double)jToken["value"];
-            else if (jToken["value"].Type == JTokenType.Integer) value = (int)jToken["value"];
-            else if (jToken["value"].Type == JTokenType.String) value = (string)jToken["value"];
-            else if (jToken["value"].Type == JTokenType.Null) value = null;
+            else if (jToken["value"].Type == JTokenType.Boolean) pInput.value = (bool)jToken["value"];
+            else if (jToken["value"].Type == JTokenType.Float) pInput.value = (double)jToken["value"];
+            else if (jToken["value"].Type == JTokenType.Integer) pInput.value = (int)jToken["value"];
+            else if (jToken["value"].Type == JTokenType.String) pInput.value = (string)jToken["value"];
             else throw new InvalidCastException($"jToken[value].Type = {jToken["value"].Type} + type = {type} 目前尚未實做!!");
 
-            return BuildCrossReference(jToken, value);
+            return pInput;
         }
-        private static PInput BuildCrossReference(JToken jToken, object value) => new PInput()
-        {
-            ToolName = jToken["ToolName"] == null ? null : jToken["ToolName"].ToString(),
-            ParaName = jToken["ParaName"] == null ? null : jToken["ParaName"].ToString(),
-            value = value
-        };
         public static PInput BuildMatByCrossReference(JToken jToken, string imgDirPath)
         {
             string imgPath = Path.IsPathRooted((string)jToken["value"]) ? (string)jToken["value"] : $@"{imgDirPath}\{(string)jToken["value"]}";
@@ -190,37 +182,39 @@ namespace VisionAnalysis
         }
         #endregion
         #region paraType Tranfer
-        protected static Dictionary<string, PInput> ParaDictBuilder<T>(params object[] ps)
+        protected static PInput ParaDictBuilder<T>(params object[] ps)
         {
+            Dictionary<string, PInput> dictPara = new Dictionary<string, PInput>();
+
             if (typeof(T) == typeof(Rect))
             {
                 string[] keyNames = { "p1", "p2" };
-                return keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ParaDictBuilder<Point>(ps[index * 2], ps[index * 2 + 1]) } }).ToDictionary(item => item.Key, item => item.Value);
+                dictPara = keyNames.Select((keyName, index) => new { Key = keyName, Value = ParaDictBuilder<Point>(ps[index * 2], ps[index * 2 + 1]) }).ToDictionary(item => item.Key, item => item.Value);
             }
             else if (typeof(T) == typeof(RotatedRect))
             {
                 string[] keyNames = { "rect", "angle" };
-                Dictionary<string, PInput> dict = new Dictionary<string, PInput>();
-                dict["rect"] = new PInput() { value = ps[0] };
-                dict["angle"] = new PInput() { value = ps[1] };
-                return dict;
+                dictPara["rect"] = new PInput() { value = ps[0] };
+                dictPara["angle"] = new PInput() { value = ps[1] };
             }
             else if (typeof(T) == typeof(Point))
             {
                 string[] keyNames = { "x", "y" };
-                return keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ps[index] } }).ToDictionary(item => item.Key, item => item.Value);
+                dictPara = keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ps[index] } }).ToDictionary(item => item.Key, item => item.Value);
             }
             else if (typeof(T) == typeof(Size))
             {
                 string[] keyNames = { "Width", "Height" };
-                return keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ps[index] } }).ToDictionary(item => item.Key, item => item.Value);
+                dictPara = keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ps[index] } }).ToDictionary(item => item.Key, item => item.Value);
             }
             else if (typeof(T) == typeof(Scalar))
             {
                 string[] keyNames = { "v0", "v1", "v2", "v3" };
-                return keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ps[index] } }).ToDictionary(item => item.Key, item => item.Value);
+                dictPara = keyNames.Select((keyName, index) => new { Key = keyName, Value = new PInput() { value = ps[index] } }).ToDictionary(item => item.Key, item => item.Value);
             }
             else throw new Exception($"{typeof(T).Name} not define method in ParaDictBuilder!");
+
+            return new PInput() { value = dictPara, Type = typeof(T) };
         }
         protected static T toT<T>(Dictionary<string, PInput> dict)
         {
@@ -250,12 +244,13 @@ namespace VisionAnalysis
             return (T)Activator.CreateInstance(typeof(T), dict.Values.Select(kvPair => kvPair.value).ToArray());
         }
         #endregion
+        public string ToolTip => $"type: {GetType()}\nname: {ToolName}";
     }
     public interface IParaValue
     {
         object value { get; }
     }
-    public class PInput : IParaValue, INotifyPropertyChanged
+    public class PInput : IParaValue, IToolTip, INotifyPropertyChanged
     {
         private string _ToolName;
         public string ToolName
@@ -286,14 +281,18 @@ namespace VisionAnalysis
                 if (_value == null)
                 {
                     _value = value;
+                    Type = _value?.GetType();
                 }
                 else
                 {
                     _value = Convert.ChangeType(value, _value.GetType());
                 }
                 onPropertyChanged(nameof(this.value));
+                onPropertyChanged(nameof(ToolTip));
             }
         }
+        public string ToolTip => $"type: {Type}{(value.GetType().IsValueType || Type == typeof(string) || Type == typeof(Mat) ? $"\nvalue: {value}" : "")}";
+
         public static JObject getJObjectAndSaveImg(Dictionary<string, PInput> inputs, string imgDirPath)
         {
             JObject jobject = new JObject();
@@ -339,13 +338,13 @@ namespace VisionAnalysis
 
             return jobject;
         }
-        public Type Type => _value == null ? null : _value.GetType();
+        public Type Type;
         public Array valueSource => _value == null ? null : Enum.GetValues(_value.GetType());
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void onPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-    public class POutput : IParaValue, INotifyPropertyChanged
+    public class POutput : IParaValue, IToolTip, INotifyPropertyChanged
     {
         private object _value;
         public object value
@@ -354,9 +353,11 @@ namespace VisionAnalysis
             set
             {
                 _value = value;
-                onPropertyChanged(nameof(value));
+                onPropertyChanged(nameof(this.value));
+                onPropertyChanged(nameof(ToolTip));
             }
         }
+        public string ToolTip => $"type: {_value?.GetType()}\nvalue: {_value}";
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void onPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

@@ -309,6 +309,10 @@ namespace VisionAnalysis
         bool CanExpand { get; }
         #endregion
     }
+    public interface IToolTip
+    {
+        string ToolTip { get; }
+    }
     public class Nd : IUITreeViewItem, INotifyPropertyChanged
     {
         public ObservableRangeCollection<IUITreeViewItem> childNodes { get; set; } = new ObservableRangeCollection<IUITreeViewItem>();

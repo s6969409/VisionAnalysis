@@ -14,7 +14,7 @@ namespace VisionAnalysis
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
-            Inputs["dSize"] = new PInput() { value = ParaDictBuilder<Size>(1920, 1080) };
+            Inputs["dSize"] = ParaDictBuilder<Size>(1920, 1080);
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             #endregion

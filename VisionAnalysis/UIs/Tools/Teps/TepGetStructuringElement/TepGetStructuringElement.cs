@@ -13,8 +13,8 @@ namespace VisionAnalysis
         {
             #region para value default...
             Inputs["shape"] = new PInput() { value = MorphShapes.Ellipse };
-            Inputs["ksize"] = new PInput() { value = ParaDictBuilder<Size>(3, 3) };
-            Inputs["anchor"] = new PInput() { value = ParaDictBuilder<Point>(-1, -1) };
+            Inputs["ksize"] = ParaDictBuilder<Size>(3, 3);
+            Inputs["anchor"] = ParaDictBuilder<Point>(-1, -1);
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             #endregion

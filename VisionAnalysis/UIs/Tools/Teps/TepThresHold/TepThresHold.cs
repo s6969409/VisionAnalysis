@@ -37,6 +37,7 @@ namespace VisionAnalysis
                 (int)Inputs["maxValue"].value,
                 TepHelper.getEnum<ThresholdTypes>(Inputs["thresholdType"].value));
             updateUIImage((Mat)Outputs["Output1"].value);
+            Outputs["Output1"].value = Outputs["Output1"].value;
         };
         #endregion
 

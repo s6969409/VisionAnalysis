@@ -14,7 +14,7 @@ namespace VisionAnalysis
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
-            Inputs["ksize"] = new PInput() { value = ParaDictBuilder<Size>(5, 5) };
+            Inputs["ksize"] = ParaDictBuilder<Size>(5, 5);
             Inputs["sigmaX"] = new PInput() { value = 0 };
             Inputs["sigmaY"] = new PInput() { value = 0 };
             Inputs["borderType"] = new PInput() { value = BorderTypes.Default };
@@ -82,8 +82,8 @@ namespace VisionAnalysis
         {
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
-            Inputs["ksize"] = new PInput() { value = ParaDictBuilder<Size>(5, 5) };
-            Inputs["anchor"] = new PInput() { value = ParaDictBuilder<Point>(-1, -1) };
+            Inputs["ksize"] = ParaDictBuilder<Size>(5, 5);
+            Inputs["anchor"] = ParaDictBuilder<Point>(-1, -1);
             Inputs["borderType"] = new PInput() { value = BorderTypes.Default };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };

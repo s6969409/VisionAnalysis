@@ -14,10 +14,10 @@ namespace VisionAnalysis
             #region para value default...
             Inputs["InputImage"] = new PInput() { value = new Mat() };
             Inputs["element"] = new PInput() { value = new Mat() };
-            Inputs["anchor"] = new PInput() { value = ParaDictBuilder<Point>(-1, -1) };
+            Inputs["anchor"] = ParaDictBuilder<Point>(-1, -1);
             Inputs["iterations"] = new PInput() { value = 3 };
             Inputs["borderType"] = new PInput() { value = BorderTypes.Default };
-            Inputs["borderValue"] = new PInput() { value = ParaDictBuilder<Scalar>(255, 0, 0, 0) };
+            Inputs["borderValue"] = ParaDictBuilder<Scalar>(255, 0, 0, 0);
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             #endregion
