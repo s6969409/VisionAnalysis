@@ -88,7 +88,7 @@ namespace VisionAnalysis
         private void img_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             btn_scale.Content = $"Scale:{Scale.ToString("0.00")}";
-            actionScaleChanged();
+            actionScaleChanged?.Invoke();
         }
 
         private void btn_scale_Click(object sender, RoutedEventArgs e)
