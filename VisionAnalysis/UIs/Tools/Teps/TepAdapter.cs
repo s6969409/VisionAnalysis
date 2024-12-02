@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using UI = System.Windows;
 
 namespace VisionAnalysis
 {
@@ -137,7 +138,23 @@ namespace VisionAnalysis
             if (UIImage != null) UIImage.Image = mat;
         };
 
-        public virtual Action<IParaValue, UcAnalysis> paraSelect => (p, u) => {};
+        public virtual Action<IParaValue, UcAnalysis> paraSelect => (p, u) => 
+        {
+            u.ucImg.cvs.Children.Clear();
+            if(p is PInput pInput && pInput.Type == typeof(Rect))
+            {
+                Rect roi = toT<Rect>((Dictionary<string, PInput>)p.value); 
+
+                if (u.ucImg.Image == null) return;
+                double x = u.ucImg.cvs.ActualWidth - u.ucImg.Image.Width * u.ucImg.Scale;
+                double y = u.ucImg.cvs.ActualHeight - u.ucImg.Image.Height * u.ucImg.Scale;
+
+                u.ucImg.cvs.Children.Add(VisualHost.draw(dc =>
+                {
+                    dc.DrawRectangle(null, new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Rect(roi.X * u.ucImg.Scale + x / 2, roi.Y * u.ucImg.Scale + y / 2, roi.Width * u.ucImg.Scale, roi.Height * u.ucImg.Scale));
+                }));
+            }
+        };
 
         public static string PathImgDir(string pathJson)
         {
