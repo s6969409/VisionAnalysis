@@ -87,7 +87,7 @@ namespace VisionAnalysis
 
         private void img_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            btn_scale.Content = $"Scale:{Scale.ToString("0.00")}";
+            btn_scale.Content = $"Scale:{Scale:F2}";
             actionScaleChanged?.Invoke();
         }
 
@@ -95,7 +95,6 @@ namespace VisionAnalysis
         {
             bool isRealSize = sv_img.VerticalScrollBarVisibility == ScrollBarVisibility.Disabled;
             changeImgZoomType(!isRealSize);
-            actionScaleChanged?.Invoke();
         }
 
         private void changeImgZoomType(bool useRealSize)
