@@ -186,20 +186,18 @@ namespace VisionAnalysis
         #region show by selected para
         private void tvl_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            updatePara();
-        }
-        private void ucImg_ScaleChanged()
-        {
-            updatePara();
-        }
-        private void updatePara()
-        {
-            uc_Analysis.ucImg.cvs.Children.Clear();
             Nd selectNd = tvl.SelectedItem as Nd;
             if (selectNd == null) return;
             uc_Analysis.update(selectNd.value);
 
             if (selectNd?.value is IToolEditParas) return;
+            selectNd.tool.paraSelect((IParaValue)selectNd.value, uc_Analysis);
+        }
+        private void ucImg_ScaleChanged()
+        {
+            Nd selectNd = tvl.SelectedItem as Nd;
+            if (selectNd == null || selectNd?.value is IToolEditParas) return;
+
             selectNd.tool.paraSelect((IParaValue)selectNd.value, uc_Analysis);
         }
         #endregion
