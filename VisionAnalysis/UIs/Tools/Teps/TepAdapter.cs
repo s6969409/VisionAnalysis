@@ -141,17 +141,31 @@ namespace VisionAnalysis
         public virtual Action<IParaValue, UcAnalysis> paraSelect => (p, u) => 
         {
             u.ucImg.cvs.Children.Clear();
-            if(p is PInput pInput && pInput.Type == typeof(Rect))
+            PInput pInput = p as PInput;
+            if (pInput == null || u.ucImg.Image == null) return;
+            double x = u.ucImg.cvs.ActualWidth - u.ucImg.Image.Width * u.ucImg.Scale;
+            double y = u.ucImg.cvs.ActualHeight - u.ucImg.Image.Height * u.ucImg.Scale;
+            if (pInput.Type == typeof(Rect))
             {
-                Rect roi = toT<Rect>((Dictionary<string, PInput>)p.value); 
-
-                if (u.ucImg.Image == null) return;
-                double x = u.ucImg.cvs.ActualWidth - u.ucImg.Image.Width * u.ucImg.Scale;
-                double y = u.ucImg.cvs.ActualHeight - u.ucImg.Image.Height * u.ucImg.Scale;
+                Rect roi = toT<Rect>((Dictionary<string, PInput>)p.value);
 
                 u.ucImg.cvs.Children.Add(VisualHost.draw(dc =>
                 {
                     dc.DrawRectangle(null, new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Rect(roi.X * u.ucImg.Scale + x / 2, roi.Y * u.ucImg.Scale + y / 2, roi.Width * u.ucImg.Scale, roi.Height * u.ucImg.Scale));
+                }));
+            }
+            else if(pInput.Type == typeof(RotatedRect))
+            {
+                RotatedRect rotatedRect = toT<RotatedRect>((Dictionary<string, PInput>)p.value);
+                Point2f ofs = new Point2f((float)x / 2, (float)y / 2);
+
+                u.ucImg.cvs.Children.Add(VisualHost.draw(dc =>
+                {
+                    Point2f[] pfs = rotatedRect.Points().Select(pf => pf * u.ucImg.Scale + ofs).ToArray();
+                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[0].X, (int)pfs[0].Y), new UI.Point((int)pfs[1].X, (int)pfs[1].Y));
+                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[1].X, (int)pfs[1].Y), new UI.Point((int)pfs[2].X, (int)pfs[2].Y));
+                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[2].X, (int)pfs[2].Y), new UI.Point((int)pfs[3].X, (int)pfs[3].Y));
+                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[3].X, (int)pfs[3].Y), new UI.Point((int)pfs[0].X, (int)pfs[0].Y));
                 }));
             }
         };
@@ -211,8 +225,8 @@ namespace VisionAnalysis
             else if (typeof(T) == typeof(RotatedRect))
             {
                 string[] keyNames = { "rect", "angle" };
-                dictPara["rect"] = new PInput() { value = ps[0] };
-                dictPara["angle"] = new PInput() { value = ps[1] };
+                dictPara["rect"] = ParaDictBuilder<Rect>(ps[0], ps[1], ps[2], ps[3]);
+                dictPara["angle"] = new PInput() { value = ps[4] };
             }
             else if (typeof(T) == typeof(Point))
             {
@@ -247,7 +261,7 @@ namespace VisionAnalysis
             else if (typeof(T) == typeof(RotatedRect))
             {
                 Rect rect = toT<Rect>((Dictionary<string, PInput>)dict["rect"].value);
-                double angle = (double)dict["angle"].value;
+                double angle = (double)dict["angle"].value; 
                 Point2f ct = new Point2f(rect.Location.Y + rect.Size.Width / 2, rect.Location.X + rect.Size.Height / 2);
                 return (T)(object)new RotatedRect(ct, rect.Size, (float)angle);
             }
