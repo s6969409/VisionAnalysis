@@ -78,20 +78,6 @@ namespace VisionAnalysis
             }
 
             dg.IsReadOnly = true;
-            return;
-            FieldInfo[] colsF = queryable.ElementType.GetFields();
-            DataTable dataTable = new DataTable();
-            foreach (FieldInfo fInfo in colsF)
-            {
-                dataTable.Columns.Add(fInfo.Name, fInfo.FieldType);
-            }
-            foreach (var item in queryable)
-            {
-                var args = item.GetType().GetFields().Select(r=>r.GetValue(item)).ToArray();
-                dataTable.Rows.Add(args);
-            }
-            dg.IsReadOnly = true;
-            dg.ItemsSource = dataTable.DefaultView;
         }
     }
 }
