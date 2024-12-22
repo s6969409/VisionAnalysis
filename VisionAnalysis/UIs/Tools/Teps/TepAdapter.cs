@@ -199,6 +199,8 @@ namespace VisionAnalysis
             else if (jToken["value"].Type == JTokenType.String) pInput.value = (string)jToken["value"];
             else throw new InvalidCastException($"jToken[value].Type = {jToken["value"].Type} + type = {type} 目前尚未實做!!");
 
+            pInput.ToolName = jToken["ToolName"] == null ? null : jToken["ToolName"].ToString();
+            pInput.ParaName = jToken["ParaName"] == null ? null : jToken["ParaName"].ToString();
             return pInput;
         }
         public static PInput BuildMatByCrossReference(JToken jToken, string imgDirPath)
