@@ -28,34 +28,66 @@ namespace VisionAnalysis
             InitializeComponent();
         }
 
-        public void update(System.Collections.IEnumerable data)
+        private void addArrElementByBase(IQueryable queryable)
         {
-            IQueryable queryable = data.AsQueryable();
-            FieldInfo[] colsF = queryable.ElementType.GetFields();
+            chart1.Series.Add(sCrt("Value"));
+            chart1.Series[0].ToolTip = "X = #VALX, Y = #VALY";
+            int x = 0;
+            foreach (var item in queryable)
+            {
+                chart1.Series[0].Points.AddXY(x++, item);
+            }
 
-            chart1.Series.Clear();
-            for (int i = 0; i < colsF.Length; i++)
+        }
+        private void addArrElementByStruct(IQueryable queryable)
+        {
+            FieldInfo[] colsF = queryable.ElementType.GetFields();
+            var filterIndexes = colsF.Where(cf =>
+            {
+                Type elementType = cf.FieldType;
+                return cf.FieldType.IsPrimitive;
+            }).Select(cf => Array.IndexOf(colsF, cf));
+
+            foreach (int i in filterIndexes)
             {
                 chart1.Series.Add(sCrt(colsF[i].Name));
-                chart1.Series[i].ToolTip = "X = #VALX, Y = #VALY";
+                chart1.Series[chart1.Series.Count - 1].ToolTip = "X = #VALX, Y = #VALY";
             }
-            object[] objs = data.Cast<object>().ToArray();
-            for (int x = 0; x < data.Cast<object>().Count(); x++)
+            object[] objs = queryable.Cast<object>().ToArray();//data
+            for (int x = 0; x < objs.Length; x++)
             {
                 FieldInfo[] fields = objs[x].GetType().GetFields();
-                for (int i = 0; i < fields.Length; i++)
+                for (int i = 0; i < filterIndexes.Count(); i++)
                 {
-                    var y = objs[x].GetType().GetFields()[i].GetValue(objs[x]);
+                    var y = objs[x].GetType().GetFields()[filterIndexes.ElementAt(i)].GetValue(objs[x]);
+
                     try
                     {
-                        chart1.Series[i].Points.AddXY(x,y);
+                        chart1.Series[i].Points.AddXY(x, y);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         chart1.Series[i].Points.AddY(y.ToString());
                     }
                 }
             }
+        }
+        public void update(System.Collections.IEnumerable data)
+        {
+            IQueryable queryable = data.AsQueryable();
+            Type elementType = queryable.ElementType;
+
+            chart1.Series.Clear();
+            if (elementType.IsPrimitive || elementType == typeof(string))
+            {
+                addArrElementByBase(queryable);
+            }
+            else
+            {
+                addArrElementByStruct(queryable);
+            }
+
+            chart1.ChartAreas[0].AxisX.Minimum = 0;
         }
         public void update(Mat mat)
         {
