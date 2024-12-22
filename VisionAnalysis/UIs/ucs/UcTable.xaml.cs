@@ -28,9 +28,57 @@ namespace VisionAnalysis
             InitializeComponent();
         }
 
+        private DataView dvCraByBase(IQueryable queryable)
+        {
+            Type elementType = queryable.ElementType;
+            DataTable dataTable = new DataTable();
+
+            dataTable.Columns.Add("Index", typeof(int));
+            dataTable.Columns.Add("Value", elementType);
+            int index = 0;
+            foreach (var item in queryable)
+            {
+                dataTable.Rows.Add(index++, item);
+            }
+            return dataTable.DefaultView;
+        }
+        private DataView dvCraByStruct(IQueryable queryable)
+        {
+            Type elementType = queryable.ElementType;
+            DataTable dataTable = new DataTable();
+
+            FieldInfo[] colsF = queryable.ElementType.GetFields();
+            bool containIndex = colsF.Any(fInfo => fInfo.Name == "Index");
+            if (!containIndex) dataTable.Columns.Add("Index", typeof(int));
+            foreach (var fInfo in colsF)
+            {
+                dataTable.Columns.Add(fInfo.Name, fInfo.FieldType);
+            }
+            int index = 0;
+            foreach (var item in queryable)
+            {
+                var values = item.GetType().GetFields().Select(r => r.GetValue(item)).ToArray();
+                if (!containIndex) values = new object[] { index++ }.Concat(values).ToArray();
+                dataTable.Rows.Add(values);
+            }
+            return dataTable.DefaultView;
+        }
         public void update(System.Collections.IEnumerable data)
         {
             IQueryable queryable = data.AsQueryable();
+            Type elementType = queryable.ElementType;
+
+            if (elementType.IsPrimitive || elementType == typeof(string))
+            {
+                dg.ItemsSource = dvCraByBase(queryable);
+            }
+            else
+            {
+                dg.ItemsSource = dvCraByStruct(queryable);
+            }
+
+            dg.IsReadOnly = true;
+            return;
             FieldInfo[] colsF = queryable.ElementType.GetFields();
             DataTable dataTable = new DataTable();
             foreach (FieldInfo fInfo in colsF)

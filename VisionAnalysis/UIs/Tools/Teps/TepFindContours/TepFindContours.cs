@@ -43,7 +43,6 @@ namespace VisionAnalysis
                 Moments moments = Cv2.Moments(c);
                 return new Contour()
                 {
-                    Index = Index,
                     Rect = contoursRange(c),
                     GravityPt = new Point((int)(moments.M10 / moments.M00), (int)(moments.M01 / moments.M00)),
                     Area = Cv2.ContourArea(c),
@@ -78,7 +77,6 @@ namespace VisionAnalysis
         }
         private struct Contour
         {
-            public int Index;
             public Rect Rect;
             public Point GravityPt;
             public double Area;
