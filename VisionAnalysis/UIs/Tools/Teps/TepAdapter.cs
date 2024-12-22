@@ -45,7 +45,7 @@ namespace VisionAnalysis
             string code = arg.ToString();
             return (T)Enum.Parse(typeof(T), code);
         }
-        public static Nd NdBuild<T>(IToolEditParas tool, KeyValuePair<string,T> kvInput)where T: IParaValue
+        public static Nd NdBuild<T>(IToolEditParas tool, KeyValuePair<string, T> kvInput) where T : IParaValue
         {
             Nd nd = new Nd(tool, kvInput.Key, kvInput.Value);
             if (kvInput.Value.value is Dictionary<string, T>)
@@ -104,7 +104,7 @@ namespace VisionAnalysis
             jobject["ToolType"] = GetType().FullName;
             jobject["ToolName"] = ToolName;
             jobject["Inputs"] = PInput.getJObjectAndSaveImg(Inputs, imgDirPath);
-            
+
             return jobject;
         };
         public virtual Action<JObject, string> loadParas => (jobject, imgDirPath) =>
@@ -138,7 +138,7 @@ namespace VisionAnalysis
             if (UIImage != null) UIImage.Image = mat;
         };
 
-        public virtual Action<IParaValue, UcAnalysis> paraSelect => (p, u) => 
+        public virtual Action<IParaValue, UcAnalysis> paraSelect => (p, u) =>
         {
             u.ucImg.cvs.Children.Clear();
             PInput pInput = p as PInput;
@@ -154,7 +154,7 @@ namespace VisionAnalysis
                     dc.DrawRectangle(null, new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Rect(roi.X * u.ucImg.Scale + x / 2, roi.Y * u.ucImg.Scale + y / 2, roi.Width * u.ucImg.Scale, roi.Height * u.ucImg.Scale));
                 }));
             }
-            else if(pInput.Type == typeof(RotatedRect))
+            else if (pInput.Type == typeof(RotatedRect))
             {
                 RotatedRect rotatedRect = toT<RotatedRect>((Dictionary<string, PInput>)p.value);
                 Point2f ofs = new Point2f((float)x / 2, (float)y / 2);
@@ -263,7 +263,7 @@ namespace VisionAnalysis
             else if (typeof(T) == typeof(RotatedRect))
             {
                 Rect rect = toT<Rect>((Dictionary<string, PInput>)dict["rect"].value);
-                double angle = (double)dict["angle"].value; 
+                double angle = (double)dict["angle"].value;
                 Point2f ct = new Point2f(rect.Location.Y + rect.Size.Width / 2, rect.Location.X + rect.Size.Height / 2);
                 return (T)(object)new RotatedRect(ct, rect.Size, (float)angle);
             }
@@ -282,10 +282,11 @@ namespace VisionAnalysis
     public interface IParaValue
     {
         object value { get; }
+        Type Type { get; }
     }
-    public class PInput : IParaValue, IToolTip, INotifyPropertyChanged
+    public class PInput : POutput
     {
-        private string _ToolName;
+        protected string _ToolName;
         public string ToolName
         {
             get => _ToolName;
@@ -295,7 +296,7 @@ namespace VisionAnalysis
                 onPropertyChanged(nameof(ToolName));
             }
         }
-        private string _ParaName;
+        protected string _ParaName;
         public string ParaName
         {
             get => _ParaName;
@@ -305,26 +306,6 @@ namespace VisionAnalysis
                 onPropertyChanged(nameof(ParaName));
             }
         }
-        private object _value;
-        public object value
-        {
-            get => _value;
-            set
-            {
-                if (_value == null)
-                {
-                    _value = value;
-                    Type = _value?.GetType();
-                }
-                else
-                {
-                    _value = Convert.ChangeType(value, _value.GetType());
-                }
-                onPropertyChanged(nameof(this.value));
-                onPropertyChanged(nameof(ToolTip));
-            }
-        }
-        public string ToolTip => $"type: {Type}{(value.GetType().IsValueType || Type == typeof(string) || Type == typeof(Mat) ? $"\nvalue: {value}" : "")}";
 
         public static JObject getJObjectAndSaveImg(Dictionary<string, PInput> inputs, string imgDirPath)
         {
@@ -371,26 +352,35 @@ namespace VisionAnalysis
 
             return jobject;
         }
-        public Type Type;
         public Array valueSource => _value == null ? null : Enum.GetValues(_value.GetType());
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void onPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
     public class POutput : IParaValue, IToolTip, INotifyPropertyChanged
     {
-        private object _value;
-        public object value
+        protected object _value;
+        public virtual object value
         {
             get => _value;
             set
             {
                 _value = value;
+                if (Type == null) Type = _value?.GetType();
                 onPropertyChanged(nameof(this.value));
                 onPropertyChanged(nameof(ToolTip));
             }
         }
-        public string ToolTip => $"type: {_value?.GetType()}\nvalue: {_value}";
+        public virtual string ToolTip
+        {
+            get
+            {
+                Type type = Type == null ? value?.GetType() : Type;
+                string tip = $"type: {type}";
+                if (value?.GetType() == type) tip += $"\nvalue: {value}";
+
+                return tip;
+            }
+        }
+
+        public Type Type { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void onPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
