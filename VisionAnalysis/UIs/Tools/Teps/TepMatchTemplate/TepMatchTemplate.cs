@@ -19,10 +19,10 @@ namespace VisionAnalysis
             Inputs["outlierRatio"] = new PInput() { value = 0.7 };
             Inputs["ptNums"] = new PInput() { value = 0 };
 
-            Outputs["OutputResult"] = new POutput() { value = null };
-            Outputs["OutputArr"] = new POutput() { value = null };
-            Outputs["OutputMatch"] = new POutput() { value = null }; 
-            Outputs["findPts"] = new POutput() { value = null };
+            Outputs["OutputResult"] = new POutput();
+            Outputs["OutputArr"] = new POutput();
+            Outputs["OutputMatch"] = new POutput(); 
+            Outputs["findPts"] = new POutput();
             #endregion
         }
 

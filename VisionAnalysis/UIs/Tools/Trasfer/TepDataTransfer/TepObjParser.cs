@@ -49,7 +49,7 @@ namespace VisionAnalysis
             Inputs["Array"] = new PInput();
             Inputs["Index"] = new PInput() { value = 0 };
             Inputs["PropertyName"] = new PInput() { value = "" };
-            Outputs["Output1"] = new POutput() { value = "" };
+            Outputs["Output1"] = new POutput();
             #endregion
         }
         #region override BaseToolEditParas member

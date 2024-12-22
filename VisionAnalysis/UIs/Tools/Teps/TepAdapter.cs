@@ -362,8 +362,15 @@ namespace VisionAnalysis
             get => _value;
             set
             {
-                _value = value;
-                if (Type == null) Type = _value?.GetType();
+                if (Type == null) Type = value?.GetType();
+                if (_value == null)
+                {
+                    _value = value;
+                }
+                else
+                {
+                    _value = Convert.ChangeType(value, _value.GetType());
+                }
                 onPropertyChanged(nameof(this.value));
                 onPropertyChanged(nameof(ToolTip));
             }

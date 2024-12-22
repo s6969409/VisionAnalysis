@@ -19,7 +19,7 @@ namespace VisionAnalysis
             Inputs["method"] = new PInput() { value = ContourApproximationModes.ApproxSimple };
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
-            Outputs["ContoursDetail"] = new POutput() { value = new List<object>() };
+            Outputs["ContoursDetail"] = new POutput();
             Outputs["Contours"] = new POutput();
             #endregion
         }

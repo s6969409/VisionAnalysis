@@ -22,7 +22,7 @@ namespace VisionAnalysis
 
             Outputs["Output1"] = new POutput() { value = new Mat() };
             Outputs["descriptors"] = new POutput() { value = new Mat() };
-            Outputs["keyPoints"] = new POutput() { value = new KeyPoint[] { } };
+            Outputs["keyPoints"] = new POutput();
             #endregion
         }
         #region override BaseToolEditParas member
