@@ -18,6 +18,7 @@ namespace VisionAnalysis
             #region para value default...
             Inputs["ImageUrl"] = new PInput() { value = "" };
             Outputs["SourceImage"] = new POutput() { value = new Mat() };
+            Outputs["FileName"] = new POutput();
             #endregion
         }
 
@@ -39,6 +40,8 @@ namespace VisionAnalysis
                 Outputs["SourceImage"].value = new Mat(ImageUrl);
                 updateUIImage((Mat)Outputs["SourceImage"].value);
             }
+
+            Outputs["FileName"].value = Path.GetFileName(ImageUrl);
         };
         #endregion
     }
