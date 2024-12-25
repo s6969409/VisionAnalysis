@@ -136,4 +136,37 @@ namespace VisionAnalysis
         #endregion
     }
 
+    public class TepLaplacian : BaseToolEditParas
+    {
+        public TepLaplacian(ObservableRangeCollection<Nd> nodes) : base(nodes)
+        {
+            #region para value default...
+            Inputs["InputImage"] = new PInput() { value = new Mat() };
+            Inputs["ksize"] = new PInput() { value = 1 };
+            Inputs["scale"] = new PInput() { value = 1.0 };
+            Inputs["delta"] = new PInput() { value = 0.0 };
+            Inputs["borderType"] = new PInput() { value = BorderTypes.Default };
+
+            Outputs["Output1"] = new POutput() { value = new Mat() };
+            #endregion
+        }
+        #region override BaseToolEditParas member
+        public override Action actionProcess => () =>
+        {
+            base.actionProcess();//read paras
+
+            Mat source = Inputs["InputImage"].value as Mat;
+            int ksize = (int)Inputs["ksize"].value;
+            double scale = (double)Inputs["scale"].value;
+            double delta = (double)Inputs["delta"].value;
+            BorderTypes borderType = TepHelper.getEnum<BorderTypes>(Inputs["borderType"].value);
+
+            //process...
+            Mat mat = new Mat();
+            Cv2.Laplacian(source, mat, source.Type(), ksize, scale, delta, borderType);
+            Outputs["Output1"].value = mat;
+            updateUIImage(mat);
+        };
+        #endregion
+    }
 }
