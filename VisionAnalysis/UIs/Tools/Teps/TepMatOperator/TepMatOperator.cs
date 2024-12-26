@@ -61,4 +61,29 @@ namespace VisionAnalysis
             Addition, Subtraction, Multiplication, Division, Inverse, ReScaleValue, Absdiff
         }
     }
+
+    public class TepMatInfo : BaseToolEditParas
+    {
+        public TepMatInfo(ObservableRangeCollection<Nd> nodes) : base(nodes)
+        {
+            #region para value default...
+            Inputs["InputImage"] = new PInput() { value = new Mat() };
+
+            Outputs["Mean"] = new POutput();
+            Outputs["Sum"] = new POutput();
+            #endregion
+        }
+        #region override BaseToolEditParas member
+        public override Action actionProcess => () =>
+        {
+            base.actionProcess();//read paras
+
+            Mat source = Inputs["InputImage"].value as Mat;
+
+            Outputs["Mean"].value = Cv2.Mean(source);
+            Outputs["Sum"].value = Cv2.Sum(source);
+        };
+        #endregion
+    }
+
 }
