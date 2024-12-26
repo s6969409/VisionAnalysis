@@ -138,6 +138,7 @@ namespace VisionAnalysis
             if (UIImage != null) UIImage.Image = mat;
         };
 
+        
         public virtual Action<IParaValue, UcAnalysis> paraSelect => (p, u) =>
         {
             u.ucImg.cvs.Children.Clear();
@@ -145,19 +146,23 @@ namespace VisionAnalysis
             if (pInput == null || u.ucImg.Image == null) return;
             double x = u.ucImg.cvs.ActualWidth - u.ucImg.Image.Width * u.ucImg.Scale;
             double y = u.ucImg.cvs.ActualHeight - u.ucImg.Image.Height * u.ucImg.Scale;
+            Point2f ofs = new Point2f((float)x / 2, (float)y / 2);
             if (pInput.Type == typeof(Rect))
             {
                 Rect roi = toT<Rect>((Dictionary<string, PInput>)p.value);
 
                 u.ucImg.cvs.Children.Add(VisualHost.draw(dc =>
                 {
-                    dc.DrawRectangle(null, new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Rect(roi.X * u.ucImg.Scale + x / 2, roi.Y * u.ucImg.Scale + y / 2, roi.Width * u.ucImg.Scale, roi.Height * u.ucImg.Scale));
+                    Point2f[] pfs = roi.Point2fs().Select(pf => pf * u.ucImg.Scale + ofs).ToArray();
+                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[0].X, (int)pfs[0].Y), new UI.Point((int)pfs[1].X, (int)pfs[1].Y));
+                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[1].X, (int)pfs[1].Y), new UI.Point((int)pfs[2].X, (int)pfs[2].Y));
+                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[2].X, (int)pfs[2].Y), new UI.Point((int)pfs[3].X, (int)pfs[3].Y));
+                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[3].X, (int)pfs[3].Y), new UI.Point((int)pfs[0].X, (int)pfs[0].Y));
                 }));
             }
             else if (pInput.Type == typeof(RotatedRect))
             {
                 RotatedRect rotatedRect = toT<RotatedRect>((Dictionary<string, PInput>)p.value);
-                Point2f ofs = new Point2f((float)x / 2, (float)y / 2);
 
                 u.ucImg.cvs.Children.Add(VisualHost.draw(dc =>
                 {

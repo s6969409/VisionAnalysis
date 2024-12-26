@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

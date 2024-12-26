@@ -121,6 +121,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UIs\CvExtensions.cs" />
     <Compile Include="UIs\Tools\Teps\TepAlgorithms\TepAlgorithms.cs" />
     <Compile Include="UIs\Tools\Teps\TepAnalysisLine\TepAnalysisLine.cs" />
     <Compile Include="UIs\Tools\Teps\TepBoundingRect\TepBoundingRect.cs" />
