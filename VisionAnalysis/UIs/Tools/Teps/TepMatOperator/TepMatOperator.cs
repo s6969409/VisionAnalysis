@@ -50,6 +50,16 @@ namespace VisionAnalysis
                 newMat = new Mat();
                 Cv2.Absdiff(source1, source2, newMat);
             }
+            else if (optMethod == OptMethod.Min)
+            {
+                newMat = new Mat();
+                Cv2.Min(source1, source2, newMat);
+            }
+            else if (optMethod == OptMethod.Max)
+            {
+                newMat = new Mat();
+                Cv2.Max(source1, source2, newMat);
+            }
             else return;
 
             Outputs["Output1"].value = newMat;
@@ -58,7 +68,7 @@ namespace VisionAnalysis
         #endregion
         public enum OptMethod
         {
-            Addition, Subtraction, Multiplication, Division, Inverse, ReScaleValue, Absdiff
+            Addition, Subtraction, Multiplication, Division, Inverse, ReScaleValue, Absdiff, Min, Max
         }
     }
 
