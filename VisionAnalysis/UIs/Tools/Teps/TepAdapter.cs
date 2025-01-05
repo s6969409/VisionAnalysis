@@ -168,9 +168,9 @@ namespace VisionAnalysis
                 {
                     Point2f[] pfs = rotatedRect.Points().Select(pf => pf * u.ucImg.Scale + ofs).ToArray();
                     dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[0].X, (int)pfs[0].Y), new UI.Point((int)pfs[1].X, (int)pfs[1].Y));
-                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[1].X, (int)pfs[1].Y), new UI.Point((int)pfs[2].X, (int)pfs[2].Y));
-                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[2].X, (int)pfs[2].Y), new UI.Point((int)pfs[3].X, (int)pfs[3].Y));
-                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[3].X, (int)pfs[3].Y), new UI.Point((int)pfs[0].X, (int)pfs[0].Y));
+                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Blue, 1), new UI.Point((int)pfs[1].X, (int)pfs[1].Y), new UI.Point((int)pfs[2].X, (int)pfs[2].Y));
+                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Green, 1), new UI.Point((int)pfs[2].X, (int)pfs[2].Y), new UI.Point((int)pfs[3].X, (int)pfs[3].Y));
+                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Yellow, 1), new UI.Point((int)pfs[3].X, (int)pfs[3].Y), new UI.Point((int)pfs[0].X, (int)pfs[0].Y));
                 }));
             }
         };
@@ -269,7 +269,7 @@ namespace VisionAnalysis
             {
                 Rect rect = toT<Rect>((Dictionary<string, PInput>)dict["rect"].value);
                 double angle = (double)dict["angle"].value;
-                Point2f ct = new Point2f(rect.Location.Y + rect.Size.Width / 2, rect.Location.X + rect.Size.Height / 2);
+                Point2f ct = new Point2f(rect.Location.X + rect.Size.Width / 2, rect.Location.Y + rect.Size.Height / 2);
                 return (T)(object)new RotatedRect(ct, rect.Size, (float)angle);
             }
             else
