@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace VisionAnalysis
@@ -21,6 +22,16 @@ namespace VisionAnalysis
         // P/Invoke 函數，用於釋放 GDI 資源
         [System.Runtime.InteropServices.DllImport("gdi32.dll")]
         private static extern bool DeleteObject(IntPtr hObject);
+
+        private static Random random = new Random();
+        public static Brush RandomBrush
+        {
+            get
+            {
+                var brushes = typeof(Brushes).GetProperties().ToArray();
+                return (Brush)brushes[random.Next(brushes.Length)].GetValue(null);
+            }
+        }
     }
 
     public class ObservableRangeCollection<T> : ObservableCollection<T>

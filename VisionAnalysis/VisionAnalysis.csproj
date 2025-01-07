@@ -125,6 +125,7 @@
     <Compile Include="UIs\Tools\Teps\TepAlgorithms\TepAlgorithms.cs" />
     <Compile Include="UIs\Tools\Teps\TepAnalysisLine\TepAnalysisLine.cs" />
     <Compile Include="UIs\Tools\Teps\TepBoundingRect\TepBoundingRect.cs" />
+    <Compile Include="UIs\Tools\Teps\TepEdgeDetect\TepEdgeDetect.cs" />
     <Compile Include="UIs\Tools\Teps\TepFast\TepFast.cs" />
     <Compile Include="UIs\Tools\Teps\TepFilter\TepFilter.cs" />
     <Compile Include="UIs\Tools\Teps\TepHough\TepHoughs.cs" />

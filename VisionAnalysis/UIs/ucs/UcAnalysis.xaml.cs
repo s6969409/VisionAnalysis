@@ -69,5 +69,6 @@ namespace VisionAnalysis
                 throw new ArgumentException($"{value} 沒有定義處理函數");
             }
         }
+        public void focusImg() => focus(ucImg);
     }
 }

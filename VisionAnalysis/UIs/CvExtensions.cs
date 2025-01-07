@@ -15,5 +15,28 @@ namespace VisionAnalysis
             rect.BottomRight,
             rect.TopLeft + new Point(0, rect.Height)
         };
+        public static ((Point2f, Point2f), (Point2f, Point2f)) Vector(this RotatedRect rotatedRect)
+        {
+            var pts = rotatedRect.Points();
+
+            for (int i = 0; i < pts.Count(); i++)
+            {
+                int index = i + 1 < pts.Length ? i + 1 : 0;
+                var pp = pts[i] - pts[index];
+                var factor = pp.X * pp.Y < 0 ? -1 : 1;
+                double angle = Math.Acos(pp.X / pp.DistanceTo(default) * factor) / Math.PI * 180;
+                angle = Math.Round(angle, 3);
+                var diff = angle - rotatedRect.Angle;
+                if(diff<0.001)
+                {
+                    int n2st = i - 1 < 0 ? pts.Length : i - 1;
+                    int n2end = index + 1 >= pts.Length ? 0 : index + 1;
+
+                    return ((pts[i], pts[index]), (pts[n2st], pts[n2end]));
+                }
+            }
+
+            return default;
+        }
     }
 }
