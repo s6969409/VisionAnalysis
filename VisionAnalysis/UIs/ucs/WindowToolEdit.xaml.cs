@@ -70,11 +70,12 @@ namespace VisionAnalysis
             }
         }
 
-        private bool[] boolValues = {false, true}; 
+        private bool[] boolValues = {false, true};
         private void tv_inputs_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             cb_ToolName.IsEnabled = true;
             Nd selectedNd = tv_inputs.SelectedItem as Nd;
+            if (selectedNd == null) return;
             string paraName = selectedNd.name;
             PInput val = selectedNd.value as PInput;
             DataContext = null;
@@ -128,7 +129,7 @@ namespace VisionAnalysis
 
         private void ucImg_ScaleChanged()
         {
-            Nd selected = tv_inputs.SelectedItem as Nd;
+            Nd selected = tv_outputs.SelectedItem as Nd;
             if (selected == null) return; 
 
             toolEditParas.paraSelect((IParaValue)selected.value, uc_Analysis);

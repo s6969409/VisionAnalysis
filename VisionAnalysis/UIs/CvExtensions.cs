@@ -29,7 +29,7 @@ namespace VisionAnalysis
                 var diff = angle - rotatedRect.Angle;
                 if(diff<0.001)
                 {
-                    int n2st = i - 1 < 0 ? pts.Length : i - 1;
+                    int n2st = i - 1 < 0 ? pts.Length - 1 : i - 1;
                     int n2end = index + 1 >= pts.Length ? 0 : index + 1;
 
                     return ((pts[i], pts[index]), (pts[n2st], pts[n2end]));
