@@ -14,7 +14,7 @@
 
         <ScrollViewer x:Name="sv_img" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" Grid.ColumnSpan="2" Margin="0,0,0,30" Grid.RowSpan="2">
             <Grid>
-                <Image x:Name="img" MouseMove="img_MouseMove" SizeChanged="img_SizeChanged" MouseWheel="img_MouseWheel"/>
+                <Image x:Name="img" MouseMove="img_MouseMove" SizeChanged="img_SizeChanged" MouseWheel="img_MouseWheel" MouseDown="cvs_MouseDown" MouseUp="cvs_MouseUp" MouseLeave="cvs_MouseLeave"/>
                 <Canvas x:Name="cvs"/>
             </Grid>
         </ScrollViewer>

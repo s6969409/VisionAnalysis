@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
+using UI = System.Windows;
 using System.Windows.Media;
+using OpenCvSharp;
 
 namespace VisionAnalysis
 {
@@ -12,7 +13,7 @@ namespace VisionAnalysis
     {
     }
     #region Image canvas support draw
-    public class VisualHost : UIElement
+    public partial class VisualHost : UI.UIElement
     {
         private Visual _visual;
 
@@ -35,6 +36,34 @@ namespace VisionAnalysis
 
             return new VisualHost(drawingVisual);
         }
+
+        public static VisualHost drawRect(Point2f[] pfs) => draw(dc =>
+        {
+            UI.Point[] pts = pfs.Select(pf => pf.toUIPoint()).ToArray();
+            dc.DrawLine(new Pen(Brushes.Red, 1), pts[0], pts[1]);
+            dc.DrawLine(new Pen(Brushes.Red, 1), pts[1], pts[2]);
+            dc.DrawLine(new Pen(Brushes.Red, 1), pts[2], pts[3]);
+            dc.DrawLine(new Pen(Brushes.Red, 1), pts[3], pts[0]);
+        });
+        private static int ptTolerance = 5;
+        public static VisualHost drawCross(Point2f pf)
+        {
+            UI.Point ptx1 = new UI.Point(pf.X - ptTolerance, pf.Y);
+            UI.Point ptx2 = new UI.Point(pf.X + ptTolerance, pf.Y);
+            UI.Point pty1 = new UI.Point(pf.X, pf.Y - ptTolerance);
+            UI.Point pty2 = new UI.Point(pf.X, pf.Y + ptTolerance);
+
+            return draw(dc =>
+            {
+                dc.DrawLine(new Pen(Brushes.Red, 1), ptx1, ptx2);
+                dc.DrawLine(new Pen(Brushes.Red, 1), pty1, pty2);
+            });
+        }
+
+        public static VisualHost drawText(string text) => draw(dc =>
+        {
+            dc.DrawText(new FormattedText(text, System.Globalization.CultureInfo.CurrentCulture, UI.FlowDirection.LeftToRight, new Typeface(""), 10, Brushes.Blue), new UI.Point());
+        });
     }
 
     #endregion

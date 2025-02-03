@@ -1,19 +1,10 @@
 ﻿using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 
 namespace VisionAnalysis
 {
@@ -69,6 +60,7 @@ namespace VisionAnalysis
 
         private void img_MouseMove(object sender, MouseEventArgs e)
         {
+            MouseMove?.Invoke(e);
             var pt = e.GetPosition((System.Windows.Controls.Image)sender);
 
             if (Image == null) return;
@@ -120,6 +112,35 @@ namespace VisionAnalysis
             string savePath = PathSelector.getUserSelectPath(PathSelector.PathRequest.SaveFile);
             if (savePath == null) return;
             Image.ImWrite(savePath);
+        }
+
+        public Action<MouseButtonEventArgs> MouseDown;
+        public Action<MouseEventArgs> MouseMove;
+        public Action<MouseButtonEventArgs> MouseUp;
+        public Action<MouseEventArgs> MouseLeave;
+
+        private void cvs_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            MouseDown?.Invoke(e);
+        }
+        private void cvs_MouseMove(object sender, MouseEventArgs e)
+        {
+            MouseMove?.Invoke(e);
+        }
+        private void cvs_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            MouseUp?.Invoke(e);
+        }
+        private void cvs_MouseLeave(object sender, MouseEventArgs e)
+        {
+            MouseLeave?.Invoke(e);
+        }
+        public void MouseEventClear()
+        {
+            MouseDown = null;
+            MouseMove = null;
+            MouseUp = null;
+            MouseLeave = null;
         }
     }
     public interface IMatProperty

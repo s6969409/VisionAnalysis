@@ -141,7 +141,9 @@ namespace VisionAnalysis
         
         public virtual Action<IParaValue, UcAnalysis> paraSelect => (p, u) =>
         {
+            //ToDo.參數調整狀態重置
             u.ucImg.cvs.Children.Clear();
+            u.ucImg.MouseEventClear();
             PInput pInput = p as PInput;
             if (pInput == null || u.ucImg.Image == null) return;
             double x = u.ucImg.cvs.ActualWidth - u.ucImg.Image.Width * u.ucImg.Scale;
@@ -151,27 +153,39 @@ namespace VisionAnalysis
             {
                 Rect roi = toT<Rect>((Dictionary<string, PInput>)p.value);
 
-                u.ucImg.cvs.Children.Add(VisualHost.draw(dc =>
-                {
-                    Point2f[] pfs = roi.Point2fs().Select(pf => pf * u.ucImg.Scale + ofs).ToArray();
-                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[0].X, (int)pfs[0].Y), new UI.Point((int)pfs[1].X, (int)pfs[1].Y));
-                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[1].X, (int)pfs[1].Y), new UI.Point((int)pfs[2].X, (int)pfs[2].Y));
-                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[2].X, (int)pfs[2].Y), new UI.Point((int)pfs[3].X, (int)pfs[3].Y));
-                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[3].X, (int)pfs[3].Y), new UI.Point((int)pfs[0].X, (int)pfs[0].Y));
-                }));
+                Point2f[] pfs = roi.Point2fs().Select(pf => pf * u.ucImg.Scale + ofs).ToArray();
+                u.ucImg.cvs.Children.Add(VisualHost.drawRect(pfs));
             }
             else if (pInput.Type == typeof(RotatedRect))
             {
                 RotatedRect rotatedRect = toT<RotatedRect>((Dictionary<string, PInput>)p.value);
 
-                u.ucImg.cvs.Children.Add(VisualHost.draw(dc =>
+                Point2f[] pfs = rotatedRect.Points().Select(pf => pf * u.ucImg.Scale + ofs).ToArray();
+                u.ucImg.cvs.Children.Add(VisualHost.drawRect(pfs));
+            }
+            else if (pInput.Type == typeof(Point))
+            {
+                Point pt = toT<Point>((Dictionary<string, PInput>)p.value);
+
+                Point2f pf = pt * u.ucImg.Scale + ofs;
+                u.ucImg.cvs.Children.Add(VisualHost.drawCross(pf));
+                u.ucImg.MouseMove = e =>
                 {
-                    Point2f[] pfs = rotatedRect.Points().Select(pf => pf * u.ucImg.Scale + ofs).ToArray();
-                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Red, 1), new UI.Point((int)pfs[0].X, (int)pfs[0].Y), new UI.Point((int)pfs[1].X, (int)pfs[1].Y));
-                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Blue, 1), new UI.Point((int)pfs[1].X, (int)pfs[1].Y), new UI.Point((int)pfs[2].X, (int)pfs[2].Y));
-                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Green, 1), new UI.Point((int)pfs[2].X, (int)pfs[2].Y), new UI.Point((int)pfs[3].X, (int)pfs[3].Y));
-                    dc.DrawLine(new UI.Media.Pen(UI.Media.Brushes.Yellow, 1), new UI.Point((int)pfs[3].X, (int)pfs[3].Y), new UI.Point((int)pfs[0].X, (int)pfs[0].Y));
-                }));
+                    bool isClick = e.LeftButton == UI.Input.MouseButtonState.Pressed;
+                    if (isClick)
+                    {
+                        var cp = e.GetPosition(u.ucImg.img).Point2f() + ofs;
+
+                        u.ucImg.cvs.Children.Clear();
+                        u.ucImg.cvs.Children.Add(VisualHost.drawCross(cp));
+                        u.ucImg.cvs.Children.Add(VisualHost.drawText(cp.ToString()));
+
+                        var pi = (Dictionary<string, PInput>)pInput.value;
+                        var newV = e.GetPosition(u.ucImg.img).Point2f() * (1/u.ucImg.Scale);
+                        pi["x"].value = (int)newV.X;
+                        pi["y"].value = (int)newV.Y;
+                    }
+                };
             }
         };
 
