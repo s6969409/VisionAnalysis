@@ -30,7 +30,15 @@ namespace VisionAnalysis
                         {
                             if (pNameKey == tool.Inputs[inputKey].ParaName && toolEditParas.Outputs[pNameKey].value != null)
                             {
-                                tool.Inputs[inputKey].value = toolEditParas.Outputs[pNameKey].value;
+                                if(tool.Inputs[inputKey].value is Dictionary<string, PInput>)
+                                {//struct type
+                                    PInput val = BaseToolEditParas.ParaBuilder(toolEditParas.Outputs[pNameKey].value);
+                                    if (val != null) tool.Inputs[inputKey].value = val.value;
+                                }
+                                else
+                                {//base type
+                                    tool.Inputs[inputKey].value = toolEditParas.Outputs[pNameKey].value;
+                                }
                                 isfound = true;
                                 break;
                             }
@@ -141,7 +149,6 @@ namespace VisionAnalysis
         
         public virtual Action<IParaValue, UcAnalysis> paraSelect => (p, u) =>
         {
-            //ToDo.參數調整狀態重置
             u.ucImg.cvs.Children.Clear();
             u.ucImg.MouseEventClear();
             PInput pInput = p as PInput;
@@ -294,6 +301,33 @@ namespace VisionAnalysis
         private static T Base<T>(Dictionary<string, PInput> dict)
         {
             return (T)Activator.CreateInstance(typeof(T), dict.Values.Select(kvPair => kvPair.value).ToArray());
+        }
+
+        public static PInput ParaBuilder(object obj)
+        {
+            Type type = obj.GetType();
+            if (type == typeof(Point))
+            {
+                Point pt = (Point)obj;
+                return ParaDictBuilder<Point>(pt.X, pt.Y);
+            }
+            else if (type == typeof(Rect))
+            {
+                Rect rect = (Rect)obj;
+                return ParaDictBuilder<Rect>(rect.X, rect.Y, rect.X + rect.Width, rect.Y + rect.Height);
+            }
+            else if (type == typeof(RotatedRect))
+            {
+                RotatedRect rotatedRect = (RotatedRect)obj;
+                return ParaDictBuilder<RotatedRect>(
+                    rotatedRect.Center.X - rotatedRect.Size.Width/2,
+                    rotatedRect.Center.Y - rotatedRect.Size.Height / 2,
+                    rotatedRect.Center.X + rotatedRect.Size.Width / 2,
+                    rotatedRect.Center.Y + rotatedRect.Size.Height / 2,
+                    rotatedRect.Angle
+                    );
+            }
+            else return null;
         }
         #endregion
         public string ToolTip => $"type: {GetType()}\nname: {ToolName}";
