@@ -25,11 +25,10 @@ namespace VisionAnalysis
             {
                 int index = i + 1 < pts.Length ? i + 1 : 0;
                 var pp = pts[i] - pts[index];
-                var factor = pp.X * pp.Y < 0 ? -1 : 1;
-                double angle = Math.Acos(pp.X / pp.DistanceTo(default) * factor) / Math.PI * 180;
+                double angle = Math.Atan2(pp.Y, pp.X) / Math.PI * 180;
                 angle = Math.Round(angle, 3);
                 var diff = angle - rotatedRect.Angle;
-                if(diff<0.001)
+                if (diff < 0.001)
                 {
                     int n2st = i - 1 < 0 ? pts.Length - 1 : i - 1;
                     int n2end = index + 1 >= pts.Length ? 0 : index + 1;
