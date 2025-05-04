@@ -47,6 +47,10 @@ namespace VisionAnalysis
             Outputs["egPts"].value = egPts;
             relationsEdPt = getPtRelation(egPts);
 
+            if (egPts.Count == 0)
+            {
+                return;
+            }
             int mostFrequentIndex = relationsEdPt.GroupBy(n => n).OrderByDescending(g => g.Count()).First().Key;
             var mostFrequentPts = relationsEdPt.Select((r, i) => r == mostFrequentIndex ? egPts[i] : default).Where(pt => pt != default);
             Outputs["egPt"].value = new Point(mostFrequentPts.Average(pt => pt.X), mostFrequentPts.Average(pt => pt.Y));
@@ -76,7 +80,7 @@ namespace VisionAnalysis
                         Point pt = pts[i];
                         dc.DrawEllipse(null, new UI.Media.Pen(Brushes[relationsEdPt[i]], 1), new UI.Point(pt.X, pt.Y), radiusD, radiusD);
                     }
-                    dc.DrawEllipse(null, new UI.Media.Pen(UI.Media.Brushes.Green, 2), new UI.Point(pts.Average(pt => pt.X), pts.Average(pt => pt.Y)), radiusD, radiusD);
+                    if(pts.Count > 0) dc.DrawEllipse(null, new UI.Media.Pen(UI.Media.Brushes.Green, 2), new UI.Point(pts.Average(pt => pt.X), pts.Average(pt => pt.Y)), radiusD, radiusD);
                     dc.DrawEllipse(null, new UI.Media.Pen(UI.Media.Brushes.Blue, 2), new UI.Point(egPt.X, egPt.Y), radiusD, radiusD);
                 }));
                 u.focusImg();
