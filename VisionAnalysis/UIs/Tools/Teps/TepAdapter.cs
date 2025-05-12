@@ -156,21 +156,32 @@ namespace VisionAnalysis
             double x = u.ucImg.cvs.ActualWidth - u.ucImg.Image.Width * u.ucImg.Scale;
             double y = u.ucImg.cvs.ActualHeight - u.ucImg.Image.Height * u.ucImg.Scale;
             Point2f ofs = new Point2f((float)x / 2, (float)y / 2);
-            if (pInput.Type == typeof(Rect))
+            if (!(p.value is string) && p.value is System.Collections.IEnumerable items && !items.AsQueryable().ElementType.IsArray)
+            {
+                foreach (var item in items)
+                {
+                    drawBase((IParaValue)item, u, ofs);
+                }
+            }
+            else drawBase(p, u, ofs);
+        };
+        private static void drawBase(IParaValue p, UcAnalysis u, Point2f ofs)
+        {
+            if (p.Type == typeof(Rect))
             {
                 Rect roi = toT<Rect>((Dictionary<string, PInput>)p.value);
 
                 Point2f[] pfs = roi.Point2fs().Select(pf => pf * u.ucImg.Scale + ofs).ToArray();
                 u.ucImg.cvs.Children.Add(VisualHost.drawRect(pfs));
             }
-            else if (pInput.Type == typeof(RotatedRect))
+            else if (p.Type == typeof(RotatedRect))
             {
                 RotatedRect rotatedRect = toT<RotatedRect>((Dictionary<string, PInput>)p.value);
 
                 Point2f[] pfs = rotatedRect.Points().Select(pf => pf * u.ucImg.Scale + ofs).ToArray();
                 u.ucImg.cvs.Children.Add(VisualHost.drawRect(pfs));
             }
-            else if (pInput.Type == typeof(Point))
+            else if (p.Type == typeof(Point))
             {
                 Point pt = toT<Point>((Dictionary<string, PInput>)p.value);
 
@@ -187,14 +198,14 @@ namespace VisionAnalysis
                         u.ucImg.cvs.Children.Add(VisualHost.drawCross(cp));
                         u.ucImg.cvs.Children.Add(VisualHost.drawText(cp.ToString()));
 
-                        var pi = (Dictionary<string, PInput>)pInput.value;
-                        var newV = e.GetPosition(u.ucImg.img).Point2f() * (1/u.ucImg.Scale);
+                        var pi = (Dictionary<string, PInput>)p.value;
+                        var newV = e.GetPosition(u.ucImg.img).Point2f() * (1 / u.ucImg.Scale);
                         pi["x"].value = (int)newV.X;
                         pi["y"].value = (int)newV.Y;
                     }
                 };
             }
-        };
+        }
 
         public static string PathImgDir(string pathJson)
         {
