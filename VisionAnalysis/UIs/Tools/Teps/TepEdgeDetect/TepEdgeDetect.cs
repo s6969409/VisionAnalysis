@@ -59,6 +59,8 @@ namespace VisionAnalysis
         private int[] relationsEdPt;
         public override Action<IParaValue, UcAnalysis> paraSelect => (p, u) =>
         {
+            base.paraSelect(p, u);
+
             if (p.value == null || u.ucImg.Image == null) return;
             double x = u.ucImg.cvs.ActualWidth - u.ucImg.Image.Width * u.ucImg.Scale;
             double y = u.ucImg.cvs.ActualHeight - u.ucImg.Image.Height * u.ucImg.Scale;
@@ -91,7 +93,6 @@ namespace VisionAnalysis
                 }));
                 u.focusImg();
             }
-            else base.paraSelect(p, u);
         };
         #endregion
 

@@ -156,14 +156,7 @@ namespace VisionAnalysis
             double x = u.ucImg.cvs.ActualWidth - u.ucImg.Image.Width * u.ucImg.Scale;
             double y = u.ucImg.cvs.ActualHeight - u.ucImg.Image.Height * u.ucImg.Scale;
             Point2f ofs = new Point2f((float)x / 2, (float)y / 2);
-            if (!(p.value is string) && p.value is System.Collections.IEnumerable items && !items.AsQueryable().ElementType.IsArray)
-            {
-                foreach (var item in items)
-                {
-                    drawBase((IParaValue)item, u, ofs);
-                }
-            }
-            else drawBase(p, u, ofs);
+            drawBase(p, u, ofs);
         };
         private static void drawBase(IParaValue p, UcAnalysis u, Point2f ofs)
         {
