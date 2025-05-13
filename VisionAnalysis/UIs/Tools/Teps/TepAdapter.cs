@@ -146,16 +146,19 @@ namespace VisionAnalysis
             if (UIImage != null) UIImage.Image = mat;
         };
 
-        
+        protected static Point2f GetOfs(UcAnalysis u)
+        {
+            double x = u.ucImg.cvs.ActualWidth - u.ucImg.Image.Width * u.ucImg.Scale;
+            double y = u.ucImg.cvs.ActualHeight - u.ucImg.Image.Height * u.ucImg.Scale;
+            return new Point2f((float)x / 2, (float)y / 2);
+        }
         public virtual Action<IParaValue, UcAnalysis> paraSelect => (p, u) =>
         {
             u.ucImg.cvs.Children.Clear();
             u.ucImg.MouseEventClear();
             PInput pInput = p as PInput;
             if (pInput == null || u.ucImg.Image == null) return;
-            double x = u.ucImg.cvs.ActualWidth - u.ucImg.Image.Width * u.ucImg.Scale;
-            double y = u.ucImg.cvs.ActualHeight - u.ucImg.Image.Height * u.ucImg.Scale;
-            Point2f ofs = new Point2f((float)x / 2, (float)y / 2);
+            Point2f ofs = GetOfs(u);
             drawBase(p, u, ofs);
         };
         private static void drawBase(IParaValue p, UcAnalysis u, Point2f ofs)
