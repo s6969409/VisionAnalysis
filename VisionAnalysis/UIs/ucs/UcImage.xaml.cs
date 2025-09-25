@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using UI = System.Windows;
 
 namespace VisionAnalysis
 {
@@ -58,25 +59,6 @@ namespace VisionAnalysis
 
         public Action actionScaleChanged;
 
-        private void img_MouseMove(object sender, MouseEventArgs e)
-        {
-            MouseMove?.Invoke(e);
-            var pt = e.GetPosition((System.Windows.Controls.Image)sender);
-
-            if (Image == null) return;
-            int x = (int)(pt.X / Scale);
-            int y = (int)(pt.Y / Scale);
-
-            lb_position.Content = $"pos:{x},{y}";
-            
-            int channels = Image.Channels();
-
-            var vs = Enumerable.Range(0, channels)
-                .Select(i => Image.Type().IsInteger ? Image.At<Vec3b>(y, x)[i].ToString() : Image.At<Vec3f>(y, x)[i].ToString());
-            lb_value.Content = $"value:{string.Join(",", vs)}";
-        }
-
-
         private void img_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             btn_scale.Content = $"Scale:{Scale:F2}";
@@ -105,6 +87,21 @@ namespace VisionAnalysis
             double zoomScale = e.Delta > 0 ? 1.5 : 0.5;
             img.Height = img.ActualHeight * zoomScale;
             img.Width = img.ActualWidth * zoomScale;
+
+            var pt = e.GetPosition((Image)sender);
+            double mx = pt.X - sv_img.HorizontalOffset;
+            double my = pt.Y - sv_img.VerticalOffset;
+            double sbx = pt.X * zoomScale - mx;
+            double sby = pt.Y * zoomScale - my;
+            if (sbx > 0 && sbx < sv_img.ScrollableWidth * zoomScale)
+            {
+                sv_img.ScrollToHorizontalOffset(sbx);
+            }
+            if (sby > 0 && sby < sv_img.ScrollableHeight * zoomScale)
+            {
+                sv_img.ScrollToVerticalOffset(sby);
+            }
+            e.Handled = true;
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -115,17 +112,49 @@ namespace VisionAnalysis
         }
 
         public Action<MouseButtonEventArgs> MouseDown;
-        public Action<MouseEventArgs> MouseMove;
+        public Action<MouseEventArgs, UI.Point> MouseMove;
         public Action<MouseButtonEventArgs> MouseUp;
         public Action<MouseEventArgs> MouseLeave;
 
+        private UI.Point clickPt;
         private void cvs_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            clickPt = e.GetPosition(img);
             MouseDown?.Invoke(e);
         }
-        private void cvs_MouseMove(object sender, MouseEventArgs e)
+        private void img_MouseMove(object sender, MouseEventArgs e)
         {
-            MouseMove?.Invoke(e);
+            var pt = e.GetPosition((Image)sender);
+            MouseMove?.Invoke(e, new UI.Point(sv_img.HorizontalOffset, sv_img.VerticalOffset));
+
+            if (Image == null) return;
+            int x = (int)(pt.X / Scale);
+            int y = (int)(pt.Y / Scale);
+
+            lb_position.Content = $"pos:{x},{y}";
+
+            int channels = Image.Channels();
+
+            var vs = Enumerable.Range(0, channels)
+                .Select(i => Image.Type().IsInteger ? Image.At<Vec3b>(y, x)[i].ToString() : Image.At<Vec3f>(y, x)[i].ToString());
+            lb_value.Content = $"value:{string.Join(",", vs)}";
+            
+            #region mouse move Image
+            if (e.RightButton == MouseButtonState.Pressed && pt.X >= 0 && pt.X < img.ActualWidth && pt.Y >= 0 && pt.Y < img.ActualHeight)
+            {
+                var ofs = pt - clickPt;
+                double sbx = sv_img.HorizontalOffset - ofs.X;
+                double sby = sv_img.VerticalOffset - ofs.Y;
+                if (sbx > 0 && sbx < sv_img.ScrollableWidth)
+                {
+                    sv_img.ScrollToHorizontalOffset(sbx);
+                }
+                if (sby > 0 && sby < sv_img.ScrollableHeight)
+                {
+                    sv_img.ScrollToVerticalOffset(sby);
+                }
+            }
+            #endregion
         }
         private void cvs_MouseUp(object sender, MouseButtonEventArgs e)
         {

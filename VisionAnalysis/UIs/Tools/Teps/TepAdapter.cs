@@ -183,7 +183,7 @@ namespace VisionAnalysis
 
                 Point2f pf = pt * u.ucImg.Scale + ofs;
                 u.ucImg.cvs.Children.Add(VisualHost.drawCross(pf));
-                u.ucImg.MouseMove = e =>
+                u.ucImg.MouseMove = (e, pFov) =>
                 {
                     bool isClick = e.LeftButton == UI.Input.MouseButtonState.Pressed;
                     if (isClick)
@@ -192,7 +192,7 @@ namespace VisionAnalysis
 
                         u.ucImg.cvs.Children.Clear();
                         u.ucImg.cvs.Children.Add(VisualHost.drawCross(cp));
-                        u.ucImg.cvs.Children.Add(VisualHost.drawText(cp.ToString()));
+                        u.ucImg.cvs.Children.Add(VisualHost.drawText(cp.ToString(), pFov));
 
                         var pi = (Dictionary<string, PInput>)p.value;
                         var newV = e.GetPosition(u.ucImg.img).Point2f() * (1 / u.ucImg.Scale);

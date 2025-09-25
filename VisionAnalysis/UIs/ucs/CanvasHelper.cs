@@ -60,9 +60,9 @@ namespace VisionAnalysis
             });
         }
 
-        public static VisualHost drawText(string text) => draw(dc =>
+        public static VisualHost drawText(string text, UI.Point p = default) => draw(dc =>
         {
-            dc.DrawText(new FormattedText(text, System.Globalization.CultureInfo.CurrentCulture, UI.FlowDirection.LeftToRight, new Typeface(""), 10, Brushes.Blue), new UI.Point());
+            dc.DrawText(new FormattedText(text, System.Globalization.CultureInfo.CurrentCulture, UI.FlowDirection.LeftToRight, new Typeface(""), 30, Brushes.Blue), p);
         });
     }
 
