@@ -13,7 +13,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace VisionAnalysis
 {
@@ -28,8 +27,8 @@ namespace VisionAnalysis
         {
             get
             {
-                var brushes = typeof(Brushes).GetProperties().ToArray();
-                return (Brush)brushes[random.Next(brushes.Length)].GetValue(null);
+                Color color = Color.FromRgb((byte)random.Next(256), (byte)random.Next(256), (byte)random.Next(256));
+                return new SolidColorBrush(color);
             }
         }
     }

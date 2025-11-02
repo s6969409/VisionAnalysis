@@ -1,11 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
-using OpenCvSharp;
+﻿using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Media;
+using UI = System.Windows;
 
 namespace VisionAnalysis
 {
@@ -43,6 +43,7 @@ namespace VisionAnalysis
                 Moments moments = Cv2.Moments(c);
                 return new Contour()
                 {
+                    Pts = c,
                     Rect = contoursRange(c),
                     GravityPt = new Point((int)(moments.M10 / moments.M00), (int)(moments.M01 / moments.M00)),
                     Area = Cv2.ContourArea(c),
@@ -59,6 +60,42 @@ namespace VisionAnalysis
             updateUIImage((Mat)Outputs["Output1"].value);
             Outputs["Output1"].value = drawMat;
         };
+
+        public override Action<IParaValue, UcAnalysis> paraSelect => (p, u) =>
+        {
+            if (p == Outputs["ContoursDetail"] && p.value != null && u.ucImg.Image != null)
+            {
+                IEnumerable<Contour> cts = Outputs["ContoursDetail"].value as IEnumerable<Contour>;
+
+                Brush[] bs = cts.Select(c => Tools.RandomBrush).ToArray();
+
+                u.ucImg.MouseDown = e =>
+                {
+
+                };
+                u.ucImg.MouseMove = (e, pt) =>
+                {
+                    //pt: Fov TopLeft position
+                    u.ucImg.cvs.Children.Clear();
+                    var ptM = e.GetPosition(u.ucImg.img).Point2f() * (1 / u.ucImg.Scale);
+                    IEnumerable<Contour> cIn = cts.Where(ct => ((Point)ptM).IsInContour(ct.Pts));
+
+                    for (int i = 0; i < cIn.Count(); i++)
+                    {
+                        Brush brush = bs[i % bs.Length];
+                        Contour ctr = cIn.ElementAt(i);
+                        Point2f ofs = GetOfs(u);
+                        
+                        double tx = (ctr.Rect.Right > u.ucImg.Image.Width - 500 ? ctr.Rect.Left : ctr.Rect.Right) * u.ucImg.Scale + ofs.X;
+                        double ty = (ctr.Rect.Bottom > u.ucImg.Image.Height - 50 ? ctr.Rect.Top : ctr.Rect.Bottom) * u.ucImg.Scale + ofs.Y;
+                        u.ucImg.cvs.Children.Add(VisualHost.drawText($"{ctr.Area}", new UI.Point(tx, ty), brush));
+                        u.ucImg.cvs.Children.Add(VisualHost.drawGeometry(ctr.Pts.Select(pf => pf * u.ucImg.Scale + ofs).ToArray(), u.ucImg.Scale, true, brush));
+                    }
+                };
+
+            }
+            else base.paraSelect(p, u);
+        };
         #endregion
 
         public static Rect contoursRange(Point[] pts)
@@ -73,10 +110,12 @@ namespace VisionAnalysis
                 if (pts[i].Y > maxY) maxY = pts[i].Y;
             }
 
-            return new Rect(minX, minY, maxX - minX, maxY - minY);
+            return new Rect(minX, minY, maxX - minX + 1, maxY - minY + 1);
         }
         private struct Contour
         {
+            public Point[] Pts;
+
             public Rect Rect;
             public Point GravityPt;
             public double Area;

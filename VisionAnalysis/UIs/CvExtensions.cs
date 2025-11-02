@@ -43,6 +43,23 @@ namespace VisionAnalysis
         {
             return new UI.Point(pf.X, pf.Y);
         }
+        public static bool IsInContour(this Point p, Point[] contour)
+        {
+            bool inside = false;
+
+            for (int i = 0, j = contour.Length - 1; i < contour.Length; j = i++)
+            {
+                if (
+                    ((contour[i].Y > p.Y) != (contour[j].Y > p.Y)) &&
+                    (p.X < (contour[j].X - contour[i].X) * (p.Y - contour[i].Y) / (contour[j].Y - contour[i].Y) + contour[i].X)
+                    )
+                {
+                    inside = !inside;
+                }
+            }
+
+            return inside;
+        }
         #endregion
 
         #region UI object
