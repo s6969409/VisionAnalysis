@@ -182,32 +182,10 @@ namespace VisionAnalysis
         //filter format: myTxt|searchName 
         public static readonly string AllFile = "All Files|*.*";
 
-        public static string getFilterStr(string[] filters)
-        {
-            string str = "";
-            foreach (string s in filters)
-            {
-                str += str == string.Empty ? "" : "|";
-                str += s;
-            }
-            return str;
-        }
-        public static string getUserSelectPath(PathRequest request)
-        {
-            return getUserSelectPath(request, new string[] { AllFile });
-        }
-        public static string getUserSelectPath(PathRequest request, string defualtPath)
-        {
-            return getUserSelectPath(request, defualtPath, new string[] { AllFile });
-        }
-        public static string getUserSelectPath(PathRequest request, string[] filterStr)
-        {
-            return getUserSelectPath(request, "", filterStr);
-        }
         public static string getUserSelectPath(
-            PathRequest request, string defualtPath, string[] filterStr)
+            PathRequest request, string defualtPath = "", string[] filterStr = null)
         {
-            string fstr = getFilterStr(filterStr);
+            string fstr = filterStr == null ? AllFile : string.Join("|", filterStr);
             if (request == PathRequest.ReadFile)
             {
                 OpenFileDialog openFileDialog = new OpenFileDialog();

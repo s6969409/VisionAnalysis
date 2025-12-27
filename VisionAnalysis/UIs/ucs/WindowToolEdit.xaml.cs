@@ -90,7 +90,7 @@ namespace VisionAnalysis
                 uc_Analysis.update(val);
 
                 textBox.IsEnabled = false;
-                cc_value.Content = textBox;
+                cc_value.Content = btnBrowse;
             }
             else if (val.value is bool)
             {
@@ -118,12 +118,25 @@ namespace VisionAnalysis
         #region ContentControl cc_value used
         private TextBox textBox = new TextBox();
         private ComboBox comboBox = new ComboBox();
+        private Button btnBrowse = new Button() { Content = "Browse" };
 
         private void cc_valueUIInit()
         {
             Binding binding = new Binding("value");
             textBox.SetBinding(TextBox.TextProperty, binding);
             comboBox.SetBinding(ComboBox.SelectedItemProperty, binding);
+            btnBrowse.SetBinding(Button.TagProperty, binding);
+            btnBrowse.Click += BtnBrowse_Click;
+        }
+
+        private void BtnBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            Nd selectedNd = tv_inputs.SelectedItem as Nd;
+            if (selectedNd == null) return;
+            PInput val = selectedNd.value as PInput;
+
+            string path = PathSelector.getUserSelectPath(PathSelector.PathRequest.ReadFile);
+            val.value = new Mat(path);
         }
         #endregion
 
