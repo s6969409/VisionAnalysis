@@ -142,6 +142,7 @@
     <Compile Include="UIs\Tools\Teps\TepResize\TepResize.cs" />
     <Compile Include="UIs\Tools\Teps\TepSIFT\TepSIFT.cs" />
     <Compile Include="UIs\Tools\Teps\TepSURF\TepSURF.cs" />
+    <Compile Include="UIs\Tools\Teps\TepWarpAffine\TepWarpAffine.cs" />
     <Compile Include="UIs\Tools\Trasfer\TepDataTransfer\TepObjParser.cs" />
     <Compile Include="UIs\Tools\Teps\TepDilate\TepDilate.cs" />
     <Compile Include="UIs\Tools\Teps\TepErode\TepErode.cs" />
