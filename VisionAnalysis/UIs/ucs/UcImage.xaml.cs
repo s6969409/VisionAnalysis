@@ -27,8 +27,9 @@ namespace VisionAnalysis
             {
                 changeImgZoomType(true);
 
-                mat = value; 
-                img.Source = value == null || value.Total() == 0 ? null : value.ToBitmapSource();
+                mat = value;
+                try { img.Source = value.ToBitmapSource(); }
+                catch { img.Source = null; }
                 if (value == null) return;
                 lb_size.Content = $"{value.Width}*{value.Height}*{value.Channels()}";
                 lb_format.Content = $"{value.Depth()},{value.Type()}";
